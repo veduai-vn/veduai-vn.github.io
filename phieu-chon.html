@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chọn nhanh</title>
+<style>
+  :root { --bg:#f4f6fb; --card:#fff; --text:#1d2433; --muted:#667085; --brand:#0068ff; --brand-d:#0053cc; --line:#e3e8f2; --ok:#12805c; --err:#c0392b; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#10131a; --card:#1a1f2b; --text:#eef1f7; --muted:#9aa4b8; --line:#2a3142; --brand:#3b8cff; --brand-d:#2f78e0; --ok:#3ecf9b; --err:#ff7a6b; }
+  }
+  * { box-sizing:border-box; }
+  html,body { margin:0; background:var(--bg); color:var(--text); font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif; }
+  body { min-height:100vh; padding:env(safe-area-inset-top,0) 16px env(safe-area-inset-bottom,0); display:flex; align-items:flex-start; justify-content:center; }
+  .wrap { width:100%; max-width:520px; padding:24px 0; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; }
+  .tag { font-size:13px; color:var(--muted); margin-bottom:8px; }
+  .msg { white-space:pre-wrap; line-height:1.5; font-size:16px; margin:0 0 18px; }
+  button.opt { display:block; width:100%; text-align:left; font:inherit; font-size:16px; padding:14px 16px; margin:0 0 10px; border:1.5px solid var(--brand); background:transparent; color:var(--text); border-radius:12px; cursor:pointer; line-height:1.4; }
+  button.opt:active { background:var(--brand); color:#fff; }
+  button.opt:disabled { opacity:.5; cursor:default; }
+  .state { text-align:center; padding:28px 8px; line-height:1.6; }
+  .state .big { font-size:40px; margin-bottom:8px; }
+  .ok { color:var(--ok); } .err { color:var(--err); } .muted { color:var(--muted); font-size:14px; }
+  .spin { width:28px; height:28px; border:3px solid var(--line); border-top-color:var(--brand); border-radius:50%; animation:r 0.8s linear infinite; margin:0 auto 12px; }
+  @keyframes r { to { transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="wrap"><div class="card" id="card"><div class="state"><div class="spin"></div>Đang tải...</div></div></div>
+
+<script>
+// ĐỔI Ở ĐÂY nếu địa chỉ n8n thay đổi (domain tĩnh của ngrok)
+const API = 'https://devotee-outclass-couch.ngrok-free.dev/webhook';
+const H = { 'ngrok-skip-browser-warning': '1' };
+const card = document.getElementById('card');
+const t = (new URLSearchParams(location.search).get('t') || '').replace(/[^A-Za-z0-9]/g, '');
+
+function state(icon, title, sub, cls) {
+  card.innerHTML = '';
+  const s = document.createElement('div'); s.className = 'state';
+  const a = document.createElement('div'); a.className = 'big'; a.textContent = icon;
+  const b = document.createElement('div'); b.className = cls || ''; b.style.fontWeight = '600'; b.textContent = title;
+  s.append(a, b);
+  if (sub) { const c = document.createElement('div'); c.className = 'muted'; c.textContent = sub; s.appendChild(c); }
+  card.appendChild(s);
+}
+const LY_DO = {
+  khong_co: ['🔍', 'Không tìm thấy phiếu', 'Link không đúng hoặc đã bị xoá. Hãy quay lại Zalo và mở link mới nhất.'],
+  da_dung: ['✅', 'Phiếu này đã được chọn rồi', 'Hãy quay lại Zalo để xem phản hồi.'],
+  het_han: ['⏰', 'Phiếu đã hết hạn', 'Hãy quay lại Zalo và mở link mới nhất.'],
+  sai_lua_chon: ['⚠️', 'Lựa chọn không hợp lệ', 'Hãy tải lại trang và thử lại.']
+};
+function showReason(r) { const x = LY_DO[r] || ['⚠️', 'Có lỗi xảy ra', 'Vui lòng thử lại sau.']; state(x[0], x[1], x[2], 'err'); }
+
+async function load() {
+  if (!t) return showReason('khong_co');
+  try {
+    const r = await fetch(API + '/zalo-phieu-lay?t=' + t, { headers: H });
+    const j = await r.json();
+    if (!j.ok) return showReason(j.reason);
+    render(j);
+  } catch (e) { state('📡', 'Không kết nối được', 'Kiểm tra mạng rồi tải lại trang.', 'err'); }
+}
+function render(j) {
+  card.innerHTML = '';
+  const tag = document.createElement('div'); tag.className = 'tag'; tag.textContent = 'Bấm một lựa chọn bên dưới';
+  card.appendChild(tag);
+  if (j.title) { const p = document.createElement('p'); p.className = 'msg'; p.textContent = j.title; card.appendChild(p); }
+  j.labels.forEach((lb, i) => {
+    const b = document.createElement('button'); b.className = 'opt'; b.type = 'button'; b.textContent = lb;
+    b.onclick = () => submit(i, lb);
+    card.appendChild(b);
+  });
+}
+let sending = false;
+async function submit(i, label) {
+  if (sending) return; sending = true;
+  card.querySelectorAll('button').forEach(b => b.disabled = true);
+  try {
+    const r = await fetch(API + '/zalo-phieu-nop', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, H), body: JSON.stringify({ t, i }) });
+    const j = await r.json();
+    if (j.ok) state('✅', 'Đã ghi nhận: ' + label, 'Bạn quay lại Zalo để xem phản hồi nhé.', 'ok');
+    else showReason(j.reason);
+  } catch (e) { sending = false; card.querySelectorAll('button').forEach(b => b.disabled = false); alert('Chưa gửi được, bạn thử lại nhé.'); }
+}
+load();
+</script>
+</body>
+</html>
