@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Phiếu làm quen</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EEF2EF; --card:#FBFCFB; --ink:#17324D; --muted:#566A60; --line:#C7D2CB;
+  --mark:#FFD84D; --mark-ink:#3A2E00; --err:#B3261E; --ok:#1E7A4C;
+  --font:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{--paper:#101A22; --card:#16232D; --ink:#E6EEF5; --muted:#9FB1BF; --line:#2C3F4E; --mark:#E8C23A; --mark-ink:#241C00; --err:#FF8A80; --ok:#6FD3A0;}
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.55 var(--font);padding:0 0 calc(96px + env(safe-area-inset-bottom,0px))}
+main{max-width:560px;margin:0 auto;padding:28px 18px 8px}
+h1{font-size:26px;line-height:1.25;margin:0 0 6px;font-weight:700}
+.lead{color:var(--muted);margin:0 0 26px}
+section{border-top:1px solid var(--line);padding:22px 0 20px}
+h2{font-size:17px;margin:0 0 4px;font-weight:700}
+.hint{color:var(--muted);font-size:14px;margin:0 0 12px}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.chip{appearance:none;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:600 15px var(--font);min-height:44px;min-width:44px;padding:0 14px;border-radius:10px;cursor:pointer}
+.chip[aria-pressed="true"],.seg button[aria-pressed="true"]{background:var(--mark);border-color:var(--mark);color:var(--mark-ink)}
+.chip:disabled{opacity:.6;cursor:default}
+.lop .chip{flex:1 0 22%}
+.mon{border-top:1px dashed var(--line);padding:14px 0}
+.mon:first-child{border-top:0}
+.mon-head{display:flex;align-items:center;gap:10px;font-weight:600}
+.mon-head input{width:22px;height:22px;accent-color:var(--ink)}
+.mon-body{margin:10px 0 0 32px;display:grid;gap:10px}
+.seg{display:flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+.seg button{flex:1;appearance:none;border:0;border-left:1.5px solid var(--line);background:transparent;color:var(--ink);font:600 14px var(--font);min-height:44px;padding:0 6px;cursor:pointer}
+.seg button:first-child{border-left:0}
+label.f{display:block;font-size:14px;color:var(--muted);margin:0 0 4px}
+input[type=text],input[type=time],select{width:100%;min-height:46px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:400 16px var(--font);padding:0 12px}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.radio{display:flex;gap:12px;align-items:flex-start;border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer}
+.radio input{margin-top:4px;width:20px;height:20px;accent-color:var(--ink)}
+.radio b{display:block}.radio span{color:var(--muted);font-size:14px}
+.radio.on{border-color:var(--ink)}
+.err{color:var(--err);font-size:14px;margin:8px 0 0;min-height:0}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px))}
+.bar-in{max-width:560px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.bar p{flex:1;margin:0;font-size:14px;color:var(--muted)}
+.go{appearance:none;border:0;background:var(--ink);color:var(--card);font:700 16px var(--font);min-height:48px;padding:0 24px;border-radius:12px;cursor:pointer}
+.go:disabled{opacity:.55;cursor:wait}
+.state{max-width:560px;margin:0 auto;padding:56px 18px}
+.state h1{margin-bottom:10px}
+.box{border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:12px;word-break:break-all;font-size:14px;margin:10px 0}
+.link{display:inline-block;margin-top:6px;color:var(--ink);font-weight:600}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:no-preference){.mon-body{animation:in .18s ease-out}@keyframes in{from{opacity:0}to{opacity:1}}}
+</style>
+</head>
+<body>
+<div id="app"><div class="state"><p>Đang mở phiếu…</p></div></div>
+
+<script>
+/* ===== CẤU HÌNH: sửa 1 dòng này thành địa chỉ webhook n8n của bạn (không có dấu / ở cuối) ===== */
+const API = 'https://devotee-outclass-couch.ngrok-free.dev/webhook';   // vẫn cần HTTPS công khai (Telegram Mini App bắt buộc)
+/* ================================================================================================ */
+
+const $app = document.getElementById('app');
+const TG = (window.Telegram && Telegram.WebApp) || null;
+if (TG) { try { TG.ready(); TG.expand(); } catch (e) {} }
+// Mini App: token nằm trong link t.me/<bot>/phieu?startapp=TOKEN  (dự phòng: ?t=TOKEN khi mở bằng trình duyệt)
+const token = (TG && TG.initDataUnsafe && TG.initDataUnsafe.start_param) || new URLSearchParams(location.search).get('t') || '';
+const thisYear = new Date().getFullYear();
+const laZalo = () => !!(S && S.cfg && S.cfg.kenh === 'zalo');   // server tra kenh: 'zalo' | 'telegram'
+const SACH = ['Kết nối tri thức', 'Chân trời sáng tạo', 'Cánh diều', 'Khác'];
+const NGAY = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+const HT = [['sgk', 'Bám SGK'], ['cd', 'Theo chủ đề'], ['ca', 'Cả hai']];
+
+function monTheoLop(l) {
+  if (l <= 2) return ['Tiếng Việt','Toán','Đạo đức','Tự nhiên và Xã hội','Tiếng Anh'];
+  if (l === 3) return ['Tiếng Việt','Toán','Đạo đức','Tự nhiên và Xã hội','Tiếng Anh','Tin học và Công nghệ'];
+  if (l <= 5) return ['Tiếng Việt','Toán','Đạo đức','Khoa học','Lịch sử và Địa lý','Tiếng Anh','Tin học và Công nghệ'];
+  if (l <= 9) return ['Ngữ văn','Toán','Tiếng Anh','Lịch sử và Địa lý','Khoa học tự nhiên','Giáo dục công dân','Tin học','Công nghệ'];
+  return ['Ngữ văn','Toán','Tiếng Anh','Vật lý','Hóa học','Sinh học','Lịch sử','Địa lý','Giáo dục kinh tế và pháp luật','Công nghệ','Tin học'];
+}
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const hkMacDinh = () => { const m = new Date().getMonth() + 1; return (m >= 2 && m <= 8) ? '2' : '1'; };
+
+const S = { cfg: null, lop: 0, mons: {}, sach: '', sachKhac: '', hk: hkMacDinh(), gt: '', ns: '', ngay: [], gio: '19:30', ph: '', loi: {}, dangGui: false };
+
+function trang(html) { $app.innerHTML = '<div class="state">' + html + '</div>'; }
+
+async function khoiDong() {
+  if (!/^[A-Za-z0-9]{16,64}$/.test(token)) return trang('<h1>Link chưa đúng</h1><p>Bạn mở lại phiếu từ nút trong tin nhắn của cô/thầy nhé.</p>');
+  try {
+    const r = await fetch(API + '/phieu-info?t=' + encodeURIComponent(token), { headers: { 'ngrok-skip-browser-warning': '1' } });
+    S.cfg = await r.json();
+  } catch (e) { return trang('<h1>Chưa mở được phiếu</h1><p>Kiểm tra kết nối mạng rồi tải lại trang giúp cô/thầy nhé.</p>'); }
+  if (!S.cfg || !S.cfg.ok) return trang('<h1>Phiếu không còn dùng được</h1><p>Phiếu này đã được gửi rồi, hoặc link đã hết hiệu lực. Nếu cần sửa thông tin, bạn nhắn trực tiếp cho cô/thầy trong khung chat.</p>');
+  ve();
+}
+
+function ve() {
+  const full = S.cfg.soMon === 'full', gioiHan = full ? 99 : Number(S.cfg.soMon) || 1;
+  const dsMon = S.lop ? monTheoLop(S.lop) : [];
+  const nChon = Object.keys(S.mons).length;
+  const years = []; for (let y = thisYear - 5; y >= 1995; y--) years.push(y);
+  const E = k => S.loi[k] ? '<p class="err" role="alert">' + esc(S.loi[k]) + '</p>' : '';
+
+  $app.innerHTML = `
+  <main>
+    <h1>Phiếu làm quen</h1>
+    <p class="lead">Điền một lần, cô/thầy lập lộ trình học cho con ngay. Khoảng 1 phút.</p>
+
+    <section>
+      <h2>Con học lớp mấy?</h2>
+      <div class="row lop" role="group" aria-label="Lớp">
+        ${[1,2,3,4,5,6,7,8,9,10,11,12].map(n => `<button type="button" class="chip" data-lop="${n}" aria-pressed="${S.lop===n}">Lớp ${n}</button>`).join('')}
+      </div>${E('lop')}
+    </section>
+
+    <section ${S.lop ? '' : 'hidden'}>
+      <h2>Con muốn học môn nào?</h2>
+      <p class="hint">${full ? 'Gói Full: con học đủ các môn của lớp ' + S.lop + '.' : 'Gói của con được chọn tối đa ' + gioiHan + ' môn (đã chọn ' + nChon + ').'} Mỗi môn chọn cách học: bám sách giáo khoa, theo chủ đề con muốn học sâu, hoặc cả hai. Hỏi đáp tự do luôn có cho mọi môn.</p>
+      <div>
+      ${dsMon.map(m => { const x = S.mons[m]; return `
+        <div class="mon">
+          <label class="mon-head"><input type="checkbox" data-mon="${esc(m)}" ${x ? 'checked' : ''} ${full ? 'disabled' : ''}> ${esc(m)}</label>
+          ${x ? `<div class="mon-body">
+            <div class="seg" role="group" aria-label="Cách học môn ${esc(m)}">
+              ${HT.map(h => `<button type="button" data-ht="${h[0]}" data-m="${esc(m)}" aria-pressed="${x.ht===h[0]}">${h[1]}</button>`).join('')}
+            </div>
+            <div><label class="f">Con đang học tới bài/chương nào? (không bắt buộc)</label>
+              <input type="text" maxlength="60" data-td="${esc(m)}" value="${esc(x.td)}" placeholder="Ví dụ: Bài 5"></div>
+            ${x.ht !== 'sgk' ? `<div><label class="f">Chủ đề con muốn học</label>
+              <input type="text" maxlength="60" data-cd="${esc(m)}" value="${esc(x.cd)}" placeholder="Ví dụ: Phân số, Hằng đẳng thức">${E('cd:' + m)}</div>` : ''}
+          </div>` : ''}
+        </div>`; }).join('')}
+      </div>${E('mons')}
+    </section>
+
+    <section ${S.lop ? '' : 'hidden'}>
+      <h2>Con đang dùng bộ sách nào?</h2>
+      <div class="row" role="group" aria-label="Bộ sách">
+        ${SACH.map(s => `<button type="button" class="chip" data-sach="${esc(s)}" aria-pressed="${S.sach===s}">${esc(s)}</button>`).join('')}
+      </div>
+      ${S.sach === 'Khác' ? `<div style="margin-top:10px"><input type="text" maxlength="40" data-sachkhac value="${esc(S.sachKhac)}" placeholder="Tên bộ sách"></div>` : ''}
+      ${E('sach')}
+      <p class="hint" style="margin-top:14px">Con đang học học kì mấy? (Học kì 1 = tập 1, học kì 2 = tập 2)</p>
+      <div class="seg" role="group" aria-label="Học kì" style="max-width:240px">
+        <button type="button" data-hk="1" aria-pressed="${S.hk==='1'}">Học kì 1</button>
+        <button type="button" data-hk="2" aria-pressed="${S.hk==='2'}">Học kì 2</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Về con</h2>
+      <div class="two">
+        <div><label class="f">Con là</label>
+          <div class="seg" role="group" aria-label="Giới tính">
+            <button type="button" data-gt="Nam" aria-pressed="${S.gt==='Nam'}">Nam</button>
+            <button type="button" data-gt="Nữ" aria-pressed="${S.gt==='Nữ'}">Nữ</button>
+          </div></div>
+        <div><label class="f" for="ns">Năm sinh</label>
+          <select id="ns"><option value="">Chọn</option>${years.map(y => `<option ${String(y)===S.ns?'selected':''}>${y}</option>`).join('')}</select></div>
+      </div>${E('gt')}${E('ns')}
+    </section>
+
+    <section>
+      <h2>Lịch học</h2>
+      <p class="hint">Chọn các ngày con học trong tuần và giờ học. Cô/thầy sẽ nhắc con đúng giờ.</p>
+      <div class="row" role="group" aria-label="Ngày học">
+        ${NGAY.map(d => `<button type="button" class="chip" data-ngay="${d}" aria-pressed="${S.ngay.includes(d)}">${d}</button>`).join('')}
+      </div>
+      <div style="margin-top:12px;max-width:200px"><label class="f" for="gio">Giờ học</label><input id="gio" type="time" value="${esc(S.gio)}"></div>
+      ${E('lich')}
+    </section>
+
+    <section>
+      <h2>Ba/mẹ nhận báo cáo thế nào?</h2>
+      ${[['chung','Dùng chung tài khoản này', laZalo() ? 'Ba/mẹ nhận báo cáo qua chính tài khoản Zalo của con.' : 'Ba/mẹ nhận báo cáo qua chính tài khoản của con.'],
+         ['rieng','Gửi link cho ba/mẹ','Ba/mẹ có tài khoản Telegram riêng. Con sẽ nhận một đường dẫn để gửi cho ba/mẹ.'],
+         ['boqua','Bỏ qua','Con có thể liên kết với ba/mẹ sau.']]
+        .filter(o => !(laZalo() && o[0] === 'rieng'))
+        .map(o => `<label class="radio ${S.ph===o[0]?'on':''}"><input type="radio" name="ph" value="${o[0]}" ${S.ph===o[0]?'checked':''}><div><b>${o[1]}</b><span>${o[2]}</span></div></label>`).join('')}
+      ${E('ph')}
+    </section>
+  </main>
+  <div class="bar"><div class="bar-in">
+    <p id="tt">${thieu().length ? 'Còn ' + thieu().length + ' mục chưa điền' : 'Đã đủ thông tin'}</p>
+    <button type="button" class="go" id="go" ${S.dangGui ? 'disabled' : ''}>${S.dangGui ? 'Đang gửi…' : 'Gửi phiếu'}</button>
+  </div></div>`;
+}
+
+function thieu() {
+  const t = [];
+  if (!S.lop) t.push('lop');
+  if (!Object.keys(S.mons).length) t.push('mons');
+  if (!S.sach || (S.sach === 'Khác' && !S.sachKhac.trim())) t.push('sach');
+  if (!S.gt) t.push('gt');
+  if (!S.ns) t.push('ns');
+  if (!S.ngay.length || !/^\d{1,2}:\d{2}$/.test(S.gio)) t.push('lich');
+  if (!S.ph) t.push('ph');
+  return t;
+}
+
+function kiemTra() {
+  const L = {};
+  if (!S.lop) L.lop = 'Chọn lớp của con.';
+  const ms = Object.keys(S.mons);
+  if (!ms.length) L.mons = 'Chọn ít nhất một môn.';
+  ms.forEach(m => { const x = S.mons[m]; if (x.ht !== 'sgk' && !x.cd.trim()) L['cd:' + m] = 'Nhập chủ đề, hoặc đổi sang “Bám SGK”.'; });
+  if (!S.sach) L.sach = 'Chọn bộ sách con đang dùng.';
+  else if (S.sach === 'Khác' && !S.sachKhac.trim()) L.sach = 'Nhập tên bộ sách.';
+  if (!S.gt) L.gt = 'Chọn nam hoặc nữ.';
+  if (!S.ns) L.ns = 'Chọn năm sinh.';
+  if (!S.ngay.length) L.lich = 'Chọn ít nhất một ngày học.';
+  else if (!/^\d{1,2}:\d{2}$/.test(S.gio)) L.lich = 'Chọn giờ học.';
+  if (!S.ph) L.ph = 'Chọn một cách nhận báo cáo.';
+  return L;
+}
+
+async function gui() {
+  S.loi = kiemTra();
+  if (Object.keys(S.loi).length) { ve(); const e = document.querySelector('.err'); if (e) e.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
+  S.dangGui = true; ve();
+  const body = {
+    t: token, lop: S.lop,
+    mons: Object.keys(S.mons).map(m => ({ mon: m, ht: S.mons[m].ht, chu_de: S.mons[m].cd.trim(), tien_do: S.mons[m].td.trim() })),
+    bo_sach: S.sach === 'Khác' ? S.sachKhac.trim() : S.sach, hoc_ki: S.hk,
+    gioi_tinh: S.gt, nam_sinh: Number(S.ns), ngay: S.ngay, gio: S.gio, phu_huynh: S.ph
+  };
+  try {
+    const r = await fetch(API + '/phieu-nop', { method: 'POST', headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' }, body: JSON.stringify(body) });
+    const j = await r.json();
+    S.dangGui = false;
+    if (!j.ok) { S.loi = { ph: (j.loi && j.loi.join(' ')) || 'Chưa gửi được phiếu, bạn thử lại nhé.' }; ve(); return; }
+    xong(j);
+  } catch (e) { S.dangGui = false; S.loi = { ph: 'Chưa gửi được phiếu. Kiểm tra mạng rồi bấm Gửi phiếu lại nhé.' }; ve(); }
+}
+
+function xong(j) {
+  trang(`<h1>Đã gửi phiếu</h1>
+    <p>Cô/thầy đã nhận đủ thông tin. ${laZalo() ? 'Con quay lại <b>Zalo</b> và gõ số <b>1</b> (“Sẵn sàng bắt đầu”) để làm bài kiểm tra đầu vào nhé.' : 'Con quay lại khung chat và bấm <b>“Sẵn sàng bắt đầu”</b> để làm bài kiểm tra đầu vào nhé.'}</p>
+    <p class="hint">${j.linkPhuHuynh || laZalo() ? '' : 'Cửa sổ này sẽ tự đóng.'}</p>
+    ${j.linkPhuHuynh ? `<p>Con gửi đường dẫn này cho ba/mẹ để nhận báo cáo sau mỗi buổi học:</p><div class="box" id="lk">${esc(j.linkPhuHuynh)}</div>
+      <button type="button" class="chip" id="cp">Sao chép đường dẫn</button>` : ''}`);
+  if (TG && !j.linkPhuHuynh) setTimeout(() => { try { TG.close(); } catch (e) {} }, 1600);   // không có link cần sao chép -> tự đóng, quay lại chat
+  const cp = document.getElementById('cp');
+  if (cp) cp.onclick = async () => { try { await navigator.clipboard.writeText(j.linkPhuHuynh); cp.textContent = 'Đã sao chép'; } catch (e) { cp.textContent = 'Hãy giữ và sao chép đường dẫn ở trên'; } };
+}
+
+$app.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b || b.id === 'go') return;
+  const d = b.dataset;
+  if (d.lop) { const n = Number(d.lop); if (n !== S.lop) { S.lop = n; S.mons = {}; if (S.cfg.soMon === 'full') monTheoLop(n).forEach(m => S.mons[m] = { ht: 'sgk', cd: '', td: '' }); } }
+  else if (d.ht) S.mons[d.m].ht = d.ht;
+  else if (d.sach) S.sach = d.sach;
+  else if (d.hk) S.hk = d.hk;
+  else if (d.gt) S.gt = d.gt;
+  else if (d.ngay) S.ngay = S.ngay.includes(d.ngay) ? S.ngay.filter(x => x !== d.ngay) : S.ngay.concat(d.ngay);
+  else return;
+  S.loi = {}; ve();
+});
+$app.addEventListener('change', e => {
+  const t = e.target;
+  if (t.dataset.mon) {
+    const m = t.dataset.mon, gh = S.cfg.soMon === 'full' ? 99 : Number(S.cfg.soMon) || 1;
+    if (t.checked) { if (Object.keys(S.mons).length >= gh) { S.loi = { mons: 'Gói của con chỉ được chọn tối đa ' + gh + ' môn.' }; return ve(); } S.mons[m] = { ht: 'sgk', cd: '', td: '' }; }
+    else delete S.mons[m];
+    S.loi = {}; ve();
+  } else if (t.id === 'ns') { S.ns = t.value; S.loi = {}; ve(); }
+  else if (t.name === 'ph') { S.ph = t.value; S.loi = {}; ve(); }
+});
+$app.addEventListener('input', e => {   // gõ chữ: chỉ cập nhật state, KHÔNG vẽ lại (giữ con trỏ)
+  const t = e.target, d = t.dataset;
+  if (d.td) S.mons[d.td].td = t.value;
+  else if (d.cd) S.mons[d.cd].cd = t.value;
+  else if (d.sachkhac !== undefined) S.sachKhac = t.value;
+  else if (t.id === 'gio') S.gio = t.value;
+  const tt = document.getElementById('tt'); if (tt) tt.textContent = thieu().length ? 'Còn ' + thieu().length + ' mục chưa điền' : 'Đã đủ thông tin';
+});
+$app.addEventListener('click', e => { if (e.target.id === 'go') gui(); });
+
+khoiDong();
+</script>
+</body>
+</html>
