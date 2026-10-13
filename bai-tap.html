@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Làm bài</title>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>VeduAI – Làm bài</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 :root{--bg:#EAF5FF;--card:#fff;--ink:#24305E;--mut:#5F6B92;--line:#C9DAF2;--sh:#B5CBEA;--mark:#FFD84D;--ok:#118A62;--err:#C2255C}
@@ -15,9 +15,9 @@ label.o input{width:20px;min-height:20px;margin-top:3px}
 .bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:2px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom,0));display:flex;gap:12px;align-items:center;justify-content:space-between}
 .err{color:var(--err);font-weight:700}.ok{color:var(--ok);font-weight:700}.ph{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.ph img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:2px solid var(--line)}
 .ct{text-align:center;padding:40px 10px}.big{font-size:60px}a{color:var(--ink);font-weight:800}
-</style></head><body><main id="app"><div class="ct"><div class="big">🐣</div>Đang mở bài…</div></main>
-<script>
-const API='https://devotee-outclass-couch.ngrok-free.dev/webhook', H={'ngrok-skip-browser-warning':'1'}, BOT='https://t.me/Openclawvni_bot';
+.vf{max-width:560px;margin:6px auto 0;padding:10px 8px;text-align:center;font-size:12.5px;line-height:1.6;color:var(--mut,var(--muted,#5F6B92))}.vf a{color:inherit;font-weight:800}</style></head><body><main id="app"><div class="ct"><div class="big">🐣</div>Đang mở bài…</div></main>
+<footer class="vf"><b>VeduAI</b> – Vietnam Education AI Solutions<br>Hỗ trợ: Admin <a href="tel:0984048177">0984048177</a> (Telegram/Zalo)</footer><script>
+const API='https://devotee-outclass-couch.ngrok-free.dev/webhook', H={'ngrok-skip-browser-warning':'1'}, BOT='https://t.me/MotSachVedu_Bot';
 const TG=window.Telegram&&Telegram.WebApp; if(TG){try{TG.ready();TG.expand()}catch(e){}}
 const mb=((TG&&TG.initDataUnsafe&&TG.initDataUnsafe.start_param)||new URLSearchParams(location.search).get('b')||'').replace(/[^A-Za-z0-9]/g,'');
 const $=document.getElementById('app'), esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -56,9 +56,14 @@ async function send(auto){if(S.sending)return;const b=S.bai;
   S.sending=false; if(!j.ok){S.err=j.loi||'Chưa nộp được, em thử lại nhé.';return j.daNop?st('✅','Em đã nộp bài này rồi',j.loi):draw()} ket(j)}
  catch(x){S.sending=false;S.err='Chưa nộp được. Kiểm tra mạng rồi bấm Nộp lại nhé.';draw()}}
 function er(m){S.err=m;draw();window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})}
-function ket(j){const b=S.bai,cta=j.co_tai_khoan?'':`<div class="c"><b>🎁 Học cùng gia sư AI</b><p class="m">Em chưa có tài khoản học với gia sư AI. Bấm để dùng thử miễn phí 5 ngày!</p><a href="${BOT}${j.ban_duoc?'?start=dl_'+encodeURIComponent(b.ma_dai_ly):''}">Mở gia sư AI trên Telegram →</a></div>`;
- $.innerHTML=`<div class="ct"><div class="big">🎉</div><h1>Đã nộp bài!</h1><p class="ok" style="font-size:26px;margin:4px 0">${j.diem} / ${j.toi_da} điểm</p><p class="m">Thang 10: ${j.diem10}${j.trang_thai==='cho_giao_vien'?' (còn câu chờ thầy/cô chấm)':''}</p></div>
+function ket(j){
+ const lis=a=>(a||[]).map(x=>esc(x.kt)+' ('+x.pct+'%'+(x.lop_tb!=null?', lớp TB '+x.lop_tb+'%':'')+')').join('; ');
+ const rk=j.hang?`<p class="m">🏅 Xếp hạng tạm thời: <b>${j.hang}/${j.tong_nop}</b>${j.tb_lop10!=null?' · điểm TB lớp '+String(j.tb_lop10).replace('.',','):''} (có thể đổi khi các bạn khác nộp)</p>`:(j.cho_cham?'<p class="m">🏅 Xếp hạng sẽ có khi thầy/cô chấm xong các câu còn lại.</p>':'<p class="m">🏅 Em là bạn nộp đầu tiên nên chưa có bạn khác để xếp hạng.</p>');
+ const pt=((j.manh&&j.manh.length)||(j.yeu&&j.yeu.length))?`<div class="c"><b>📊 Nhận xét kiến thức</b>${j.manh&&j.manh.length?`<p style="margin:8px 0">💪 <b>Em làm tốt:</b> ${lis(j.manh)}</p>`:''}${j.yeu&&j.yeu.length?`<p style="margin:8px 0">⚠️ <b>Cần ôn tập tăng cường:</b> ${lis(j.yeu)}</p>`:'<p class="m">Chưa có phần nào yếu rõ rệt, em giỏi lắm!</p>'}</div>`:'';
+const b=S.bai,cta=j.co_tai_khoan?'':`<div class="c"><b>🎁 Học cùng VeduAI – gia sư AI của em</b><p class="m">Em chưa có tài khoản VeduAI. Dùng thử miễn phí 5 ngày: học và làm bài mọi lúc mọi nơi, không cần sách giáo khoa, có báo cáo điểm mạnh, điểm yếu và kế hoạch khắc phục!</p><a href="${BOT}${j.ban_duoc?'?start=dl_'+encodeURIComponent(b.ma_dai_ly):''}">Mở VeduAI trên Telegram →</a></div>`;
+ $.innerHTML=`<div class="ct"><div class="big">🎉</div><h1>Đã nộp bài!</h1><p class="ok" style="font-size:26px;margin:4px 0">${j.diem} / ${j.toi_da} điểm</p><p class="m">Thang 10: ${j.diem10}${j.trang_thai==='cho_giao_vien'?' (còn câu chờ thầy/cô chấm)':''}</p>${rk}</div>
  ${j.nhan_xet?`<div class="c"><b>Nhận xét</b><p style="white-space:pre-wrap">${esc(j.nhan_xet)}</p></div>`:''}
+ ${pt}
  ${j.co_ai?'<p class="m">Phần tự luận do AI chấm sơ bộ, thầy/cô sẽ xem lại.</p>':''}
  <div class="c">${j.chi_tiet.map((d,i)=>`<p style="margin:6px 0">${d.dung===true?'✅':d.dung===false?'❌':'📝'} <b>Câu ${i+1}:</b> ${d.diem}/${d.toi_da}${d.dap_an&&d.dung===false?' · Đáp án: '+esc(d.dap_an):''}${d.nhan_xet?'<br><span class="m">'+esc(d.nhan_xet)+'</span>':''}</p>`).join('')}</div>${cta}`}
 load();
