@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Làm bài</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--bg:#EAF5FF;--card:#fff;--ink:#24305E;--mut:#5F6B92;--line:#C9DAF2;--sh:#B5CBEA;--mark:#FFD84D;--ok:#118A62;--err:#C2255C}
+@media(prefers-color-scheme:dark){:root{--bg:#151B36;--card:#1F2850;--ink:#F1F4FF;--mut:#AAB4DC;--line:#38437A;--sh:#0E1328;--ok:#5FE0B0;--err:#FF9BB5}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:500 16px/1.5 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;padding:env(safe-area-inset-top,0) 14px calc(90px + env(safe-area-inset-bottom,0))}
+main{max-width:560px;margin:0 auto;padding:18px 0}h1{font-size:22px;margin:0 0 4px}.m{color:var(--mut);font-size:14px}
+.c{background:var(--card);border:2px solid var(--line);border-radius:20px;box-shadow:0 4px 0 var(--sh);padding:14px;margin:0 0 14px}
+input,select,textarea{width:100%;min-height:46px;border:2px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);font:inherit;padding:8px 12px}
+.g{display:grid;gap:10px}.dob{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:8px}
+label.o{display:flex;gap:10px;align-items:flex-start;border:2px solid var(--line);border-radius:14px;padding:10px;margin:8px 0;cursor:pointer}label.o.on{border-color:var(--ink);background:var(--mark);color:#4A3700}
+label.o input{width:20px;min-height:20px;margin-top:3px}
+.b{appearance:none;border:0;background:var(--ink);color:var(--card);font:800 16px system-ui;min-height:48px;padding:0 22px;border-radius:999px;cursor:pointer}.b:disabled{opacity:.5}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:2px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom,0));display:flex;gap:12px;align-items:center;justify-content:space-between}
+.err{color:var(--err);font-weight:700}.ok{color:var(--ok);font-weight:700}.ph{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.ph img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:2px solid var(--line)}
+.ct{text-align:center;padding:40px 10px}.big{font-size:60px}a{color:var(--ink);font-weight:800}
+</style></head><body><main id="app"><div class="ct"><div class="big">🐣</div>Đang mở bài…</div></main>
+<script>
+const API='https://devotee-outclass-couch.ngrok-free.dev/webhook', H={'ngrok-skip-browser-warning':'1'}, BOT='https://t.me/Openclawvni_bot';
+const TG=window.Telegram&&Telegram.WebApp; if(TG){try{TG.ready();TG.expand()}catch(e){}}
+const mb=((TG&&TG.initDataUnsafe&&TG.initDataUnsafe.start_param)||new URLSearchParams(location.search).get('b')||'').replace(/[^A-Za-z0-9]/g,'');
+const $=document.getElementById('app'), esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const S={bai:null,ten:'',nd:'',nt:'',nn:'',lop:'',tr:'',a:{},anh:{},sending:false,left:0,err:''}; let timer=null;
+const st=(i,t,s)=>{$.innerHTML=`<div class="ct"><div class="big">${i}</div><h1>${esc(t)}</h1><p class="m">${esc(s||'')}</p></div>`};
+async function load(){ if(!mb)return st('🔍','Link chưa đúng','Em mở lại đường dẫn bài từ thầy/cô nhé.');
+ try{const j=await (await fetch(API+'/gv-bai?b='+mb,{headers:H})).json(); if(!j.ok)return st('🔍',j.loi||'Không tìm thấy bài'); S.bai=j.bai; if(!j.bai.mo)return st('⏰','Bài đã đóng','Bài này đã hết hạn hoặc thầy/cô đã đóng.'); S.lop=j.bai.ten_lop; S.tr=j.bai.truong; draw();}
+ catch(e){st('📡','Không kết nối được','Kiểm tra mạng rồi tải lại trang.')}}
+function dobOk(){const v=new Date(S.nn+'-'+String(S.nt).padStart(2,'0')+'-'+String(S.nd).padStart(2,'0')+'T00:00:00');return S.nn&&v.getFullYear()==S.nn&&v.getMonth()+1==S.nt&&v.getDate()==S.nd}
+function draw(){const b=S.bai, L='ABCDEF', ys=[];for(let y=new Date().getFullYear()-5;y>=1995;y--)ys.push(y);
+ const opt=(a,t)=>`<option value="">${t}</option>`+a.map(x=>`<option ${String(x)===String(S[{Ngày:'nd',Tháng:'nt',Năm:'nn'}[t]])?'selected':''}>${x}</option>`).join('');
+ $.innerHTML=`<h1>${esc(b.tieu_de)}</h1><p class="m">${esc([b.mon,b.ten_lop&&'Lớp '+b.ten_lop,b.ten_gv&&'GV '+b.ten_gv,b.thoi_gian_phut&&b.thoi_gian_phut+' phút'].filter(Boolean).join(' · '))}</p>
+ <div class="c g"><b>Thông tin của em</b><input id="ten" placeholder="Họ và tên" value="${esc(S.ten)}" autocomplete="name">
+ <div class="dob"><select id="nd">${opt([...Array(31).keys()].map(i=>i+1),'Ngày')}</select><select id="nt">${opt([...Array(12).keys()].map(i=>i+1),'Tháng')}</select><select id="nn">${opt(ys,'Năm')}</select></div>
+ <div class="dob" style="grid-template-columns:1fr 2fr"><input id="lop" placeholder="Lớp (7A2)" value="${esc(S.lop)}"><input id="tr" placeholder="Trường" value="${esc(S.tr)}"></div></div>
+ ${b.cau.map((q,i)=>`<div class="c"><b>Câu ${i+1}</b> <span class="m">(${q.diem} điểm)</span><p style="white-space:pre-wrap;margin:6px 0">${esc(q.de)}</p>`+
+  (q.loai==='tn'?q.lc.map((x,k)=>`<label class="o ${S.a[q.id]===L[k]?'on':''}"><input type="radio" name="${q.id}" data-q="${q.id}" value="${L[k]}" ${S.a[q.id]===L[k]?'checked':''}><span><b>${L[k]}.</b> ${esc(x)}</span></label>`).join(''):
+   q.loai==='ngan'?`<input data-q="${q.id}" placeholder="Đáp án của em" value="${esc(S.a[q.id]||'')}">`:
+   `<textarea data-q="${q.id}" rows="3" placeholder="Gõ bài làm (hoặc chụp ảnh bên dưới)">${esc(S.a[q.id]||'')}</textarea><input type="file" accept="image/*" multiple data-f="${q.id}" style="margin-top:8px"><div class="ph">${(S.anh[q.id]||[]).map(x=>`<img src="data:image/jpeg;base64,${x}">`).join('')}</div>`)+`</div>`).join('')}
+ <p class="err" id="er">${esc(S.err)}</p><div class="bar"><span class="m" id="tm"></span><button class="b" id="go" ${S.sending?'disabled':''}>${S.sending?'Đang chấm…':'Nộp bài 🚀'}</button></div>`;
+ if(b.thoi_gian_phut&&!timer){S.left=b.thoi_gian_phut*60;timer=setInterval(()=>{S.left--;const t=document.getElementById('tm');if(t)t.textContent='⏱ '+Math.floor(S.left/60)+':'+String(S.left%60).padStart(2,'0');if(S.left<=0){clearInterval(timer);send(true)}},1000)}}
+function nen(file){return new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,1280/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',.72).split(',')[1])};im.onerror=no;im.src=r.result};r.onerror=no;r.readAsDataURL(file)})}
+$.addEventListener('input',e=>{const t=e.target;if(t.dataset.q)S.a[t.dataset.q]=t.value;else if(t.id==='ten')S.ten=t.value;else if(t.id==='lop')S.lop=t.value;else if(t.id==='tr')S.tr=t.value});
+$.addEventListener('change',async e=>{const t=e.target;
+ if(t.dataset.q&&t.type==='radio'){S.a[t.dataset.q]=t.value;draw()}
+ else if(['nd','nt','nn'].includes(t.id))S[t.id]=t.value;
+ else if(t.dataset.f){const q=t.dataset.f,a=(S.anh[q]||[]).slice();for(const f of [...t.files]){if(a.length>=3)break;try{a.push(await nen(f))}catch(x){}}S.anh[q]=a;draw()}});
+$.addEventListener('click',e=>{if(e.target.id==='go')send(false)});
+async function send(auto){if(S.sending)return;const b=S.bai;
+ if(!auto){if(S.ten.trim().split(/\s+/).filter(Boolean).length<2)return er('Nhập đủ họ và tên.');if(!dobOk())return er('Chọn đủ ngày sinh.');
+  const thieu=b.cau.filter(q=>q.loai==='tl'?!(S.a[q.id]||'').trim()&&!(S.anh[q.id]||[]).length:!(S.a[q.id]||'').trim()).length; if(thieu&&!confirm('Em còn '+thieu+' câu chưa làm. Vẫn nộp bài?'))return}
+ if(auto&&!S.ten.trim())return st('⏰','Hết giờ','Em chưa nhập họ tên nên chưa nộp được. Tải lại trang để làm lại nhé.');
+ S.sending=true;clearInterval(timer);draw();
+ const tl={};b.cau.forEach(q=>{tl[q.id]=q.loai==='tl'?{text:S.a[q.id]||'',anh:S.anh[q.id]||[]}:(S.a[q.id]||'')});
+ try{const j=await (await fetch(API+'/gv-nop',{method:'POST',headers:{'Content-Type':'application/json',...H},body:JSON.stringify({b:mb,ho_ten:S.ten,ngay_sinh:S.nn+'-'+String(S.nt).padStart(2,'0')+'-'+String(S.nd).padStart(2,'0'),ten_lop:S.lop,truong:S.tr,tra_loi:tl})})).json();
+  S.sending=false; if(!j.ok){S.err=j.loi||'Chưa nộp được, em thử lại nhé.';return j.daNop?st('✅','Em đã nộp bài này rồi',j.loi):draw()} ket(j)}
+ catch(x){S.sending=false;S.err='Chưa nộp được. Kiểm tra mạng rồi bấm Nộp lại nhé.';draw()}}
+function er(m){S.err=m;draw();window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})}
+function ket(j){const b=S.bai,cta=j.co_tai_khoan?'':`<div class="c"><b>🎁 Học cùng gia sư AI</b><p class="m">Em chưa có tài khoản học với gia sư AI. Bấm để dùng thử miễn phí 5 ngày!</p><a href="${BOT}${j.ban_duoc?'?start=dl_'+encodeURIComponent(b.ma_dai_ly):''}">Mở gia sư AI trên Telegram →</a></div>`;
+ $.innerHTML=`<div class="ct"><div class="big">🎉</div><h1>Đã nộp bài!</h1><p class="ok" style="font-size:26px;margin:4px 0">${j.diem} / ${j.toi_da} điểm</p><p class="m">Thang 10: ${j.diem10}${j.trang_thai==='cho_giao_vien'?' (còn câu chờ thầy/cô chấm)':''}</p></div>
+ ${j.nhan_xet?`<div class="c"><b>Nhận xét</b><p style="white-space:pre-wrap">${esc(j.nhan_xet)}</p></div>`:''}
+ ${j.co_ai?'<p class="m">Phần tự luận do AI chấm sơ bộ, thầy/cô sẽ xem lại.</p>':''}
+ <div class="c">${j.chi_tiet.map((d,i)=>`<p style="margin:6px 0">${d.dung===true?'✅':d.dung===false?'❌':'📝'} <b>Câu ${i+1}:</b> ${d.diem}/${d.toi_da}${d.dap_an&&d.dung===false?' · Đáp án: '+esc(d.dap_an):''}${d.nhan_xet?'<br><span class="m">'+esc(d.nhan_xet)+'</span>':''}</p>`).join('')}</div>${cta}`}
+load();
+</script></body></html>
