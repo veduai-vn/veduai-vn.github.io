@@ -50,6 +50,8 @@ label.f{display:block;font-size:14px;font-weight:600;color:var(--muted);margin:0
 input[type=text],input[type=time],select{width:100%;min-height:48px;border:2px solid var(--line);border-radius:16px;background:var(--card);color:var(--ink);font:500 16px var(--font);padding:0 14px}
 input:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid var(--pop);outline-offset:2px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dob{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:8px}
+@media(max-width:380px){.two{grid-template-columns:1fr}}
 .radio{display:flex;gap:12px;align-items:flex-start;border:2px solid var(--line);background:var(--card);border-radius:18px;padding:12px;margin-bottom:10px;cursor:pointer}
 .radio input{margin-top:4px;width:20px;height:20px;accent-color:var(--pop)}
 .radio b{display:block}.radio span{color:var(--muted);font-size:14px}
@@ -110,7 +112,10 @@ function monTheoLop(l) {
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const hkMacDinh = () => { const m = new Date().getMonth() + 1; return (m >= 2 && m <= 8) ? '2' : '1'; };
 
-const S = { cfg: null, lop: 0, mons: {}, sach: '', sachKhac: '', hk: hkMacDinh(), gt: '', ns: '', ngay: [], gio: '19:30', ph: '', loi: {}, dangGui: false };
+const TONG = 10;   // so muc bat buoc (de tinh thanh tien do)
+const S = { cfg: null, lop: 0, mons: {}, sach: '', sachKhac: '', hk: hkMacDinh(), gt: '', ten: '', nd: '', nt: '', nn: '', truong: '', tenLop: '', ngay: [], gio: '19:30', ph: '', loi: {}, dangGui: false };
+const ngaySinhISO = () => (S.nd && S.nt && S.nn) ? S.nn + '-' + String(S.nt).padStart(2, '0') + '-' + String(S.nd).padStart(2, '0') : '';
+const ngaySinhHopLe = () => { const v = ngaySinhISO(); if (!v) return false; const d = new Date(v + 'T00:00:00'); return d.getFullYear() === Number(S.nn) && d.getMonth() + 1 === Number(S.nt) && d.getDate() === Number(S.nd); };
 
 function pop() {   // 1 lần pháo giấy khi gửi xong (bỏ qua nếu bật giảm chuyển động)
   if (matchMedia('(prefers-reduced-motion:reduce)').matches) return;
@@ -126,6 +131,8 @@ async function khoiDong() {
     S.cfg = await r.json();
   } catch (e) { return trang('<div class="big" aria-hidden="true">📡</div><h1>Chưa mở được phiếu</h1><p>Kiểm tra kết nối mạng rồi tải lại trang giúp cô/thầy nhé.</p>'); }
   if (!S.cfg || !S.cfg.ok) return trang('<div class="big" aria-hidden="true">🔒</div><h1>Phiếu không còn dùng được</h1><p>Phiếu này đã được gửi rồi, hoặc link đã hết hiệu lực. Nếu cần sửa thông tin, bạn nhắn trực tiếp cho cô/thầy trong khung chat.</p>');
+  if (S.cfg.goiYTen && !S.ten) S.ten = S.cfg.goiYTen;
+  if (S.cfg.truongMacDinh && !S.truong) S.truong = S.cfg.truongMacDinh;
   ve();
 }
 
@@ -134,11 +141,14 @@ function ve() {
   const dsMon = S.lop ? monTheoLop(S.lop) : [];
   const nChon = Object.keys(S.mons).length;
   const years = []; for (let y = thisYear - 5; y >= 1995; y--) years.push(y);
+  const days = []; for (let i = 1; i <= 31; i++) days.push(i);
+  const months = []; for (let i = 1; i <= 12; i++) months.push(i);
+  const gv = S.cfg.giaoVien || {};
   const E = k => S.loi[k] ? '<p class="err" role="alert">' + esc(S.loi[k]) + '</p>' : '';
 
   $app.innerHTML = `
   <main>
-    <div class="hero"><span class="mascot" aria-hidden="true">🦉</span><div class="bubble"><h1>Mình làm quen nhé!</h1><p class="lead">Điền một lần, cô/thầy lập lộ trình học cho con ngay. Chỉ khoảng 1 phút thôi.</p></div></div>
+    <div class="hero"><span class="mascot" aria-hidden="true">🦉</span><div class="bubble"><h1>Mình làm quen nhé!</h1><p class="lead">Điền một lần, cô/thầy lập lộ trình học cho con ngay. Chỉ khoảng 1 phút thôi.</p>${gv.ten ? `<p class="lead" style="margin-top:6px">👩‍🏫 Lớp của ${esc(gv.ten)}${gv.truong ? ' · ' + esc(gv.truong) : ''}</p>` : ''}</div></div>
 
     <section>
       <h2><i class="em" aria-hidden="true">🎒</i>Con học lớp mấy?</h2>
@@ -183,15 +193,27 @@ function ve() {
 
     <section>
       <h2><i class="em" aria-hidden="true">🌟</i>Về con</h2>
-      <div class="two">
+      <div style="display:grid;gap:12px">
+        <div><label class="f" for="ten">Họ và tên của con</label>
+          <input id="ten" type="text" maxlength="60" autocomplete="name" value="${esc(S.ten)}" placeholder="Ví dụ: Nguyễn Minh Anh">${E('ten')}</div>
+        <div><label class="f">Ngày tháng năm sinh</label>
+          <div class="dob">
+            <select id="nd" aria-label="Ngày"><option value="">Ngày</option>${days.map(y => `<option ${String(y)===String(S.nd)?'selected':''}>${y}</option>`).join('')}</select>
+            <select id="nt" aria-label="Tháng"><option value="">Tháng</option>${months.map(y => `<option ${String(y)===String(S.nt)?'selected':''}>${y}</option>`).join('')}</select>
+            <select id="ns" aria-label="Năm"><option value="">Năm</option>${years.map(y => `<option ${String(y)===String(S.nn)?'selected':''}>${y}</option>`).join('')}</select>
+          </div>${E('ns')}</div>
         <div><label class="f">Con là</label>
-          <div class="seg" role="group" aria-label="Giới tính">
+          <div class="seg" role="group" aria-label="Giới tính" style="max-width:240px">
             <button type="button" data-gt="Nam" aria-pressed="${S.gt==='Nam'}">Nam</button>
             <button type="button" data-gt="Nữ" aria-pressed="${S.gt==='Nữ'}">Nữ</button>
-          </div></div>
-        <div><label class="f" for="ns">Năm sinh</label>
-          <select id="ns"><option value="">Chọn</option>${years.map(y => `<option ${String(y)===S.ns?'selected':''}>${y}</option>`).join('')}</select></div>
-      </div>${E('gt')}${E('ns')}
+          </div>${E('gt')}</div>
+        <div class="two">
+          <div><label class="f" for="truong">Trường</label>
+            <input id="truong" type="text" maxlength="80" value="${esc(S.truong)}" placeholder="Ví dụ: THCS Nguyễn Du">${E('truong')}</div>
+          <div><label class="f" for="tenlop">Lớp</label>
+            <input id="tenlop" type="text" maxlength="20" value="${esc(S.tenLop)}" placeholder="Ví dụ: 7A2">${E('tenlop')}</div>
+        </div>
+      </div>
     </section>
 
     <section>
@@ -214,7 +236,7 @@ function ve() {
       ${E('ph')}
     </section>
   </main>
-  <div class="bar"><div class="prog" aria-hidden="true"><i id="pg" style="width:${Math.round((7 - thieu().length) / 7 * 100)}%"></i></div><div class="bar-in">
+  <div class="bar"><div class="prog" aria-hidden="true"><i id="pg" style="width:${Math.round((TONG - thieu().length) / TONG * 100)}%"></i></div><div class="bar-in">
     <p id="tt">${thieu().length ? 'Còn ' + thieu().length + ' mục nữa thôi nè 🐾' : 'Xong hết rồi, gửi thôi! 🚀'}</p>
     <button type="button" class="go" id="go" ${S.dangGui ? 'disabled' : ''}>${S.dangGui ? 'Đang gửi…' : 'Gửi phiếu 🚀'}</button>
   </div></div>`;
@@ -225,8 +247,11 @@ function thieu() {
   if (!S.lop) t.push('lop');
   if (!Object.keys(S.mons).length) t.push('mons');
   if (!S.sach || (S.sach === 'Khác' && !S.sachKhac.trim())) t.push('sach');
+  if (S.ten.trim().split(/\s+/).filter(Boolean).length < 2) t.push('ten');
+  if (!ngaySinhHopLe()) t.push('ns');
   if (!S.gt) t.push('gt');
-  if (!S.ns) t.push('ns');
+  if (!S.truong.trim()) t.push('truong');
+  if (!S.tenLop.trim()) t.push('tenlop');
   if (!S.ngay.length || !/^\d{1,2}:\d{2}$/.test(S.gio)) t.push('lich');
   if (!S.ph) t.push('ph');
   return t;
@@ -240,8 +265,12 @@ function kiemTra() {
   ms.forEach(m => { const x = S.mons[m]; if (x.ht !== 'sgk' && !x.cd.trim()) L['cd:' + m] = 'Nhập chủ đề, hoặc đổi sang “Bám SGK”.'; });
   if (!S.sach) L.sach = 'Chọn bộ sách con đang dùng.';
   else if (S.sach === 'Khác' && !S.sachKhac.trim()) L.sach = 'Nhập tên bộ sách.';
+  if (S.ten.trim().split(/\s+/).filter(Boolean).length < 2) L.ten = 'Nhập đủ họ và tên của con.';
+  if (!S.nd || !S.nt || !S.nn) L.ns = 'Chọn đủ ngày, tháng, năm sinh.';
+  else if (!ngaySinhHopLe()) L.ns = 'Ngày sinh chưa đúng, bạn kiểm tra lại nhé.';
   if (!S.gt) L.gt = 'Chọn nam hoặc nữ.';
-  if (!S.ns) L.ns = 'Chọn năm sinh.';
+  if (!S.truong.trim()) L.truong = 'Nhập tên trường.';
+  if (!S.tenLop.trim()) L.tenlop = 'Nhập tên lớp, ví dụ 7A2.';
   if (!S.ngay.length) L.lich = 'Chọn ít nhất một ngày học.';
   else if (!/^\d{1,2}:\d{2}$/.test(S.gio)) L.lich = 'Chọn giờ học.';
   if (!S.ph) L.ph = 'Chọn một cách nhận báo cáo.';
@@ -256,7 +285,7 @@ async function gui() {
     t: token, lop: S.lop,
     mons: Object.keys(S.mons).map(m => ({ mon: m, ht: S.mons[m].ht, chu_de: S.mons[m].cd.trim(), tien_do: S.mons[m].td.trim() })),
     bo_sach: S.sach === 'Khác' ? S.sachKhac.trim() : S.sach, hoc_ki: S.hk,
-    gioi_tinh: S.gt, nam_sinh: Number(S.ns), ngay: S.ngay, gio: S.gio, phu_huynh: S.ph
+    ho_ten: S.ten.trim(), ngay_sinh: ngaySinhISO(), nam_sinh: Number(S.nn), gioi_tinh: S.gt, truong: S.truong.trim(), ten_lop: S.tenLop.trim(), ngay: S.ngay, gio: S.gio, phu_huynh: S.ph
   };
   try {
     const r = await fetch(API + '/phieu-nop', { method: 'POST', headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' }, body: JSON.stringify(body) });
@@ -298,7 +327,7 @@ $app.addEventListener('change', e => {
     if (t.checked) { if (Object.keys(S.mons).length >= gh) { S.loi = { mons: 'Gói của con chỉ được chọn tối đa ' + gh + ' môn.' }; return ve(); } S.mons[m] = { ht: 'sgk', cd: '', td: '' }; }
     else delete S.mons[m];
     S.loi = {}; ve();
-  } else if (t.id === 'ns') { S.ns = t.value; S.loi = {}; ve(); }
+  } else if (t.id === 'nd' || t.id === 'nt' || t.id === 'ns') { if (t.id === 'nd') S.nd = t.value; else if (t.id === 'nt') S.nt = t.value; else S.nn = t.value; S.loi = {}; ve(); }
   else if (t.name === 'ph') { S.ph = t.value; S.loi = {}; ve(); }
 });
 $app.addEventListener('input', e => {   // gõ chữ: chỉ cập nhật state, KHÔNG vẽ lại (giữ con trỏ)
@@ -307,7 +336,10 @@ $app.addEventListener('input', e => {   // gõ chữ: chỉ cập nhật state, 
   else if (d.cd) S.mons[d.cd].cd = t.value;
   else if (d.sachkhac !== undefined) S.sachKhac = t.value;
   else if (t.id === 'gio') S.gio = t.value;
-  const pg = document.getElementById('pg'); if (pg) pg.style.width = Math.round((7 - thieu().length) / 7 * 100) + '%';
+  else if (t.id === 'ten') S.ten = t.value;
+  else if (t.id === 'truong') S.truong = t.value;
+  else if (t.id === 'tenlop') S.tenLop = t.value;
+  const pg = document.getElementById('pg'); if (pg) pg.style.width = Math.round((TONG - thieu().length) / TONG * 100) + '%';
   const tt = document.getElementById('tt'); if (tt) tt.textContent = thieu().length ? 'Còn ' + thieu().length + ' mục nữa thôi nè 🐾' : 'Xong hết rồi, gửi thôi! 🚀';
 });
 $app.addEventListener('click', e => { if (e.target.id === 'go') gui(); });
