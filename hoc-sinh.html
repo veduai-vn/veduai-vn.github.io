@@ -44,12 +44,26 @@ function ve(){const h=D.hs,n=D.nop,done=n.filter(x=>x.toi_da),tb=done.length?Mat
  $.innerHTML=`<div class="r"><div><h1>Chào ${esc(h.ten)} 👋</h1><span class="m">Lớp ${esc(h.lop)} · ${esc(h.truong)}</span></div><button class="b l" id="out">Thoát</button></div>
  <div class="c g" style="margin-top:12px"><h2>📝 Làm bài thầy/cô giao</h2><input id="ma" placeholder="Dán link hoặc mã bài thầy/cô gửi"><p class="err" id="er"></p><button class="b" id="go">Mở bài</button></div>
  <div class="c"><h2>📚 Bài em đã làm (${n.length})${tb!=null?' · điểm TB '+String(tb).replace('.',','):''}</h2>${n.map(x=>`<div class="r" style="border-top:1px solid var(--line);padding:8px 0"><div><b>${esc(x.tieu_de)}</b><br><span class="m">${esc([x.mon,x.gv&&'GV '+x.gv,x.ngay_nop.split('-').reverse().join('/')].filter(Boolean).join(' · '))}${x.trang_thai==='cho_giao_vien'?' · ⏳ chờ thầy/cô chấm':''}</span></div><span class="sc">${String(x.diem).replace('.',',')}/${x.toi_da}</span></div>`).join('')||'<p class="m">Em chưa làm bài nào. Dán link bài thầy/cô gửi vào ô phía trên nhé.</p>'}</div>
- <div class="c"><h2>🎁 Học cùng VeduAI – gia sư AI của em</h2><p class="m">Dùng thử miễn phí 5 ngày: học theo sách giáo khoa, hỏi bài bằng chữ, ảnh hoặc giọng nói, có báo cáo điểm mạnh, điểm yếu và kế hoạch khắc phục.</p><a href="${BOT}">Mở VeduAI trên Telegram →</a></div>`}
+ <div id="phbox"></div>
+ <div class="c"><h2>🎁 Học cùng VeduAI – gia sư AI của em</h2><p class="m">Dùng thử miễn phí 5 ngày: học theo sách giáo khoa, hỏi bài bằng chữ, ảnh hoặc giọng nói, có báo cáo điểm mạnh, điểm yếu và kế hoạch khắc phục.</p><a href="${BOT}">Mở VeduAI trên Telegram →</a></div>`;phTai()}
 $.addEventListener('input',e=>{if(e.target.dataset.r)R[e.target.dataset.r]=e.target.value});
 $.addEventListener('change',e=>{if(e.target.dataset.r)R[e.target.dataset.r]=e.target.value});
 $.addEventListener('click',e=>{const id=e.target.id;
  if(id==='dk')dkGo();
+ else if(id==='shu'&&PH&&PH.url)guiPH('Xem điểm của '+CR.ten+' trên VeduAI (phụ huynh không cần đăng nhập): '+PH.url);
+ else if(id==='shtg'&&PH&&PH.tg)guiPH('Phụ huynh bấm link này một lần để nhận kết quả bài làm của '+CR.ten+' tự động qua Telegram (miễn phí, có thể ngừng bất cứ lúc nào): '+PH.tg);
  else if(id==='out'){CR=null;D=null;try{localStorage.removeItem(HK)}catch(x){}dk()}
  else if(id==='go'){const m=maBai(document.getElementById('ma').value);if(!m)return document.getElementById('er').textContent='Em dán đúng link hoặc mã bài (thầy/cô gửi) nhé.';location.href=PAGE_BAI+'?b='+m}});
+/* ===== v78: phu huynh xem diem / nhan thong bao Telegram ===== */
+const PHPAGE='https://veduai-vn.github.io/phu-huynh.html';let PH=null;
+function cpOld(t){try{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();const r=document.execCommand('copy');a.remove();return r}catch(e){return false}}
+function copyTxt(t){return new Promise(ok=>{try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>ok(true),()=>ok(cpOld(t)))}else ok(cpOld(t))}catch(e){ok(cpOld(t))}})}
+async function guiPH(t){if(navigator.share){try{await navigator.share({text:t});return}catch(e){if(e&&e.name==='AbortError')return}}
+ const ok=await copyTxt(t),m=document.getElementById('phmsg');if(m)m.textContent=ok?'✅ Đã sao chép. Em dán vào Zalo/Messenger/tin nhắn gửi phụ huynh nhé.':'Chưa sao chép được, em thử lại nhé.'}
+function phVe(){const el=document.getElementById('phbox');if(!el)return;
+ el.innerHTML='<div class="c"><h2>👨‍👩‍👧 Cho phụ huynh xem điểm</h2><p class="m" style="margin:0 0 10px">Em tự gửi từ máy của em, không cần nhập số điện thoại phụ huynh. Phụ huynh xem được tất cả bài em đã làm, không cần đăng nhập.</p>'+
+ (PH&&PH.url?'<div class="g"><button class="b" id="shu">📨 Gửi link xem điểm cho phụ huynh</button><button class="b l" id="shtg">🔔 Mời phụ huynh nhận điểm qua Telegram</button></div><p class="m" style="margin:10px 0 0">'+(PH.n?PH.n+' phụ huynh đã đăng ký nhận thông báo. ':'')+'<a href="'+esc(PH.url)+'" target="_blank" rel="noopener">Xem thử trang phụ huynh</a></p><p class="m" id="phmsg" style="margin:6px 0 0;font-weight:700"></p>':'<p class="m">'+(PH===null?'Đang tạo link…':'Chưa tạo được link cho phụ huynh, em thử tải lại trang nhé.')+'</p>')+'</div>'}
+async function phTai(){PH=null;phVe();const j=await post('hs-ph-link',{hs:CR.hs,k:CR.k});PH=j.ok?{url:j.ph_url,tg:j.tg_url,n:j.so_ph||0}:{};phVe()}
+
 vao();
 </script></body></html>
