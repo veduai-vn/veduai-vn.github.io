@@ -66,7 +66,7 @@ $.addEventListener('change',async e=>{const t=e.target;
  if(t.dataset.q&&t.type==='radio'){S.a[t.dataset.q]=t.value;draw()}
  else if(['nd','nt','nn'].includes(t.id))S[t.id]=t.value;
  else if(t.dataset.f){const q=t.dataset.f,a=(S.anh[q]||[]).slice();for(const f of [...t.files]){if(a.length>=3)break;try{a.push(await nen(f))}catch(x){}}S.anh[q]=a;draw()}});
-$.addEventListener('click',e=>{const id=e.target.id;if(id==='go')send(false);else if(id==='dk')dkGo();else if(id==='doi'){e.preventDefault();CR=null;try{localStorage.removeItem(HK)}catch(x){}clearInterval(timer);timer=null;dangKy()}});
+$.addEventListener('click',e=>{const id=e.target.id;if(id==='go')send(false);else if(id==='dk')dkGo();else if(id==='share')guiPH(phTxtKQ());else if(id==='shtg'&&S.ph&&S.ph.tg)guiPH(phTxtTG());else if(id==='doi'){e.preventDefault();CR=null;try{localStorage.removeItem(HK)}catch(x){}clearInterval(timer);timer=null;dangKy()}});
 async function send(auto){if(S.sending)return;const b=S.bai;
  if(!auto){
   const thieu=b.cau.filter(q=>q.loai==='tl'?!(S.a[q.id]||'').trim()&&!(S.anh[q.id]||[]).length:!(S.a[q.id]||'').trim()).length; if(thieu&&!confirm('Em còn '+thieu+' câu chưa làm. Vẫn nộp bài?'))return}
@@ -77,6 +77,7 @@ async function send(auto){if(S.sending)return;const b=S.bai;
  catch(x){S.sending=false;S.err='Chưa nộp được. Kiểm tra mạng rồi bấm Nộp lại nhé.';draw()}}
 function er(m){S.err=m;draw();window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})}
 function ket(j){
+ S.kq={diem:j.diem,toi_da:j.toi_da,diem10:j.diem10,trang_thai:j.trang_thai};
  const lis=a=>(a||[]).map(x=>esc(x.kt)+' ('+x.pct+'%'+(x.lop_tb!=null?', lớp TB '+x.lop_tb+'%':'')+')').join('; ');
  const rk=j.hang?`<p class="m">🏅 Xếp hạng tạm thời: <b>${j.hang}/${j.tong_nop}</b>${j.tb_lop10!=null?' · điểm TB lớp '+String(j.tb_lop10).replace('.',','):''} (có thể đổi khi các bạn khác nộp)</p>`:(j.cho_cham?'<p class="m">🏅 Xếp hạng sẽ có khi thầy/cô chấm xong các câu còn lại.</p>':'<p class="m">🏅 Em là bạn nộp đầu tiên nên chưa có bạn khác để xếp hạng.</p>');
  const pt=((j.manh&&j.manh.length)||(j.yeu&&j.yeu.length))?`<div class="c"><b>📊 Nhận xét kiến thức</b>${j.manh&&j.manh.length?`<p style="margin:8px 0">💪 <b>Em làm tốt:</b> ${lis(j.manh)}</p>`:''}${j.yeu&&j.yeu.length?`<p style="margin:8px 0">⚠️ <b>Cần ôn tập tăng cường:</b> ${lis(j.yeu)}</p>`:'<p class="m">Chưa có phần nào yếu rõ rệt, em giỏi lắm!</p>'}</div>`:'';
@@ -85,6 +86,27 @@ const b=S.bai,cta=j.co_tai_khoan?'':`<div class="c"><b>🎁 Học cùng VeduAI �
  ${j.nhan_xet?`<div class="c"><b>Nhận xét</b><p style="white-space:pre-wrap">${esc(j.nhan_xet)}</p></div>`:''}
  ${pt}
  ${j.co_ai?'<p class="m">Phần tự luận do AI chấm sơ bộ, thầy/cô sẽ xem lại.</p>':''}
- <p class="m" style="text-align:center"><a href="${HSPAGE}">📚 Xem tất cả bài đã làm</a></p><div class="c">${j.chi_tiet.map((d,i)=>`<p style="margin:6px 0">${d.dung===true?'✅':d.dung===false?'❌':'📝'} <b>Câu ${i+1}:</b> ${d.diem}/${d.toi_da}${d.dap_an&&d.dung===false?' · Đáp án: '+esc(d.dap_an):''}${d.nhan_xet?'<br><span class="m">'+esc(d.nhan_xet)+'</span>':''}</p>`).join('')}</div>${cta}`}
+ <p class="m" style="text-align:center"><a href="${HSPAGE}">📚 Xem tất cả bài đã làm</a></p><div class="c">${j.chi_tiet.map((d,i)=>`<p style="margin:6px 0">${d.dung===true?'✅':d.dung===false?'❌':'📝'} <b>Câu ${i+1}:</b> ${d.diem}/${d.toi_da}${d.dap_an&&d.dung===false?' · Đáp án: '+esc(d.dap_an):''}${d.nhan_xet?'<br><span class="m">'+esc(d.nhan_xet)+'</span>':''}</p>`).join('')}</div><div id="phbox"></div>${cta}`;phTai()}
+/* ===== v78: gui ket qua cho phu huynh (nut chia se + link xem + Telegram) ===== */
+const PHPAGE='https://veduai-vn.github.io/phu-huynh.html';
+function copyTxt(t){return new Promise(ok=>{try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>ok(true),()=>ok(cpOld(t)))}else ok(cpOld(t))}catch(e){ok(cpOld(t))}})}
+function cpOld(t){try{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();const r=document.execCommand('copy');a.remove();return r}catch(e){return false}}
+async function guiPH(t,tb){
+ if(navigator.share){try{await navigator.share({text:t});return}catch(e){if(e&&e.name==='AbortError')return}}
+ const ok=await copyTxt(t);const m=document.getElementById('phmsg');
+ if(m)m.textContent=ok?'✅ Đã sao chép. Em dán vào Zalo/Messenger/tin nhắn gửi phụ huynh nhé.':'Chưa sao chép được. Em chụp màn hình điểm gửi phụ huynh nhé.'}
+function phTxtKQ(){const k=S.kq||{},b=S.bai||{},u=S.ph&&S.ph.url?' Phụ huynh xem tất cả điểm của con tại: '+S.ph.url:'';
+ return 'Kết quả của '+CR.ten+': '+b.tieu_de+' – '+k.diem+'/'+k.toi_da+' điểm (thang 10: '+k.diem10+')'+(k.trang_thai==='cho_giao_vien'?', còn câu chờ thầy/cô chấm':'')+'.'+u}
+function phTxtTG(){return 'Phụ huynh bấm link này một lần để nhận kết quả bài làm của '+CR.ten+' tự động qua Telegram (miễn phí, có thể ngừng bất cứ lúc nào): '+S.ph.tg}
+function phVe(){const el=document.getElementById('phbox');if(!el)return;const p=S.ph;
+ el.innerHTML='<div class="c"><b>👨‍👩‍👧 Gửi kết quả cho phụ huynh</b><p class="m" style="margin:6px 0 10px">Em tự gửi từ máy của em, không cần nhập số điện thoại phụ huynh.</p>'+
+ '<div class="g"><button class="b" id="share">📨 Gửi kết quả này cho phụ huynh</button>'+
+ (p&&p.tg?'<button class="b" id="shtg" style="background:var(--card);color:var(--ink);border:2px solid var(--line)">🔔 Mời phụ huynh nhận điểm tự động qua Telegram</button>':'')+'</div>'+
+ '<p class="m" style="margin:10px 0 0">'+(p===null?'Đang tạo link cho phụ huynh…':p&&p.url?('Link xem điểm của em: <a href="'+esc(p.url)+'" target="_blank" rel="noopener">mở trang phụ huynh</a>'+(p.n?' · '+p.n+' phụ huynh đã đăng ký nhận thông báo':'')):'Chưa tạo được link xem điểm, nhưng em vẫn gửi được kết quả bằng nút trên.')+'</p><p class="m" id="phmsg" style="margin:6px 0 0;font-weight:700"></p></div>'}
+async function phTai(){S.ph=null;phVe();
+ try{const j=await (await fetch(API+'/hs-ph-link',{method:'POST',headers:{'Content-Type':'application/json',...H},body:JSON.stringify({hs:CR.hs,k:CR.k})})).json();
+  S.ph=j.ok?{url:j.ph_url,tg:j.tg_url,n:j.so_ph||0}:{}}catch(e){S.ph={}}
+ phVe()}
+
 load();
 </script></body></html>
