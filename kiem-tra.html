@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>VeduAI – Kiểm tra đầu vào</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
@@ -48,6 +49,29 @@
   .chip.g { background:var(--ok-bg); color:var(--ok); } .chip.w { background:var(--err-bg); color:var(--err); }
   .dots span { display:inline-block; animation:dt 1.2s infinite; } .dots span:nth-child(2){animation-delay:.2s} .dots span:nth-child(3){animation-delay:.4s}
   @media (prefers-reduced-motion:no-preference) { @keyframes dt { 50% { transform:translateY(-6px); } } }
+
+  textarea.t { width:100%; min-height:110px; border:2px solid var(--line); border-radius:16px; background:var(--card); color:var(--text); font:inherit; font-weight:600; padding:10px 14px; resize:vertical; line-height:1.5; }
+  textarea.t:focus-visible { outline:3px solid #FF7A90; outline-offset:2px; }
+  .fig { background:var(--card); border:2px dashed var(--line); border-radius:16px; padding:8px; margin:0 0 12px; }
+  .fig svg { width:100%; height:auto; max-height:300px; display:block; }
+  .fig svg text { paint-order:stroke; stroke:var(--card); stroke-width:3px; stroke-linejoin:round; }
+  .fig .cap { text-align:center; font-size:13px; font-weight:700; color:var(--muted); margin-top:2px; }
+  .gtag { background:#B9E4FF; color:#0B3556; }
+  .pas { white-space:pre-wrap; line-height:1.65; font-size:16.5px; font-weight:600; background:var(--bg); border:2px solid var(--line); border-radius:16px; padding:12px 14px; margin:8px 0 0; }
+  .say { font:800 21px/1.45 var(--disp); text-align:center; background:var(--bg); border:2px solid var(--line); border-radius:16px; padding:14px; margin:6px 0 12px; }
+  .play { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:10px; }
+  .play .m { font-weight:800; }
+  button.b.s { min-height:40px; padding:0 16px; font-size:14px; background:var(--card); color:var(--text); border:2px solid var(--line); box-shadow:none; }
+  button.b.rec { background:var(--err); color:#fff; }
+  @media (prefers-reduced-motion:no-preference) { button.b.rec { animation:pls 1s infinite; } @keyframes pls { 50% { transform:scale(1.05); } } }
+  .heard { margin-top:10px; padding:10px 12px; border-radius:14px; background:var(--bg); border:2px solid var(--line); font-weight:700; white-space:pre-wrap; }
+  .heard:empty { display:none; }
+  .skill { display:grid; grid-template-columns:132px 1fr 46px; gap:8px; align-items:center; margin:8px 0; font-weight:800; font-size:14px; }
+  .skill .bar2 { height:12px; border-radius:99px; background:var(--line); overflow:hidden; } .skill .bar2 i { display:block; height:100%; background:var(--ok); border-radius:99px; }
+  .skill .bar2 i.lo { background:var(--err); } .skill .bar2 i.mid { background:var(--mark-d); }
+  .res.p { background:var(--bg); border-color:var(--mark-d); }
+  .fb { margin-top:6px; font-size:15px; line-height:1.5; white-space:pre-wrap; }
+  details.tx { margin:0 0 12px; border:2px solid var(--line); border-radius:16px; padding:8px 12px; background:var(--card); } details.tx summary { cursor:pointer; font-weight:800; }
   .vf { margin:6px auto 0; padding:10px 8px; text-align:center; font-size:12.5px; line-height:1.6; color:var(--muted); }
   .vf a { color:inherit; font-weight:800; }
 </style>
@@ -59,14 +83,135 @@
   <footer class="vf"><b>VeduAI</b> – Vietnam Education AI Solutions<br>Hỗ trợ: Admin <a href="tel:0984048177">0984048177</a> (Telegram/Zalo)</footer>
 </div>
 <script>
+/* VeduAI – bộ vẽ hình hình học (SVG) theo đúng schema "ve_hinh" của bot */
+function veHinh(spec) {
+  const NS = 'http://www.w3.org/2000/svg', W = 360, H = 270, PAD = 38;
+  const COL = { blue: '#2F6FDE', red: '#D6336C', green: '#1E9E6A' };
+  const INK = 'var(--text,#24305E)';
+  const mk = (t, a, txt) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); if (txt != null) e.textContent = txt; return e; };
+  const svg = mk('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': String(spec.title || 'Hình vẽ') });
+  const g = (c) => COL[c] || INK;
+  const num = (v) => Number(v) || 0;
+
+  /* ---------- khối tròn xoay ---------- */
+  if (spec.template && spec.template.name) {
+    const t = spec.template, nm = String(t.name), r = Math.max(0.5, num(t.r) || 3), h = Math.max(0.5, num(t.h) || 5);
+    const line = (x1, y1, x2, y2, d) => svg.appendChild(mk('line', { x1, y1, x2, y2, stroke: INK, 'stroke-width': 2, 'stroke-linecap': 'round', 'stroke-dasharray': d ? '5 4' : '' }));
+    const arc = (cx, cy, rx, ry, front) => svg.appendChild(mk('path', { d: 'M ' + (cx - rx) + ' ' + cy + ' A ' + rx + ' ' + ry + ' 0 0 ' + (front ? 0 : 1) + ' ' + (cx + rx) + ' ' + cy, fill: 'none', stroke: INK, 'stroke-width': 2, 'stroke-dasharray': front ? '' : '5 4' }));
+    const dot = (x, y, lb, dx, dy) => { svg.appendChild(mk('circle', { cx: x, cy: y, r: 3, fill: INK })); if (lb) svg.appendChild(mk('text', { x: x + dx, y: y + dy, 'text-anchor': 'middle', 'dominant-baseline': 'middle', fill: INK, 'font-size': 15, 'font-weight': 800 }, lb)); };
+    if (nm === 'hinh_cau') {
+      const R = 95, cx = W / 2, cy = H / 2;
+      svg.appendChild(mk('circle', { cx, cy, r: R, fill: 'none', stroke: INK, 'stroke-width': 2 }));
+      arc(cx, cy, R, R * 0.3, true); arc(cx, cy, R, R * 0.3, false);
+      line(cx, cy, cx + R, cy, true); dot(cx, cy, 'O', 0, -13);
+    } else {
+      const maxW = 220, maxH = 190, k = Math.min(maxW / (2 * r), maxH / (h + 0.7 * r)), rx = r * k, ry = Math.max(8, rx * 0.3), hh = h * k;
+      const cx = W / 2, top = (H - (hh + 2 * ry)) / 2 + ry, bot = top + hh;
+      if (nm === 'hinh_tru') {
+        arc(cx, bot, rx, ry, true); arc(cx, bot, rx, ry, false);
+        svg.appendChild(mk('ellipse', { cx, cy: top, rx, ry, fill: 'none', stroke: INK, 'stroke-width': 2 }));
+        line(cx - rx, top, cx - rx, bot); line(cx + rx, top, cx + rx, bot);
+        line(cx, top, cx, bot, true); line(cx, bot, cx + rx, bot, true);
+        dot(cx, top, 'O\u2032', 0, -ry - 10); dot(cx, bot, 'O', 0, 14);
+      } else {
+        arc(cx, bot, rx, ry, true); arc(cx, bot, rx, ry, false);
+        line(cx, top - ry, cx - rx, bot); line(cx, top - ry, cx + rx, bot);
+        line(cx, top - ry, cx, bot, true); line(cx, bot, cx + rx, bot, true);
+        dot(cx, top - ry, 'S', 0, -12); dot(cx, bot, 'O', 0, 14);
+      }
+    }
+    return svg;
+  }
+
+  /* ---------- hình phẳng / hình không gian ---------- */
+  const is3d = String(spec.kind) === '3d', K = 0.5, AL = 38 * Math.PI / 180;
+  const P = {}; (spec.points || []).forEach(p => { P[String(p.name)] = { x: num(p.x), y: num(p.y), z: num(p.z) }; });
+  const has = (n) => Object.prototype.hasOwnProperty.call(P, String(n));
+  const proj = (p) => is3d ? [p.x + K * p.y * Math.cos(AL), p.z + K * p.y * Math.sin(AL)] : [p.x, p.y];
+  const S = {}; Object.keys(P).forEach(n => { S[n] = proj(P[n]); });
+  const names = Object.keys(S);
+  if (!names.length) return svg;
+  let minx = Infinity, maxx = -Infinity, miny = Infinity, maxy = -Infinity;
+  const ext = (x, y) => { minx = Math.min(minx, x); maxx = Math.max(maxx, x); miny = Math.min(miny, y); maxy = Math.max(maxy, y); };
+  names.forEach(n => ext(S[n][0], S[n][1]));
+  (spec.circles || []).forEach(c => { if (has(c.center)) { const q = S[c.center], r = num(c.r); ext(q[0] - r, q[1] - r); ext(q[0] + r, q[1] + r); } });
+  const bw = Math.max(maxx - minx, 1e-6), bh = Math.max(maxy - miny, 1e-6);
+  const sc = Math.min((W - 2 * PAD) / bw, (H - 2 * PAD) / bh);
+  const offx = (W - bw * sc) / 2, offy = (H - bh * sc) / 2;
+  const T = (n) => { const q = S[n]; return [offx + (q[0] - minx) * sc, H - offy - (q[1] - miny) * sc]; };
+  const cen = names.reduce((a, n) => { const t = T(n); return [a[0] + t[0] / names.length, a[1] + t[1] / names.length]; }, [0, 0]);
+  const unit = (dx, dy) => { const l = Math.hypot(dx, dy) || 1; return [dx / l, dy / l]; };
+  const draw = (e) => svg.appendChild(e);
+  const dashAttr = '6 4';
+
+  (spec.polygons || []).forEach(pg => {
+    const pts = (pg.points || []).filter(has); if (pts.length < 3) return;
+    draw(mk('polygon', { points: pts.map(n => T(n).join(',')).join(' '), fill: g(pg.fill) === INK ? '#9AA8D8' : g(pg.fill), 'fill-opacity': 0.18, stroke: 'none' }));
+  });
+  (spec.circles || []).forEach(c => { if (has(c.center)) { const q = T(c.center); draw(mk('circle', { cx: q[0], cy: q[1], r: num(c.r) * sc, fill: 'none', stroke: INK, 'stroke-width': 2 })); } });
+
+  /* các mặt của khối: tự tính nét khuất */
+  const segKey = (a, b) => [String(a), String(b)].sort().join('|');
+  const explicit = new Set((spec.segments || []).map(s => segKey(s.from, s.to)));
+  if (is3d && (spec.faces || []).length) {
+    const faces = spec.faces.filter(f => f.every(has));
+    const all = []; faces.forEach(f => f.forEach(n => all.push(P[n])));
+    const c3 = all.reduce((a, p) => ({ x: a.x + p.x / all.length, y: a.y + p.y / all.length, z: a.z + p.z / all.length }), { x: 0, y: 0, z: 0 });
+    const W3 = [K * Math.cos(AL), -1, K * Math.sin(AL)];
+    const front = faces.map(f => {
+      const a = P[f[0]], b = P[f[1]], c = P[f[2]];
+      const u = [b.x - a.x, b.y - a.y, b.z - a.z], v = [c.x - a.x, c.y - a.y, c.z - a.z];
+      let n = [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]];
+      const fc = f.reduce((s, nme) => ({ x: s.x + P[nme].x / f.length, y: s.y + P[nme].y / f.length, z: s.z + P[nme].z / f.length }), { x: 0, y: 0, z: 0 });
+      if (n[0] * (fc.x - c3.x) + n[1] * (fc.y - c3.y) + n[2] * (fc.z - c3.z) < 0) n = n.map(t => -t);
+      return n[0] * W3[0] + n[1] * W3[1] + n[2] * W3[2] > 1e-9;
+    });
+    const edges = {};
+    faces.forEach((f, i) => f.forEach((n, k) => { const m = f[(k + 1) % f.length], key = segKey(n, m); (edges[key] = edges[key] || { a: n, b: m, vis: false }); if (front[i]) edges[key].vis = true; }));
+    Object.keys(edges).forEach(key => {
+      if (explicit.has(key)) return; const e = edges[key], a = T(e.a), b = T(e.b);
+      draw(mk('line', { x1: a[0], y1: a[1], x2: b[0], y2: b[1], stroke: INK, 'stroke-width': 2, 'stroke-linecap': 'round', 'stroke-dasharray': e.vis ? '' : dashAttr, opacity: e.vis ? 1 : 0.8 }));
+    });
+  }
+  (spec.segments || []).forEach(s => {
+    if (!has(s.from) || !has(s.to)) return; const a = T(s.from), b = T(s.to), col = g(s.color);
+    draw(mk('line', { x1: a[0], y1: a[1], x2: b[0], y2: b[1], stroke: col, 'stroke-width': 2, 'stroke-linecap': 'round', 'stroke-dasharray': s.style === 'dashed' ? dashAttr : '' }));
+    if (s.label) { const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, u = unit(b[0] - a[0], b[1] - a[1]); let nx = -u[1], ny = u[0]; if (nx * (mx - cen[0]) + ny * (my - cen[1]) < 0) { nx = -nx; ny = -ny; }
+      draw(mk('text', { x: mx + nx * 17, y: my + ny * 17, 'text-anchor': 'middle', 'dominant-baseline': 'middle', fill: col, 'font-size': 13, 'font-weight': 700 }, String(s.label))); }
+  });
+  (spec.equal_ticks || []).forEach(et => (et.segs || []).forEach(sg => {
+    if (!has(sg[0]) || !has(sg[1])) return; const a = T(sg[0]), b = T(sg[1]), u = unit(b[0] - a[0], b[1] - a[1]), n = Math.max(1, Math.min(4, num(et.n) || 1)), mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
+    for (let i = 0; i < n; i++) { const o = (i - (n - 1) / 2) * 5; draw(mk('line', { x1: mx + u[0] * o - u[1] * 6, y1: my + u[1] * o + u[0] * 6, x2: mx + u[0] * o + u[1] * 6, y2: my + u[1] * o - u[0] * 6, stroke: INK, 'stroke-width': 2 })); }
+  }));
+  (spec.right_angles || []).forEach(ra => {
+    if (ra.length < 3 || !ra.every(has)) return; const v = T(ra[1]), a = T(ra[0]), b = T(ra[2]), u = unit(a[0] - v[0], a[1] - v[1]), w = unit(b[0] - v[0], b[1] - v[1]), s = 11;
+    draw(mk('polyline', { points: [[v[0] + u[0] * s, v[1] + u[1] * s], [v[0] + (u[0] + w[0]) * s, v[1] + (u[1] + w[1]) * s], [v[0] + w[0] * s, v[1] + w[1] * s]].map(p => p.join(',')).join(' '), fill: 'none', stroke: INK, 'stroke-width': 1.6 }));
+  });
+  (spec.angles || []).forEach(an => {
+    if (![an.at, an.from, an.to].every(has)) return; const v = T(an.at), a = T(an.from), b = T(an.to), r = 22;
+    const a1 = Math.atan2(a[1] - v[1], a[0] - v[0]), a2 = Math.atan2(b[1] - v[1], b[0] - v[0]);
+    let d = a2 - a1; while (d > Math.PI) d -= 2 * Math.PI; while (d <= -Math.PI) d += 2 * Math.PI;
+    const p1 = [v[0] + r * Math.cos(a1), v[1] + r * Math.sin(a1)], p2 = [v[0] + r * Math.cos(a2), v[1] + r * Math.sin(a2)];
+    draw(mk('path', { d: 'M ' + p1.join(' ') + ' A ' + r + ' ' + r + ' 0 0 ' + (d > 0 ? 1 : 0) + ' ' + p2.join(' '), fill: 'none', stroke: '#D6336C', 'stroke-width': 1.8 }));
+    if (an.label) { const m = a1 + d / 2; draw(mk('text', { x: v[0] + (r + 16) * Math.cos(m), y: v[1] + (r + 16) * Math.sin(m), 'text-anchor': 'middle', 'dominant-baseline': 'middle', fill: '#D6336C', 'font-size': 12, 'font-weight': 800 }, String(an.label))); }
+  });
+  names.forEach(n => {
+    const q = T(n), u = unit(q[0] - cen[0], q[1] - cen[1]);
+    draw(mk('circle', { cx: q[0], cy: q[1], r: 2.6, fill: INK }));
+    draw(mk('text', { x: q[0] + u[0] * 14, y: q[1] + u[1] * 14, 'text-anchor': 'middle', 'dominant-baseline': 'middle', fill: INK, 'font-size': 15, 'font-weight': 800 }, n));
+  });
+  return svg;
+}
+
 const API = 'https://devotee-outclass-couch.ngrok-free.dev/webhook';
 const H = { 'ngrok-skip-browser-warning': '1' };
-const b = (new URLSearchParams(location.search).get('b') || '').replace(/[^A-Za-z0-9]/g, '');
+const TGW = window.Telegram && Telegram.WebApp; if (TGW) { try { TGW.ready(); TGW.expand(); } catch (e) {} }
+const b = (new URLSearchParams(location.search).get('b') || new URLSearchParams(location.search).get('tgWebAppStartParam') || (TGW && TGW.initDataUnsafe && TGW.initDataUnsafe.start_param) || '').replace(/[^A-Za-z0-9]/g, '');
 const app = document.getElementById('app');
 const say = m => { document.getElementById('say').textContent = m; };
 const LET = 'ABCD';
-const PHUT = 25;
-let D = null, A = {}, sending = false, timer = null, endAt = 0;
+let PHUT = 25;
+let D = null, A = {}, L = {}, sending = false, timer = null, endAt = 0;
 
 const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
 function store(k, v) { try { if (v === undefined) return JSON.parse(sessionStorage.getItem('kt_' + b + '_' + k) || 'null'); sessionStorage.setItem('kt_' + b + '_' + k, JSON.stringify(v)); } catch (e) { return null; } }
@@ -85,6 +230,38 @@ async function api(path, body) {
   const opt = body ? { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, H), body: JSON.stringify(body) } : { headers: H };
   return (await fetch(API + path, opt)).json();
 }
+function figure(h) {
+  if (!h) return null;
+  try { const f = el('figure', 'fig'); f.style.margin = '0 0 12px'; f.appendChild(veHinh(h)); if (h.title) f.appendChild(el('div', 'cap', h.title)); return f; } catch (e) { return null; }
+}
+
+/* ---------- đọc thành tiếng (bài nghe) bằng giọng đọc có sẵn của máy ---------- */
+const TTS = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+let voicesCache = [];
+function loadVoices() { try { voicesCache = speechSynthesis.getVoices() || []; } catch (e) {} }
+if (TTS) { loadVoices(); try { speechSynthesis.onvoiceschanged = loadVoices; } catch (e) {} }
+function enVoices() { const v = voicesCache.filter(x => /^en[-_]/i.test(x.lang)); const pri = (x) => /en[-_]US/i.test(x.lang) ? 0 : /en[-_]GB/i.test(x.lang) ? 1 : 2; return v.sort((p, q) => pri(p) - pri(q)); }
+let speakToken = 0;
+function stopSpeak() { speakToken++; try { speechSynthesis.cancel(); } catch (e) {} }
+function speak(g, onEnd) {
+  if (!TTS) { onEnd && onEnd(false); return; }
+  stopSpeak(); const tok = speakToken;
+  const lop = parseInt(String((D && D.lop) || '').replace(/\D/g, ''), 10) || 6, rate = lop <= 5 ? 0.78 : 0.9;
+  const vs = enVoices(), lines = g.giong === 'hoi_thoai' ? g.kich_ban.split(/\n+/).map(s => s.trim()).filter(Boolean) : [g.kich_ban.replace(/\s*\n+\s*/g, ' ')];
+  const q = [];
+  lines.forEach((ln, k) => { (ln.match(/[^.!?]+[.!?]*/g) || [ln]).map(s => s.trim()).filter(Boolean).forEach((s, j, arr) => q.push({ s, k, last: j === arr.length - 1 })); });
+  let i = 0;
+  const next = () => {
+    if (tok !== speakToken) return; if (i >= q.length) { onEnd && onEnd(true); return; }
+    const it = q[i++], u = new SpeechSynthesisUtterance(it.s); u.lang = 'en-US'; u.rate = rate;
+    if (vs.length) u.voice = vs[(g.giong === 'hoi_thoai' && vs.length > 1 ? it.k % 2 : 0) % vs.length];
+    u.pitch = g.giong === 'hoi_thoai' ? (it.k % 2 ? 1.25 : 0.95) : 1;
+    u.onend = () => setTimeout(next, it.last ? 450 : 120); u.onerror = () => { if (tok === speakToken) onEnd && onEnd(false); };
+    speechSynthesis.speak(u);
+  };
+  next();
+}
+document.addEventListener('visibilitychange', () => { if (document.hidden) stopSpeak(); });
 
 async function load() {
   if (!b) { say('Ối, link chưa đúng!'); return state('🔍', 'Link chưa đúng', 'Em mở lại link mới nhất trong chat nhé.', 'err'); }
@@ -95,7 +272,7 @@ async function load() {
   } catch (e) { say('Mạng đang chập chờn…'); state('📡', 'Không kết nối được', 'Kiểm tra mạng rồi tải lại trang.', 'err'); }
 }
 function route(j) {
-  D = j;
+  D = j; PHUT = j.phut || 25;
   if (j.tt === 'da_nop') return showResult(j);
   if (j.tt === 'dang_lam') return showTest(j);
   showStart(j);
@@ -105,7 +282,8 @@ function showStart(j) {
   say('Mình bắt đầu thôi nào! 👇');
   app.innerHTML = ''; const c = el('div', 'card');
   c.append(el('h1', '', 'Kiểm tra đầu vào – ' + (j.mon || '')),
-    el('p', 'm', (j.lop ? 'Lớp ' + j.lop + ' · ' : '') + '20 câu · khoảng ' + PHUT + ' phút'));
+    el('p', 'm', (j.lop ? 'Lớp ' + j.lop + ' · ' : '') + (j.anh ? '20 câu · 4 kỹ năng Nghe – Nói – Đọc – Viết · khoảng ' + (j.phut || 35) + ' phút' : '20 câu · khoảng ' + (j.phut || 25) + ' phút')));
+  if (j.anh) c.appendChild(el('p', 'm', '🎧 Con bật loa hoặc đeo tai nghe  ·  🎤 Cho phép micro khi cô/thầy hỏi  ·  🤫 Tìm chỗ yên tĩnh nhé.'));
   c.appendChild(el('p', 'q', 'Con đang học đến bài hoặc chương nào? Cô/thầy sẽ ra đề bao quát đến phần đó.'));
   const inp = el('input', 't'); inp.id = 'bai'; inp.placeholder = 'Ví dụ: Chương 3, bài Hàm số bậc nhất'; inp.maxLength = 200; inp.autocomplete = 'off';
   const er = el('p', 'err'); er.id = 'er';
@@ -123,16 +301,81 @@ function showStart(j) {
   c.append(inp, er, go); app.appendChild(c);
 }
 
+/* ---------- thẻ bài nghe / bài đọc ---------- */
+function groupCard(g) {
+  const c = el('div', 'card'); c.id = 'g_' + g.id;
+  const top = el('div'); top.append(el('span', 'tag gtag', g.loai === 'nghe' ? '🎧 Bài nghe' : '📖 Bài đọc'), el('span', 'm', g.tieu_de || '')); c.appendChild(top);
+  if (g.loai === 'doc') { c.appendChild(el('div', 'pas', g.van_ban)); c.appendChild(el('p', 'm', 'Đọc kỹ bài rồi trả lời các câu bên dưới.')); return c; }
+  const MAXP = 2, row = el('div', 'play'), btn = el('button', 'b', '▶ Nghe'), st = el('span', 'm'); btn.type = 'button'; row.append(btn, st);
+  const fb = el('div'); let playing = false;
+  const upd = () => { const left = MAXP - (L[g.id] || 0); st.textContent = playing ? '🔊 Đang phát…' : (left > 0 ? 'Còn ' + left + ' lần nghe' : 'Đã hết lượt nghe'); btn.disabled = playing || left <= 0; btn.textContent = (L[g.id] || 0) ? '▶ Nghe lại' : '▶ Nghe'; };
+  btn.onclick = () => {
+    if (playing || (L[g.id] || 0) >= MAXP) return; L[g.id] = (L[g.id] || 0) + 1; store('l', L); playing = true; upd();
+    speak(g, ok => { playing = false; upd(); if (ok === false && !fb.firstChild) noVoice(); });
+  };
+  const noVoice = () => {
+    fb.appendChild(el('p', 'err', 'Máy của con chưa phát được tiếng Anh. Con mở bằng trình duyệt khác (Chrome/Safari) hoặc xem nội dung bài nghe bên dưới để làm bài nhé.'));
+    const d = el('details', 'tx'); d.append(el('summary', '', 'Xem nội dung bài nghe'), el('div', 'pas', g.kich_ban)); fb.appendChild(d);
+  };
+  c.append(row, el('p', 'm', 'Con được nghe tối đa ' + MAXP + ' lần. Nghe kỹ rồi trả lời các câu bên dưới.'), fb);
+  if (!TTS) noVoice(); upd(); return c;
+}
+
+/* ---------- ghi âm câu nói ---------- */
+function micBox(q) {
+  const wrap = el('div'), btn = el('button', 'b', '🎤 Bấm để nói'), st = el('div', 'm'), out = el('div', 'heard'), err = el('p', 'err'), alt = el('div');
+  btn.type = 'button'; btn.style.marginTop = '4px';
+  let rec = null, chunks = [], stream = null, tmr = null, t0 = 0, busy = false;
+  const show = () => { out.textContent = A[q.id] ? '🗣️ Máy nghe được: “' + A[q.id] + '”' : ''; btn.textContent = A[q.id] ? '🔁 Ghi âm lại' : '🎤 Bấm để nói'; };
+  const noMic = (why) => {
+    err.textContent = why; if (alt.firstChild) return;
+    if (TGW && TGW.openLink) { const o = el('button', 'b s', '🌐 Mở bằng trình duyệt để ghi âm'); o.type = 'button'; o.onclick = () => { try { TGW.openLink(location.origin + location.pathname + '?b=' + b); } catch (e) {} }; alt.appendChild(o); }
+    if (q.loai === 'noi_tl') { alt.appendChild(el('p', 'm', 'Không ghi âm được? Em gõ câu trả lời bằng tiếng Anh:')); const t = el('textarea', 't'); t.rows = 2; t.style.minHeight = '70px'; t.value = A[q.id] || ''; t.oninput = () => { A[q.id] = t.value; store('a', A); count(); }; alt.appendChild(t); }
+    else alt.appendChild(el('p', 'm', 'Nếu không ghi âm được, em bỏ qua câu này và làm tiếp các câu khác nhé.'));
+  };
+  const gui = async (blob) => {
+    busy = true; btn.disabled = true; btn.classList.remove('rec'); err.textContent = '';
+    if (blob.size < 2000) { err.textContent = 'Bản ghi quá ngắn. Em bấm nói lại, nói đủ câu rồi bấm dừng nhé.'; st.textContent = ''; busy = false; btn.disabled = false; show(); return; }
+    st.textContent = 'Cô/thầy đang nghe em nói…';
+    try {
+      const b64 = await new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(',')[1] || ''); r.onerror = no; r.readAsDataURL(blob); });
+      const r = await api('/kt-noi', { b, q: q.id, mime: blob.type || 'audio/webm', audio: b64 });
+      if (!r.ok) { err.textContent = r.loi || 'Chưa nhận dạng được, em thử lại nhé.'; st.textContent = ''; }
+      else { A[q.id] = r.text; store('a', A); count(); st.textContent = r.con_lai > 0 ? 'Em còn ' + r.con_lai + ' lần ghi lại.' : 'Đã dùng hết lượt ghi âm của câu này.'; if (r.con_lai <= 0) btn.style.display = 'none'; }
+    } catch (e) { err.textContent = 'Mạng chập chờn, em bấm ghi âm lại nhé.'; st.textContent = ''; }
+    busy = false; btn.disabled = false; show();
+  };
+  btn.onclick = async () => {
+    if (busy) return;
+    if (rec && rec.state === 'recording') { rec.stop(); return; }
+    err.textContent = ''; stopSpeak();
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) return noMic('Thiết bị hoặc ứng dụng này chưa hỗ trợ ghi âm.');
+    try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { return noMic('Em chưa cho phép dùng micro.'); }
+    const mt = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'].find(t => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || '';
+    try { rec = new MediaRecorder(stream, mt ? { mimeType: mt } : undefined); } catch (e) { stream.getTracks().forEach(t => t.stop()); return noMic('Thiết bị này chưa ghi âm được.'); }
+    chunks = []; rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+    rec.onstop = () => { clearInterval(tmr); stream.getTracks().forEach(t => t.stop()); gui(new Blob(chunks, { type: (rec.mimeType || mt || 'audio/webm').split(';')[0] })); };
+    rec.start(); t0 = Date.now(); btn.textContent = '⏹ Dừng ghi âm'; btn.classList.add('rec');
+    tmr = setInterval(() => { const s = Math.floor((Date.now() - t0) / 1000); st.textContent = '🔴 Đang ghi âm… ' + s + 's (tối đa 30s)'; if (s >= 30) rec.stop(); }, 250);
+  };
+  wrap.append(btn, st, out, err, alt); show(); return wrap;
+}
+
 function showTest(j) {
-  say('Làm cẩn thận nhé, cố lên! 💪');
-  A = store('a') || {};
+  say(j.anh ? 'Nghe kỹ, đọc kỹ, làm cẩn thận nhé! 💪' : 'Làm cẩn thận nhé, cố lên! 💪');
+  A = store('a') || {}; L = store('l') || {};
   endAt = store('end') || (Date.now() + PHUT * 60000); store('end', endAt);
   app.innerHTML = '';
   const head = el('div', 'card'); head.append(el('h1', '', 'Kiểm tra đầu vào – ' + (j.mon || '')), el('p', 'm', (j.bai ? 'Đến: ' + j.bai + ' · ' : '') + j.cau.length + ' câu')); app.appendChild(head);
+  const groups = {}; (j.nhom || []).forEach(g => { groups[g.id] = g; });
+  let lastG = '';
   j.cau.forEach((q, i) => {
+    if (q.nhom && q.nhom !== lastG && groups[q.nhom]) app.appendChild(groupCard(groups[q.nhom]));
+    lastG = q.nhom || '';
     const c = el('div', 'card'); c.id = 'c_' + q.id;
     const top = el('div'); top.append(el('span', 'tag', 'Câu ' + (i + 1)), el('span', 'm', q.chu_de || '')); c.appendChild(top);
     c.appendChild(el('p', 'q', q.de));
+    const f = figure(q.hinh); if (f) c.appendChild(f);
     if (q.loai === 'tn') {
       (q.lc || []).forEach((x, k) => {
         const l = el('label', 'o' + (A[q.id] === LET[k] ? ' on' : ''));
@@ -140,13 +383,22 @@ function showTest(j) {
         r.onchange = () => { A[q.id] = LET[k]; store('a', A); c.querySelectorAll('label.o').forEach(z => z.classList.remove('on')); l.classList.add('on'); count(); };
         const s = el('span'); const bb = el('b', '', LET[k] + '. '); s.append(bb, document.createTextNode(x)); l.append(r, s); c.appendChild(l);
       });
+    } else if (q.loai === 'viet') {
+      const t = el('textarea', 't'); t.rows = 4; t.placeholder = 'Write your answer here (viết bằng tiếng Anh)…'; t.value = A[q.id] || ''; t.lang = 'en'; t.spellcheck = false; t.autocapitalize = 'sentences';
+      const wc = el('div', 'm'); const upd = () => { const n = (t.value.trim().match(/\S+/g) || []).length; wc.textContent = n + ' từ' + (q.min_tu ? ' (nên viết ít nhất ' + q.min_tu + ' từ)' : ''); };
+      t.oninput = () => { A[q.id] = t.value; store('a', A); upd(); count(); }; upd(); c.append(t, wc);
+    } else if (q.loai === 'noi_doc') {
+      c.appendChild(el('div', 'say', q.doc)); c.appendChild(micBox(q));
+    } else if (q.loai === 'noi_tl') {
+      c.appendChild(micBox(q));
     } else {
-      const t = el('input', 't'); t.placeholder = 'Đáp án của con (số hoặc từ ngắn)'; t.value = A[q.id] || ''; t.autocomplete = 'off';
+      const t = el('input', 't'); t.placeholder = j.anh ? 'Đáp án của con (một câu hoặc từ ngắn)' : 'Đáp án của con (số hoặc từ ngắn)'; t.value = A[q.id] || ''; t.autocomplete = 'off'; if (j.anh) { t.lang = 'en'; t.spellcheck = false; }
       t.oninput = () => { A[q.id] = t.value; store('a', A); count(); }; c.appendChild(t);
     }
     app.appendChild(c);
   });
   const er = el('p', 'err'); er.id = 'er'; app.appendChild(er);
+  document.querySelectorAll('.bar').forEach(x => x.remove());
   const bar = el('div', 'bar'); const tm = el('span', 'm'); tm.id = 'tm';
   const go = el('button', 'b', 'Nộp bài'); go.type = 'button'; go.id = 'go'; go.onclick = () => nop(false);
   bar.append(tm, go); document.body.appendChild(bar);
@@ -165,29 +417,36 @@ async function nop(auto) {
   if (sending) return;
   const thieu = D.cau.length - done();
   if (!auto && thieu && !confirm('Con còn ' + thieu + ' câu chưa làm. Vẫn nộp bài?')) return;
-  sending = true; clearInterval(timer);
+  sending = true; clearInterval(timer); stopSpeak();
   const go = document.getElementById('go'); if (go) { go.disabled = true; go.textContent = 'Đang chấm…'; }
   try {
     const r = await api('/kt-nop', { b, tra_loi: A });
     if (!r.ok) { sending = false; const er = document.getElementById('er'); if (er) er.textContent = r.loi || 'Chưa nộp được, con thử lại nhé.'; if (go) { go.disabled = false; go.textContent = 'Nộp bài'; } timer = setInterval(tick, 1000); return; }
     document.querySelectorAll('.bar').forEach(x => x.remove());
-    try { sessionStorage.removeItem('kt_' + b + '_a'); sessionStorage.removeItem('kt_' + b + '_end'); } catch (e) {}
-    showResult(r); window.scrollTo({ top: 0 });
+    try { ['a', 'end', 'l'].forEach(k => sessionStorage.removeItem('kt_' + b + '_' + k)); } catch (e) {}
+    D = Object.assign(D, { nhom: r.nhom || D.nhom }); showResult(r); window.scrollTo({ top: 0 });
   } catch (e) {
     sending = false; const er = document.getElementById('er'); if (er) er.textContent = 'Chưa nộp được. Kiểm tra mạng rồi bấm Nộp lại nhé (bài làm của con vẫn còn).';
     if (go) { go.disabled = false; go.textContent = 'Nộp bài'; } timer = setInterval(tick, 1000);
   }
 }
 
+const KN_TEN = { nghe: '🎧 Nghe', noi: '🎤 Nói', doc: '📖 Đọc', viet: '✍️ Viết', ngu_phap: '🔤 Từ vựng & ngữ pháp' };
+const KN_THUTU = ['nghe', 'noi', 'doc', 'viet', 'ngu_phap'];
 function showResult(j) {
-  const k = j.ket; sending = false;
+  const k = j.ket; sending = false; D = D || j; stopSpeak();
   say(k.diem10 >= 8 ? 'Giỏi quá! 🎉' : k.diem10 >= 5 ? 'Làm tốt lắm! 👏' : 'Không sao, mình cùng ôn lại nhé 💛');
   app.innerHTML = '';
   const top = el('div', 'card'); top.style.textAlign = 'center';
   top.append(el('h1', '', 'Kết quả – ' + (j.mon || '')), el('div', 'score', String(k.diem10).replace('.', ',') + '/10'),
-    el('p', 'm', k.dung + '/' + k.tong + ' câu đúng · ' + k.xep_loai));
+    el('p', 'm', k.dung + '/' + k.tong + ' câu đạt · ' + k.xep_loai));
   const note = el('p', 'q', 'Quay lại chat, cô/thầy sẽ tiếp tục với con nhé. Phần dưới là đáp án và lời giải từng câu.'); note.style.marginTop = '10px'; top.appendChild(note);
   app.appendChild(top);
+  if ((k.ky_nang || []).length) {
+    const c = el('div', 'card'); c.appendChild(el('b', '', '🧭 Điểm từng kỹ năng'));
+    KN_THUTU.forEach(key => { const s = k.ky_nang.find(x => x.kn === key); if (!s) return; const pct = Math.round(s.diem / s.tong * 100); const r = el('div', 'skill'), bar = el('div', 'bar2'), i = el('i', pct >= 70 ? '' : pct >= 50 ? 'mid' : 'lo'); i.style.width = pct + '%'; bar.appendChild(i); r.append(el('span', '', KN_TEN[key] || key), bar, el('span', '', pct + '%')); c.appendChild(r); });
+    app.appendChild(c);
+  }
   if ((k.manh || []).length || (k.yeu || []).length) {
     const c = el('div', 'card'); c.appendChild(el('b', '', '📊 Nhận xét kiến thức'));
     if (k.manh && k.manh.length) { c.appendChild(el('p', 'm', '💪 Con làm tốt:')); const ch = el('div', 'chips'); k.manh.forEach(x => ch.appendChild(el('span', 'chip g', x))); c.appendChild(ch); }
@@ -195,14 +454,26 @@ function showResult(j) {
     app.appendChild(c);
   }
   const h = el('div', 'card'); h.appendChild(el('b', '', 'Đáp án và lời giải')); app.appendChild(h);
+  const groups = {}; ((k.nhom && k.nhom.length ? k.nhom : j.nhom) || []).forEach(g => { groups[g.id] = g; });
+  let lastG = '';
   (k.chi_tiet || []).forEach((d, i) => {
-    const c = el('div', 'res ' + (d.dung ? 'd' : 's'));
-    c.appendChild(el('div', '', (d.dung ? '✅ ' : '❌ ') + 'Câu ' + (i + 1) + (d.chu_de ? ' · ' + d.chu_de : '')));
+    if (d.nhom && d.nhom !== lastG && groups[d.nhom]) {
+      const g = groups[d.nhom], dt = el('details', 'tx'); dt.append(el('summary', '', g.loai === 'nghe' ? '🎧 Lời bài nghe – ' + (g.tieu_de || '') : '📖 Bài đọc – ' + (g.tieu_de || '')), el('div', 'pas', g.loai === 'nghe' ? g.kich_ban : g.van_ban));
+      if (g.loai === 'nghe' && TTS) { const sb = el('button', 'b s', '🔊 Nghe lại'); sb.type = 'button'; sb.style.marginTop = '8px'; sb.onclick = () => speak(g); dt.appendChild(sb); }
+      app.appendChild(dt);
+    }
+    lastG = d.nhom || '';
+    const part = !d.dung && d.diem > 0, c = el('div', 'res ' + (d.dung ? 'd' : part ? 'p' : 's')), cham = (d.loai === 'viet' || d.loai === 'noi_doc' || d.loai === 'noi_tl');
+    c.appendChild(el('div', '', (d.dung ? '✅ ' : part ? '🟡 ' : '❌ ') + 'Câu ' + (i + 1) + (d.chu_de ? ' · ' + d.chu_de : '') + (cham || d.diem % 1 ? ' · ' + String(d.diem).replace('.', ',') + '/1 điểm' : '')));
     c.appendChild(el('p', 'q', d.de));
+    if (d.loai === 'noi_doc' && d.doc) c.appendChild(el('div', 'say', d.doc));
+    const f = figure(d.hinh); if (f) c.appendChild(f);
     if (d.loai === 'tn' && d.lc) c.appendChild(el('div', 'm', d.lc.map((x, z) => LET[z] + '. ' + x).join('\n'))).style.whiteSpace = 'pre-wrap';
     const ex = el('div', 'ex');
-    ex.appendChild(el('div', '', 'Con chọn: ' + (d.hs ? d.hs : '(chưa trả lời)')));
-    if (!d.dung) ex.appendChild(el('div', 'err', 'Đáp án đúng: ' + d.dap_an));
+    const lab = d.loai === 'tn' ? 'Con chọn' : d.loai === 'viet' ? 'Bài của con' : (d.loai === 'noi_doc' || d.loai === 'noi_tl') ? 'Con nói (máy ghi lại)' : 'Con trả lời';
+    ex.appendChild(el('div', '', lab + ': ' + (d.hs ? d.hs : '(chưa trả lời)')));
+    if (cham) { if (d.nx) ex.appendChild(el('div', 'fb', '💬 ' + d.nx)); if (d.sua) ex.appendChild(el('div', 'fb', '✏️ Gợi ý sửa: ' + d.sua)); if (d.loai !== 'noi_doc' && d.dap_an) ex.appendChild(el('div', 'fb', '📘 Bài mẫu: ' + d.dap_an)); }
+    else if (!d.dung) ex.appendChild(el('div', 'err', 'Đáp án đúng: ' + d.dap_an));
     if (d.giai_thich) ex.appendChild(el('div', '', '💡 ' + d.giai_thich));
     c.appendChild(ex); app.appendChild(c);
   });
