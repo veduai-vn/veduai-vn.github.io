@@ -95,6 +95,7 @@ function stepCach(g) {
   card.innerHTML = ''; say('Con muốn học theo cách nào? 👇');
   const bk = document.createElement('button'); bk.className = 'back'; bk.type = 'button'; bk.textContent = '← Chọn môn khác'; bk.onclick = stepMon; card.appendChild(bk);
   const p = document.createElement('p'); p.className = 'msg'; p.textContent = 'Môn ' + g.label; card.appendChild(p);
+  const hint = document.createElement('p'); hint.className = 'muted'; hint.style.margin = '0 0 14px'; hint.textContent = '💡 Làm kiểm tra đầu vào trước sẽ cho kết quả học tốt nhất. Con vẫn có thể chọn cách học khác.'; card.appendChild(hint);
   g.items.forEach((o, i) => btn(i + 1, o.label, () => submit(o.k, g.label + ' · ' + o.label)));
 }
 async function submit(i, label) {
