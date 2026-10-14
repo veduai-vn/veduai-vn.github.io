@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VeduAI – Chọn môn</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#EAF5FF; --card:#fff; --text:#24305E; --muted:#5F6B92; --line:#C9DAF2; --shadow:#B5CBEA; --mark:#FFD84D; --mark-d:#E3AE00; --mark-ink:#4A3700; --ok:#118A62; --err:#C2255C;
+    --font:'Nunito',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif; --disp:'Baloo 2','Nunito',system-ui,sans-serif; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#151B36; --card:#1F2850; --text:#F1F4FF; --muted:#AAB4DC; --line:#38437A; --shadow:#0E1328; --mark-d:#B88A00; --ok:#5FE0B0; --err:#FF9BB5; }
+  }
+  * { box-sizing:border-box; }
+  html,body { margin:0; background:var(--bg); color:var(--text); font-family:var(--font); font-weight:500; }
+  body { min-height:100vh; padding:env(safe-area-inset-top,0) 16px env(safe-area-inset-bottom,0); background-image:radial-gradient(var(--line) 1.5px,transparent 1.5px); background-size:26px 26px; display:flex; justify-content:center; }
+  .wrap { width:100%; max-width:520px; padding:24px 0; }
+  .hero { display:flex; gap:10px; align-items:flex-end; margin-bottom:14px; }
+  .mascot { font-size:56px; line-height:1; flex:none; }
+  .bubble { background:var(--card); border:2px solid var(--line); border-radius:22px 22px 22px 6px; padding:8px 16px 10px; box-shadow:0 4px 0 var(--shadow); font-weight:700; }
+  .card { background:var(--card); border:2px solid var(--line); border-radius:24px; box-shadow:0 4px 0 var(--shadow); padding:20px 16px; }
+  .msg { white-space:pre-wrap; line-height:1.5; font-size:17px; font-weight:700; margin:0 0 16px; }
+  button.opt { display:flex; align-items:center; gap:12px; width:100%; text-align:left; font:inherit; font-weight:700; font-size:16px; padding:10px 16px 10px 10px; margin:0 0 12px; border:2px solid var(--line); background:var(--card); color:var(--text); border-radius:999px; cursor:pointer; line-height:1.4; box-shadow:0 4px 0 var(--shadow); transition:transform .08s, box-shadow .08s; }
+  button.opt .n { flex:none; display:inline-grid; place-items:center; width:34px; height:34px; border-radius:50%; background:var(--mark); color:var(--mark-ink); font:800 17px var(--disp); }
+  button.opt:active { transform:translateY(3px); box-shadow:0 1px 0 var(--shadow); background:var(--mark); border-color:var(--mark-d); color:var(--mark-ink); }
+  button.opt:disabled { opacity:.55; cursor:default; }
+  button.back { appearance:none; border:0; background:none; color:var(--muted); font:700 14px var(--font); cursor:pointer; padding:4px 0 12px; }
+  .state { text-align:center; padding:24px 8px; line-height:1.6; }
+  .state .big { font-size:64px; line-height:1.1; margin-bottom:8px; }
+  .state .t { font:800 21px var(--disp); }
+  .ok { color:var(--ok); } .err { color:var(--err); } .muted { color:var(--muted); font-size:14px; font-weight:600; }
+  .vf { max-width:560px; margin:6px auto 0; padding:10px 8px; text-align:center; font-size:12.5px; line-height:1.6; color:var(--muted); }
+  .vf a { color:inherit; font-weight:800; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero"><span class="mascot" aria-hidden="true">🦉</span><div class="bubble" id="say">Cô/thầy đang chuẩn bị…</div></div>
+  <div class="card" id="card"><div class="state"><div class="big" aria-hidden="true">🐣</div>Đang tải...</div></div>
+  <footer class="vf"><b>VeduAI</b> – Vietnam Education AI Solutions<br>Hỗ trợ: Admin <a href="tel:0984048177">0984048177</a> (Telegram/Zalo)</footer>
+</div>
+<script>
+const API = 'https://devotee-outclass-couch.ngrok-free.dev/webhook';
+const H = { 'ngrok-skip-browser-warning': '1' };
+const TG = window.Telegram && Telegram.WebApp;
+if (TG) { try { TG.ready(); TG.expand(); } catch (e) {} }
+const raw = (TG && TG.initDataUnsafe && TG.initDataUnsafe.start_param) || new URLSearchParams(location.search).get('t') || '';
+const t = raw.replace(/[^A-Za-z0-9]/g, '');
+const card = document.getElementById('card');
+const say = m => { document.getElementById('say').textContent = m; };
+
+function state(icon, title, sub, cls) {
+  card.innerHTML = '';
+  const s = document.createElement('div'); s.className = 'state';
+  const a = document.createElement('div'); a.className = 'big'; a.textContent = icon;
+  const b = document.createElement('div'); b.className = 't ' + (cls || ''); b.textContent = title;
+  s.append(a, b);
+  if (sub) { const c = document.createElement('div'); c.className = 'muted'; c.textContent = sub; s.appendChild(c); }
+  card.appendChild(s);
+}
+const LY_DO = {
+  khong_co: ['🔍', 'Không tìm thấy phiếu', 'Link không đúng hoặc đã bị xoá. Em quay lại ứng dụng và mở link mới nhất nhé.'],
+  da_dung: ['✅', 'Em đã chọn xong rồi nè', 'Quay lại ứng dụng để tiếp tục nhé.'],
+  het_han: ['⏰', 'Link đã hết hạn', 'Em quay lại ứng dụng và mở link mới nhất nhé.'],
+  sai_lua_chon: ['⚠️', 'Lựa chọn không hợp lệ', 'Hãy tải lại trang và thử lại.']
+};
+function showReason(r) { say('Ối, có chút trục trặc rồi!'); const x = LY_DO[r] || ['⚠️', 'Có lỗi xảy ra', 'Vui lòng thử lại sau.']; state(x[0], x[1], x[2], 'err'); }
+
+let J = null, sending = false;
+async function load() {
+  if (!t) return showReason('khong_co');
+  try {
+    const j = await (await fetch(API + '/zalo-phieu-lay?t=' + t, { headers: H })).json();
+    if (!j.ok) return showReason(j.reason);
+    J = j;
+    if (Array.isArray(j.nhom) && j.nhom.length) stepMon(); else stepFlat();
+  } catch (e) { say('Mạng đang chập chờn…'); state('📡', 'Không kết nối được', 'Kiểm tra mạng rồi tải lại trang.', 'err'); }
+}
+function addTitle() { if (J.title) { const p = document.createElement('p'); p.className = 'msg'; p.textContent = J.title; card.appendChild(p); } }
+function btn(i, label, fn) {
+  const b = document.createElement('button'); b.className = 'opt'; b.type = 'button';
+  const n = document.createElement('span'); n.className = 'n'; n.textContent = i;
+  b.append(n, document.createTextNode(label)); b.onclick = fn; card.appendChild(b);
+}
+function stepFlat() { card.innerHTML = ''; say('Chọn một đáp án nhé 👇'); addTitle(); J.labels.forEach((lb, i) => btn(i + 1, lb, () => submit(i, lb))); }
+function stepMon() {
+  card.innerHTML = ''; say('Mình bắt đầu từ môn nào nhỉ? 👇');
+  const p = document.createElement('p'); p.className = 'msg'; p.textContent = 'Chọn môn con muốn bắt đầu:'; card.appendChild(p);
+  J.nhom.forEach((g, i) => btn(i + 1, g.label, () => g.items.length === 1 ? submit(g.items[0].k, g.label) : stepCach(g)));
+}
+function stepCach(g) {
+  card.innerHTML = ''; say('Con muốn học theo cách nào? 👇');
+  const bk = document.createElement('button'); bk.className = 'back'; bk.type = 'button'; bk.textContent = '← Chọn môn khác'; bk.onclick = stepMon; card.appendChild(bk);
+  const p = document.createElement('p'); p.className = 'msg'; p.textContent = 'Môn ' + g.label; card.appendChild(p);
+  g.items.forEach((o, i) => btn(i + 1, o.label, () => submit(o.k, g.label + ' · ' + o.label)));
+}
+async function submit(i, label) {
+  if (sending) return; sending = true;
+  card.querySelectorAll('button').forEach(b => b.disabled = true);
+  try {
+    const j = await (await fetch(API + '/zalo-phieu-nop', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, H), body: JSON.stringify({ t, i }) })).json();
+    if (j.ok) {
+      state('🎉', 'Đã ghi nhận: ' + label, TG ? 'Cô/thầy đang chuẩn bị câu hỏi, quay lại chat nhé.' : 'Em quay lại ứng dụng chat để làm tiếp nhé.', 'ok');
+      say('Giỏi lắm! Mình bắt đầu thôi.');
+      if (TG) setTimeout(() => { try { TG.close(); } catch (e) {} }, 1200);
+    } else { sending = false; showReason(j.reason); }
+  } catch (e) { sending = false; card.querySelectorAll('button').forEach(b => b.disabled = false); alert('Chưa gửi được, em thử lại nhé.'); }
+}
+load();
+</script>
+</body>
+</html>
