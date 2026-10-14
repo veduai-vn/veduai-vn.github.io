@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>VeduAI – Góc học sinh</title>
+<style>
+:root{--bg:#EAF5FF;--card:#fff;--ink:#24305E;--mut:#5F6B92;--line:#C9DAF2;--sh:#B5CBEA;--mark:#FFD84D;--ok:#118A62;--err:#C2255C}
+@media(prefers-color-scheme:dark){:root{--bg:#151B36;--card:#1F2850;--ink:#F1F4FF;--mut:#AAB4DC;--line:#38437A;--sh:#0E1328;--ok:#5FE0B0;--err:#FF9BB5}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:500 16px/1.5 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;padding:env(safe-area-inset-top,0) 14px calc(20px + env(safe-area-inset-bottom,0))}
+main{max-width:560px;margin:0 auto;padding:18px 0}h1{font-size:22px;margin:0 0 4px}h2{font-size:17px;margin:0 0 6px}.m{color:var(--mut);font-size:14px}
+.c{background:var(--card);border:2px solid var(--line);border-radius:20px;box-shadow:0 4px 0 var(--sh);padding:14px;margin:0 0 14px}
+input,select{width:100%;min-height:46px;border:2px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);font:inherit;padding:8px 12px}
+.g{display:grid;gap:10px}.dob{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:8px}.r{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.b{appearance:none;border:0;background:var(--ink);color:var(--card);font:800 16px system-ui;min-height:48px;padding:0 22px;border-radius:999px;cursor:pointer}.b:disabled{opacity:.5}.b.l{background:var(--card);color:var(--ink);border:2px solid var(--line)}
+.err{color:var(--err);font-weight:700;margin:0}.ok{color:var(--ok);font-weight:700}.sc{font:800 22px system-ui;white-space:nowrap}a{color:var(--ink);font-weight:800}
+.vf{max-width:560px;margin:6px auto 0;padding:10px 8px;text-align:center;font-size:12.5px;line-height:1.6;color:var(--mut)}.vf a{color:inherit}</style></head>
+<body><main id="app"><p class="m">Đang mở…</p></main>
+<footer class="vf"><b>VeduAI</b> – Vietnam Education AI Solutions<br>Hỗ trợ: Admin <a href="tel:0984048177">0984048177</a> (Telegram/Zalo)</footer>
+<script>
+const API='https://devotee-outclass-couch.ngrok-free.dev/webhook',H={'ngrok-skip-browser-warning':'1','Content-Type':'application/json'};
+const PAGE_BAI='https://veduai-vn.github.io/bai-tap.html',BOT='https://t.me/MotSachVedu_Bot',HK='hsfree';
+const $=document.getElementById('app'),esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let CR=null;try{CR=JSON.parse(localStorage.getItem(HK)||'null')}catch(e){}
+const R={ten:'',nd:'',nt:'',nn:'',tr:'',lop:'',ma:'',err:'',busy:false};let D=null;
+const post=async(p,b)=>{try{return await (await fetch(API+'/'+p,{method:'POST',headers:H,body:JSON.stringify(b)})).json()}catch(e){return{ok:false,loi:'Không kết nối được. Kiểm tra mạng rồi thử lại.'}}};
+async function vao(){if(!CR||!CR.hs)return dk();$.innerHTML='<p class="m">Đang tải…</p>';const j=await post('hs-vao',{hs:CR.hs,k:CR.k});
+ if(!j.ok){if(j.dangKy){CR=null;try{localStorage.removeItem(HK)}catch(e){}R.err=j.loi||'';return dk()}$.innerHTML='<div class="c"><p class="err">'+esc(j.loi)+'</p><button class="b" onclick="vao()">Thử lại</button></div>';return}
+ D=j;ve()}
+function dk(){const ys=[];for(let y=new Date().getFullYear()-5;y>=1995;y--)ys.push(y);
+ const o=(a,t,k)=>`<option value="">${t}</option>`+a.map(x=>`<option ${String(x)===String(R[k])?'selected':''}>${x}</option>`).join('');
+ $.innerHTML=`<h1>🎒 Góc học sinh VeduAI</h1><p class="m">Làm bài tập, bài kiểm tra thầy/cô giao hoàn toàn miễn phí và xem lại điểm các bài đã làm.</p>
+ <div class="c g"><h2>Đăng ký miễn phí / Đăng nhập</h2><p class="m" style="margin:0">Chưa có tài khoản thì điền để đăng ký (30 giây). Đã đăng ký thì nhập lại đúng họ tên, ngày sinh, trường để đăng nhập.</p>
+ <input data-r="ten" placeholder="Họ và tên" value="${esc(R.ten)}" autocomplete="name">
+ <div class="dob"><select data-r="nd">${o([...Array(31).keys()].map(i=>i+1),'Ngày','nd')}</select><select data-r="nt">${o([...Array(12).keys()].map(i=>i+1),'Tháng','nt')}</select><select data-r="nn">${o(ys,'Năm','nn')}</select></div>
+ <div class="dob" style="grid-template-columns:1fr 2fr"><input data-r="lop" placeholder="Lớp (7A2)" value="${esc(R.lop)}"><input data-r="tr" placeholder="Trường" value="${esc(R.tr)}"></div>
+ <input id="hp" style="display:none" tabindex="-1" autocomplete="off"><p class="err">${esc(R.err)}</p><button class="b" id="dk" ${R.busy?'disabled':''}>${R.busy?'Đang xử lý…':'Đăng ký / Đăng nhập'}</button></div>`}
+async function dkGo(){if(R.ten.trim().split(/\s+/).filter(Boolean).length<2){R.err='Nhập đủ họ và tên.';return dk()}
+ const ns=R.nn+'-'+String(R.nt).padStart(2,'0')+'-'+String(R.nd).padStart(2,'0'),v=new Date(ns+'T00:00:00');
+ if(!(R.nn&&v.getFullYear()==R.nn&&v.getMonth()+1==R.nt&&v.getDate()==R.nd)){R.err='Chọn đủ ngày sinh.';return dk()}
+ if(!R.tr.trim()||!R.lop.trim()){R.err='Nhập lớp và trường.';return dk()}
+ R.busy=true;R.err='';dk();
+ const j=await post('hs-dang-ky',{ho_ten:R.ten,ngay_sinh:ns,ten_lop:R.lop,truong:R.tr,hp:(document.getElementById('hp')||{}).value||''});R.busy=false;
+ if(!j.ok){R.err=j.loi||'Chưa được, em thử lại nhé.';return dk()}
+ CR={hs:j.hs,k:j.k,ten:j.ten,lop:j.lop,truong:j.truong};try{localStorage.setItem(HK,JSON.stringify(CR))}catch(e){}vao()}
+function maBai(v){v=String(v||'').trim();const m=v.match(/[?&]b=([A-Za-z0-9]+)/)||v.match(/^([A-Za-z0-9]{5,12})$/);return m?m[1]:''}
+function ve(){const h=D.hs,n=D.nop,done=n.filter(x=>x.toi_da),tb=done.length?Math.round(done.reduce((s,x)=>s+x.diem10,0)/done.length*10)/10:null;
+ $.innerHTML=`<div class="r"><div><h1>Chào ${esc(h.ten)} 👋</h1><span class="m">Lớp ${esc(h.lop)} · ${esc(h.truong)}</span></div><button class="b l" id="out">Thoát</button></div>
+ <div class="c g" style="margin-top:12px"><h2>📝 Làm bài thầy/cô giao</h2><input id="ma" placeholder="Dán link hoặc mã bài thầy/cô gửi"><p class="err" id="er"></p><button class="b" id="go">Mở bài</button></div>
+ <div class="c"><h2>📚 Bài em đã làm (${n.length})${tb!=null?' · điểm TB '+String(tb).replace('.',','):''}</h2>${n.map(x=>`<div class="r" style="border-top:1px solid var(--line);padding:8px 0"><div><b>${esc(x.tieu_de)}</b><br><span class="m">${esc([x.mon,x.gv&&'GV '+x.gv,x.ngay_nop.split('-').reverse().join('/')].filter(Boolean).join(' · '))}${x.trang_thai==='cho_giao_vien'?' · ⏳ chờ thầy/cô chấm':''}</span></div><span class="sc">${String(x.diem).replace('.',',')}/${x.toi_da}</span></div>`).join('')||'<p class="m">Em chưa làm bài nào. Dán link bài thầy/cô gửi vào ô phía trên nhé.</p>'}</div>
+ <div class="c"><h2>🎁 Học cùng VeduAI – gia sư AI của em</h2><p class="m">Dùng thử miễn phí 5 ngày: học theo sách giáo khoa, hỏi bài bằng chữ, ảnh hoặc giọng nói, có báo cáo điểm mạnh, điểm yếu và kế hoạch khắc phục.</p><a href="${BOT}">Mở VeduAI trên Telegram →</a></div>`}
+$.addEventListener('input',e=>{if(e.target.dataset.r)R[e.target.dataset.r]=e.target.value});
+$.addEventListener('change',e=>{if(e.target.dataset.r)R[e.target.dataset.r]=e.target.value});
+$.addEventListener('click',e=>{const id=e.target.id;
+ if(id==='dk')dkGo();
+ else if(id==='out'){CR=null;D=null;try{localStorage.removeItem(HK)}catch(x){}dk()}
+ else if(id==='go'){const m=maBai(document.getElementById('ma').value);if(!m)return document.getElementById('er').textContent='Em dán đúng link hoặc mã bài (thầy/cô gửi) nhé.';location.href=PAGE_BAI+'?b='+m}});
+vao();
+</script></body></html>
