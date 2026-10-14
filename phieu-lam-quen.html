@@ -113,7 +113,7 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>'
 const hkMacDinh = () => { const m = new Date().getMonth() + 1; return (m >= 2 && m <= 8) ? '2' : '1'; };
 
 const TONG = 10;   // so muc bat buoc (de tinh thanh tien do)
-const S = { cfg: null, lop: 0, mons: {}, sach: '', sachKhac: '', hk: hkMacDinh(), gt: '', ten: '', nd: '', nt: '', nn: '', truong: '', tenLop: '', ngay: [], gio: '19:30', ph: '', loi: {}, dangGui: false };
+const S = { cfg: null, lop: 0, mons: {}, sach: '', sachKhac: '', hk: hkMacDinh(), gt: '', ten: '', nd: '', nt: '', nn: '', truong: '', tenLop: '', ngay: [], gio: '19:30', ph: '', bc: 'tuan', bcGio: '20:00', bcThu: 'CN', bcNgay: '1', nhac: '10', loi: {}, dangGui: false };
 const ngaySinhISO = () => (S.nd && S.nt && S.nn) ? S.nn + '-' + String(S.nt).padStart(2, '0') + '-' + String(S.nd).padStart(2, '0') : '';
 const ngaySinhHopLe = () => { const v = ngaySinhISO(); if (!v) return false; const d = new Date(v + 'T00:00:00'); return d.getFullYear() === Number(S.nn) && d.getMonth() + 1 === Number(S.nt) && d.getDate() === Number(S.nd); };
 
@@ -235,6 +235,21 @@ function ve() {
         .map(o => `<label class="radio ${S.ph===o[0]?'on':''}"><input type="radio" name="ph" value="${o[0]}" ${S.ph===o[0]?'checked':''}><div><b>${o[1]}</b><span>${o[2]}</span></div></label>`).join('')}
       ${E('ph')}
     </section>
+
+    ${S.ph && S.ph !== 'boqua' ? `<section>
+      <h2><i class="em" aria-hidden="true">📬</i>Báo cáo nhanh &amp; nhắc giờ học cho ba/mẹ</h2>
+      <p class="hint">Báo cáo ngắn gọn: tuân thủ giờ học, điểm, bài kiểm tra. Ba/mẹ xem chi tiết bằng đường link trong bot. Ba/mẹ có thể đổi lại bất cứ lúc nào.</p>
+      <div class="row" role="group" aria-label="Tần suất báo cáo">
+        ${[['ngay','Hằng ngày'],['tuan','Hằng tuần'],['thang','Hằng tháng'],['tat','Không nhận']].map(o => `<button type="button" class="chip" data-bc="${o[0]}" aria-pressed="${S.bc === o[0]}">${o[1]}</button>`).join('')}
+      </div>
+      ${S.bc !== 'tat' ? `<div style="margin-top:12px;max-width:200px"><label class="f" for="bcgio">Giờ gửi báo cáo</label><input id="bcgio" type="time" value="${esc(S.bcGio)}"></div>` : ''}
+      ${S.bc === 'tuan' ? `<p class="hint" style="margin-top:12px">Gửi vào thứ mấy?</p><div class="row" role="group" aria-label="Thứ gửi báo cáo">${NGAY.map(d => `<button type="button" class="chip" data-bcthu="${d}" aria-pressed="${S.bcThu === d}">${d}</button>`).join('')}</div>` : ''}
+      ${S.bc === 'thang' ? `<div style="margin-top:12px;max-width:200px"><label class="f" for="bcngay">Ngày trong tháng</label><select id="bcngay">${[...Array(28).keys()].map(i => `<option value="${i + 1}" ${String(S.bcNgay) === String(i + 1) ? 'selected' : ''}>Ngày ${i + 1}</option>`).join('')}</select></div>` : ''}
+      <p class="hint" style="margin-top:12px">Nhắc ba/mẹ trước giờ học của con</p>
+      <div class="row" role="group" aria-label="Nhắc trước giờ học">
+        ${[['0','Không nhắc'],['10','Trước 10 phút'],['30','Trước 30 phút']].map(o => `<button type="button" class="chip" data-nhac="${o[0]}" aria-pressed="${S.nhac === o[0]}">${o[1]}</button>`).join('')}
+      </div>
+    </section>` : ''}
   </main>
   <div class="bar"><div class="prog" aria-hidden="true"><i id="pg" style="width:${Math.round((TONG - thieu().length) / TONG * 100)}%"></i></div><div class="bar-in">
     <p id="tt">${thieu().length ? 'Còn ' + thieu().length + ' mục nữa thôi nè 🐾' : 'Xong hết rồi, gửi thôi! 🚀'}</p>
@@ -285,7 +300,8 @@ async function gui() {
     t: token, lop: S.lop,
     mons: Object.keys(S.mons).map(m => ({ mon: m, ht: S.mons[m].ht, chu_de: S.mons[m].cd.trim(), tien_do: S.mons[m].td.trim() })),
     bo_sach: S.sach === 'Khác' ? S.sachKhac.trim() : S.sach, hoc_ki: S.hk,
-    ho_ten: S.ten.trim(), ngay_sinh: ngaySinhISO(), nam_sinh: Number(S.nn), gioi_tinh: S.gt, truong: S.truong.trim(), ten_lop: S.tenLop.trim(), ngay: S.ngay, gio: S.gio, phu_huynh: S.ph
+    ho_ten: S.ten.trim(), ngay_sinh: ngaySinhISO(), nam_sinh: Number(S.nn), gioi_tinh: S.gt, truong: S.truong.trim(), ten_lop: S.tenLop.trim(), ngay: S.ngay, gio: S.gio, phu_huynh: S.ph,
+    bao_cao: { tan_suat: S.bc, gio: S.bcGio, thu: S.bcThu, ngay: Number(S.bcNgay), nhac: Number(S.nhac) }
   };
   try {
     const r = await fetch(API + '/phieu-nop', { method: 'POST', headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' }, body: JSON.stringify(body) });
@@ -317,6 +333,9 @@ $app.addEventListener('click', e => {
   else if (d.hk) S.hk = d.hk;
   else if (d.gt) S.gt = d.gt;
   else if (d.ngay) S.ngay = S.ngay.includes(d.ngay) ? S.ngay.filter(x => x !== d.ngay) : S.ngay.concat(d.ngay);
+  else if (d.bc) S.bc = d.bc;
+  else if (d.bcthu) S.bcThu = d.bcthu;
+  else if (d.nhac !== undefined) S.nhac = d.nhac;
   else return;
   S.loi = {}; ve();
 });
@@ -329,6 +348,7 @@ $app.addEventListener('change', e => {
     S.loi = {}; ve();
   } else if (t.id === 'nd' || t.id === 'nt' || t.id === 'ns') { if (t.id === 'nd') S.nd = t.value; else if (t.id === 'nt') S.nt = t.value; else S.nn = t.value; S.loi = {}; ve(); }
   else if (t.name === 'ph') { S.ph = t.value; S.loi = {}; ve(); }
+  else if (t.id === 'bcngay') S.bcNgay = t.value;
 });
 $app.addEventListener('input', e => {   // gõ chữ: chỉ cập nhật state, KHÔNG vẽ lại (giữ con trỏ)
   const t = e.target, d = t.dataset;
@@ -336,6 +356,7 @@ $app.addEventListener('input', e => {   // gõ chữ: chỉ cập nhật state, 
   else if (d.cd) S.mons[d.cd].cd = t.value;
   else if (d.sachkhac !== undefined) S.sachKhac = t.value;
   else if (t.id === 'gio') S.gio = t.value;
+  else if (t.id === 'bcgio') S.bcGio = t.value;
   else if (t.id === 'ten') S.ten = t.value;
   else if (t.id === 'truong') S.truong = t.value;
   else if (t.id === 'tenlop') S.tenLop = t.value;
