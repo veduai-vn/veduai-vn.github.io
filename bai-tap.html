@@ -21,39 +21,59 @@ const API='https://devotee-outclass-couch.ngrok-free.dev/webhook', H={'ngrok-ski
 const TG=window.Telegram&&Telegram.WebApp; if(TG){try{TG.ready();TG.expand()}catch(e){}}
 const mb=((TG&&TG.initDataUnsafe&&TG.initDataUnsafe.start_param)||new URLSearchParams(location.search).get('b')||'').replace(/[^A-Za-z0-9]/g,'');
 const $=document.getElementById('app'), esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const S={bai:null,ten:'',nd:'',nt:'',nn:'',lop:'',tr:'',a:{},anh:{},sending:false,left:0,err:''}; let timer=null;
+const HK='hsfree',HSPAGE='https://veduai-vn.github.io/hoc-sinh.html';
+let CR=null;try{CR=JSON.parse(localStorage.getItem(HK)||'null')}catch(e){}
+const S={bai:null,reg:{ten:'',nd:'',nt:'',nn:'',tr:'',lop:'',err:'',busy:false},ten:'',nd:'',nt:'',nn:'',lop:'',tr:'',a:{},anh:{},sending:false,left:0,err:''}; let timer=null;
 const st=(i,t,s)=>{$.innerHTML=`<div class="ct"><div class="big">${i}</div><h1>${esc(t)}</h1><p class="m">${esc(s||'')}</p></div>`};
 async function load(){ if(!mb)return st('🔍','Link chưa đúng','Em mở lại đường dẫn bài từ thầy/cô nhé.');
- try{const j=await (await fetch(API+'/gv-bai?b='+mb,{headers:H})).json(); if(!j.ok)return st('🔍',j.loi||'Không tìm thấy bài'); S.bai=j.bai; if(!j.bai.mo)return st('⏰','Bài đã đóng','Bài này đã hết hạn hoặc thầy/cô đã đóng.'); S.lop=j.bai.ten_lop; S.tr=j.bai.truong; draw();}
+ try{const j=await (await fetch(API+'/gv-bai?b='+mb,{headers:H})).json(); if(!j.ok)return st('🔍',j.loi||'Không tìm thấy bài'); S.bai=j.bai; if(!j.bai.mo)return st('⏰','Bài đã đóng','Bài này đã hết hạn hoặc thầy/cô đã đóng.'); S.reg.lop=j.bai.ten_lop||'';S.reg.tr=j.bai.truong||''; CR&&CR.hs&&CR.k?draw():dangKy();}
  catch(e){st('📡','Không kết nối được','Kiểm tra mạng rồi tải lại trang.')}}
 function dobOk(){const v=new Date(S.nn+'-'+String(S.nt).padStart(2,'0')+'-'+String(S.nd).padStart(2,'0')+'T00:00:00');return S.nn&&v.getFullYear()==S.nn&&v.getMonth()+1==S.nt&&v.getDate()==S.nd}
 function draw(){const b=S.bai, L='ABCDEF', ys=[];for(let y=new Date().getFullYear()-5;y>=1995;y--)ys.push(y);
  const opt=(a,t)=>`<option value="">${t}</option>`+a.map(x=>`<option ${String(x)===String(S[{Ngày:'nd',Tháng:'nt',Năm:'nn'}[t]])?'selected':''}>${x}</option>`).join('');
  $.innerHTML=`<h1>${esc(b.tieu_de)}</h1><p class="m">${esc([b.mon,b.ten_lop&&'Lớp '+b.ten_lop,b.ten_gv&&'GV '+b.ten_gv,b.thoi_gian_phut&&b.thoi_gian_phut+' phút'].filter(Boolean).join(' · '))}</p>
- <div class="c g"><b>Thông tin của em</b><input id="ten" placeholder="Họ và tên" value="${esc(S.ten)}" autocomplete="name">
- <div class="dob"><select id="nd">${opt([...Array(31).keys()].map(i=>i+1),'Ngày')}</select><select id="nt">${opt([...Array(12).keys()].map(i=>i+1),'Tháng')}</select><select id="nn">${opt(ys,'Năm')}</select></div>
- <div class="dob" style="grid-template-columns:1fr 2fr"><input id="lop" placeholder="Lớp (7A2)" value="${esc(S.lop)}"><input id="tr" placeholder="Trường" value="${esc(S.tr)}"></div></div>
+ <div class="c"><b>👤 ${esc(CR.ten)}</b><span class="m"> · Lớp ${esc(CR.lop)} · ${esc(CR.truong)}</span><br><a href="#" id="doi" class="m">Không phải em? Đổi tài khoản</a> · <a href="${HSPAGE}" class="m">Bài đã làm</a></div>
  ${b.cau.map((q,i)=>`<div class="c"><b>Câu ${i+1}</b> <span class="m">(${q.diem} điểm)</span><p style="white-space:pre-wrap;margin:6px 0">${esc(q.de)}</p>`+
   (q.loai==='tn'?q.lc.map((x,k)=>`<label class="o ${S.a[q.id]===L[k]?'on':''}"><input type="radio" name="${q.id}" data-q="${q.id}" value="${L[k]}" ${S.a[q.id]===L[k]?'checked':''}><span><b>${L[k]}.</b> ${esc(x)}</span></label>`).join(''):
    q.loai==='ngan'?`<input data-q="${q.id}" placeholder="Đáp án của em" value="${esc(S.a[q.id]||'')}">`:
    `<textarea data-q="${q.id}" rows="3" placeholder="Gõ bài làm (hoặc chụp ảnh bên dưới)">${esc(S.a[q.id]||'')}</textarea><input type="file" accept="image/*" multiple data-f="${q.id}" style="margin-top:8px"><div class="ph">${(S.anh[q.id]||[]).map(x=>`<img src="data:image/jpeg;base64,${x}">`).join('')}</div>`)+`</div>`).join('')}
  <p class="err" id="er">${esc(S.err)}</p><div class="bar"><span class="m" id="tm"></span><button class="b" id="go" ${S.sending?'disabled':''}>${S.sending?'Đang chấm…':'Nộp bài 🚀'}</button></div>`;
  if(b.thoi_gian_phut&&!timer){S.left=b.thoi_gian_phut*60;timer=setInterval(()=>{S.left--;const t=document.getElementById('tm');if(t)t.textContent='⏱ '+Math.floor(S.left/60)+':'+String(S.left%60).padStart(2,'0');if(S.left<=0){clearInterval(timer);send(true)}},1000)}}
+
+function dangKy(msg){const R=S.reg,ys=[];for(let y=new Date().getFullYear()-5;y>=1995;y--)ys.push(y);
+ const o=(a,t,k)=>`<option value="">${t}</option>`+a.map(x=>`<option ${String(x)===String(R[k])?'selected':''}>${x}</option>`).join('');
+ $.innerHTML=`<h1>🎒 Đăng ký miễn phí để làm bài</h1><p class="m">${esc(S.bai.tieu_de)}${S.bai.ten_gv?' · GV '+esc(S.bai.ten_gv):''}</p>
+ <div class="c g"><p class="m" style="margin:0">Em chỉ đăng ký một lần (khoảng 30 giây), lần sau làm bài thầy/cô giao không phải nhập lại và xem lại điểm các bài đã làm. Đã đăng ký rồi thì nhập lại đúng thông tin để đăng nhập.</p>
+ <input data-r="ten" placeholder="Họ và tên" value="${esc(R.ten)}" autocomplete="name">
+ <div class="dob"><select data-r="nd">${o([...Array(31).keys()].map(i=>i+1),'Ngày','nd')}</select><select data-r="nt">${o([...Array(12).keys()].map(i=>i+1),'Tháng','nt')}</select><select data-r="nn">${o(ys,'Năm','nn')}</select></div>
+ <div class="dob" style="grid-template-columns:1fr 2fr"><input data-r="lop" placeholder="Lớp (7A2)" value="${esc(R.lop)}"><input data-r="tr" placeholder="Trường" value="${esc(R.tr)}"></div>
+ <input id="hp" style="display:none" tabindex="-1" autocomplete="off"><p class="err">${esc(msg||R.err)}</p><button class="b" id="dk" ${R.busy?'disabled':''}>${R.busy?'Đang đăng ký…':'Đăng ký miễn phí & làm bài 🚀'}</button></div>`}
+async function dkGo(){const R=S.reg;
+ if(R.ten.trim().split(/\s+/).filter(Boolean).length<2){R.err='Nhập đủ họ và tên.';return dangKy()}
+ const ns=R.nn+'-'+String(R.nt).padStart(2,'0')+'-'+String(R.nd).padStart(2,'0'),v=new Date(ns+'T00:00:00');
+ if(!(R.nn&&v.getFullYear()==R.nn&&v.getMonth()+1==R.nt&&v.getDate()==R.nd)){R.err='Chọn đủ ngày sinh.';return dangKy()}
+ if(!R.tr.trim()||!R.lop.trim()){R.err='Nhập lớp và trường.';return dangKy()}
+ R.busy=true;R.err='';dangKy();
+ try{const j=await (await fetch(API+'/hs-dang-ky',{method:'POST',headers:{'Content-Type':'application/json',...H},body:JSON.stringify({ho_ten:R.ten,ngay_sinh:ns,ten_lop:R.lop,truong:R.tr,hp:(document.getElementById('hp')||{}).value||''})})).json();
+  R.busy=false;if(!j.ok){R.err=j.loi||'Chưa đăng ký được, em thử lại nhé.';return dangKy()}
+  CR={hs:j.hs,k:j.k,ten:j.ten,lop:j.lop,truong:j.truong};try{localStorage.setItem(HK,JSON.stringify(CR))}catch(e){}draw()}
+ catch(e){R.busy=false;R.err='Không kết nối được. Kiểm tra mạng rồi thử lại.';dangKy()}}
+$.addEventListener('input',e=>{const t=e.target;if(t.dataset.r)S.reg[t.dataset.r]=t.value});
+$.addEventListener('change',e=>{const t=e.target;if(t.dataset.r)S.reg[t.dataset.r]=t.value});
 function nen(file){return new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,1280/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',.72).split(',')[1])};im.onerror=no;im.src=r.result};r.onerror=no;r.readAsDataURL(file)})}
 $.addEventListener('input',e=>{const t=e.target;if(t.dataset.q)S.a[t.dataset.q]=t.value;else if(t.id==='ten')S.ten=t.value;else if(t.id==='lop')S.lop=t.value;else if(t.id==='tr')S.tr=t.value});
 $.addEventListener('change',async e=>{const t=e.target;
  if(t.dataset.q&&t.type==='radio'){S.a[t.dataset.q]=t.value;draw()}
  else if(['nd','nt','nn'].includes(t.id))S[t.id]=t.value;
  else if(t.dataset.f){const q=t.dataset.f,a=(S.anh[q]||[]).slice();for(const f of [...t.files]){if(a.length>=3)break;try{a.push(await nen(f))}catch(x){}}S.anh[q]=a;draw()}});
-$.addEventListener('click',e=>{if(e.target.id==='go')send(false)});
+$.addEventListener('click',e=>{const id=e.target.id;if(id==='go')send(false);else if(id==='dk')dkGo();else if(id==='doi'){e.preventDefault();CR=null;try{localStorage.removeItem(HK)}catch(x){}clearInterval(timer);timer=null;dangKy()}});
 async function send(auto){if(S.sending)return;const b=S.bai;
- if(!auto){if(S.ten.trim().split(/\s+/).filter(Boolean).length<2)return er('Nhập đủ họ và tên.');if(!dobOk())return er('Chọn đủ ngày sinh.');
+ if(!auto){
   const thieu=b.cau.filter(q=>q.loai==='tl'?!(S.a[q.id]||'').trim()&&!(S.anh[q.id]||[]).length:!(S.a[q.id]||'').trim()).length; if(thieu&&!confirm('Em còn '+thieu+' câu chưa làm. Vẫn nộp bài?'))return}
- if(auto&&!S.ten.trim())return st('⏰','Hết giờ','Em chưa nhập họ tên nên chưa nộp được. Tải lại trang để làm lại nhé.');
- S.sending=true;clearInterval(timer);draw();
+  S.sending=true;clearInterval(timer);draw();
  const tl={};b.cau.forEach(q=>{tl[q.id]=q.loai==='tl'?{text:S.a[q.id]||'',anh:S.anh[q.id]||[]}:(S.a[q.id]||'')});
- try{const j=await (await fetch(API+'/gv-nop',{method:'POST',headers:{'Content-Type':'application/json',...H},body:JSON.stringify({b:mb,ho_ten:S.ten,ngay_sinh:S.nn+'-'+String(S.nt).padStart(2,'0')+'-'+String(S.nd).padStart(2,'0'),ten_lop:S.lop,truong:S.tr,tra_loi:tl})})).json();
-  S.sending=false; if(!j.ok){S.err=j.loi||'Chưa nộp được, em thử lại nhé.';return j.daNop?st('✅','Em đã nộp bài này rồi',j.loi):draw()} ket(j)}
+ try{const j=await (await fetch(API+'/gv-nop',{method:'POST',headers:{'Content-Type':'application/json',...H},body:JSON.stringify({b:mb,hs:CR.hs,k:CR.k,tra_loi:tl})})).json();
+  S.sending=false; if(!j.ok&&j.dangKy){CR=null;try{localStorage.removeItem(HK)}catch(x){}timer=null;return dangKy(j.loi)} if(!j.ok){S.err=j.loi||'Chưa nộp được, em thử lại nhé.';return j.daNop?st('✅','Em đã nộp bài này rồi',j.loi):draw()} ket(j)}
  catch(x){S.sending=false;S.err='Chưa nộp được. Kiểm tra mạng rồi bấm Nộp lại nhé.';draw()}}
 function er(m){S.err=m;draw();window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})}
 function ket(j){
@@ -65,6 +85,6 @@ const b=S.bai,cta=j.co_tai_khoan?'':`<div class="c"><b>🎁 Học cùng VeduAI �
  ${j.nhan_xet?`<div class="c"><b>Nhận xét</b><p style="white-space:pre-wrap">${esc(j.nhan_xet)}</p></div>`:''}
  ${pt}
  ${j.co_ai?'<p class="m">Phần tự luận do AI chấm sơ bộ, thầy/cô sẽ xem lại.</p>':''}
- <div class="c">${j.chi_tiet.map((d,i)=>`<p style="margin:6px 0">${d.dung===true?'✅':d.dung===false?'❌':'📝'} <b>Câu ${i+1}:</b> ${d.diem}/${d.toi_da}${d.dap_an&&d.dung===false?' · Đáp án: '+esc(d.dap_an):''}${d.nhan_xet?'<br><span class="m">'+esc(d.nhan_xet)+'</span>':''}</p>`).join('')}</div>${cta}`}
+ <p class="m" style="text-align:center"><a href="${HSPAGE}">📚 Xem tất cả bài đã làm</a></p><div class="c">${j.chi_tiet.map((d,i)=>`<p style="margin:6px 0">${d.dung===true?'✅':d.dung===false?'❌':'📝'} <b>Câu ${i+1}:</b> ${d.diem}/${d.toi_da}${d.dap_an&&d.dung===false?' · Đáp án: '+esc(d.dap_an):''}${d.nhan_xet?'<br><span class="m">'+esc(d.nhan_xet)+'</span>':''}</p>`).join('')}</div>${cta}`}
 load();
 </script></body></html>
