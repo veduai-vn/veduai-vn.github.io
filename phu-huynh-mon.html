@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><title>VeduAI – Phụ huynh: môn học & báo cáo</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--bg:#EAF5FF;--card:#fff;--ink:#24305E;--mut:#5F6B92;--line:#C9DAF2;--sh:#B5CBEA;--mark:#FFD84D;--ok:#118A62;--err:#C2255C;--warn:#B45309;--bar:#4C7BE0}
+@media(prefers-color-scheme:dark){:root{--bg:#151B36;--card:#1F2850;--ink:#F1F4FF;--mut:#AAB4DC;--line:#38437A;--sh:#0E1328;--ok:#5FE0B0;--err:#FF9BB5;--warn:#FBBF5C;--bar:#7FA2FF}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:500 16px/1.5 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;padding:env(safe-area-inset-top,0) 14px calc(20px + env(safe-area-inset-bottom,0))}
+main{max-width:560px;margin:0 auto;padding:18px 0}h1{font-size:22px;margin:0 0 2px}h2{font-size:17px;margin:0 0 8px}.m{color:var(--mut);font-size:14px}
+.c{background:var(--card);border:2px solid var(--line);border-radius:20px;box-shadow:0 4px 0 var(--sh);padding:14px;margin:0 0 14px}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:10px}.k{border:2px solid var(--line);border-radius:14px;padding:10px;text-align:center}.k b{display:block;font:800 22px system-ui}
+.bar{height:8px;border-radius:99px;background:var(--line);margin-top:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--bar);border-radius:99px}
+.tabs{display:flex;gap:8px;margin:0 0 10px}.t,.b,.mv{appearance:none;font:700 15px system-ui;min-height:44px;padding:0 16px;border-radius:999px;border:2px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.t[aria-pressed=true],.b.p{background:var(--ink);color:var(--card);border-color:var(--ink)}.b:disabled,.mv:disabled{opacity:.4;cursor:default}
+.mon{border-top:1px solid var(--line);padding:10px 0}.mon:first-of-type{border-top:0}.r{display:flex;gap:8px;align-items:center;justify-content:space-between}.mv{min-width:44px;padding:0}
+.tag{display:inline-block;font-size:12.5px;padding:1px 9px;border-radius:99px;background:var(--line);margin:4px 4px 0 0}.wait{color:var(--warn)}
+input,select{width:100%;min-height:44px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font:inherit;padding:6px 10px}
+.fx{display:grid;gap:8px;margin-top:8px}.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}label.l{font-size:13.5px;color:var(--mut)}
+#msg{position:sticky;bottom:8px;text-align:center;font-weight:700;min-height:22px}.ok{color:var(--ok)}.err{color:var(--err)}
+.vf{max-width:560px;margin:6px auto 0;padding:10px 8px;text-align:center;font-size:12.5px;line-height:1.6;color:var(--mut)}.vf a{color:inherit;font-weight:800}
+</style></head>
+<body><main id="app"><p class="m">Đang mở…</p></main>
+<div id="msg" role="status" aria-live="polite" style="max-width:560px;margin:0 auto"></div>
+<footer class="vf"><b>VeduAI</b> – Vietnam Education AI Solutions<br>Hỗ trợ: Admin <a href="tel:0984048177">0984048177</a> (Telegram/Zalo)</footer>
+<script>
+const API='https://devotee-outclass-couch.ngrok-free.dev/webhook',H={'ngrok-skip-browser-warning':'1','Content-Type':'application/json'};
+const TG=window.Telegram&&Telegram.WebApp;if(TG){try{TG.ready();TG.expand()}catch(e){}}
+const raw=new URLSearchParams(location.search).get('p')||(TG&&TG.initDataUnsafe&&TG.initDataUnsafe.start_param)||'';
+const p=raw.replace(/[^A-Za-z0-9]/g,'');
+const $=document.getElementById('app'),$m=document.getElementById('msg');
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>String(n).replace('.',',');
+let D=null,kyXem='tuan',moGiao=null,busy=false;
+const THU=['T2','T3','T4','T5','T6','T7','CN'];
+const say=(t,c)=>{$m.className=c||'';$m.textContent=t||''};
+async function post(path,b){try{return await (await fetch(API+'/'+path,{method:'POST',headers:H,body:JSON.stringify(Object.assign({p},b||{}))})).json()}catch(e){return{ok:false,loi:'Không kết nối được. Kiểm tra mạng rồi thử lại.'}}}
+async function tai(){
+  if(p.length<12){$.innerHTML='<div class="c"><h1>🔍 Link chưa đúng</h1><p class="m">Ba/mẹ mở lại từ nút trong bot VeduAI Phụ huynh nhé.</p></div>';return}
+  const j=await post('ph-mon-xem');
+  if(!j.ok){$.innerHTML='<div class="c"><h1>🔍 Không mở được</h1><p class="m">'+esc(j.loi||'Có lỗi xảy ra.')+'</p></div>';return}
+  D=j;ve()}
+function bc(b){const tl=b.ti_le;
+ return `<div class="g"><div class="k"><b>${b.lich?(b.du_kien?b.dung_lich+'/'+b.du_kien:'–'):'–'}</b><span class="m">buổi đúng lịch${tl!=null?' ('+tl+'%)':''}</span>${tl!=null?`<div class="bar"><i style="width:${tl}%"></i></div>`:''}</div>
+ <div class="k"><b>${b.phut}′</b><span class="m">${b.so_tiet} tiết đã học</span></div>
+ <div class="k"><b>${b.diem_tb==null?'–':fmt(b.diem_tb)}</b><span class="m">điểm TB (${b.so_bai_kt} bài)</span></div>
+ <div class="k"><b>${b.giao_ky?b.giao_bat_dau+'/'+b.giao_ky:'–'}</b><span class="m">chủ đề ba/mẹ giao, con đã bắt đầu</span></div></div>
+ <p class="m" style="margin:10px 0 0">${b.lich?'':'Con chưa đặt lịch học nên chưa tính được mức tuân thủ giờ. '}${b.hoc_them?'Học thêm ngoài lịch: '+b.hoc_them+' buổi. ':''}${b.thieu_dau_vao?'⚠️ Còn '+b.thieu_dau_vao+' mục chưa làm kiểm tra đầu vào. ':''}${b.giao_ton?'⏳ '+b.giao_ton+' chủ đề giao chưa làm. ':''}${b.yeu.length?'Cần ôn: '+esc(b.yeu.join(', '))+'.':''}</p>`}
+function ve(){const h=D.hs,k=D.cai_dat,ds=D.mon,b=D.bao_cao[kyXem],ct=k.tan_suat;
+ const opt=(a,v)=>a.map(x=>`<option value="${x[0]}" ${String(x[0])===String(v)?'selected':''}>${x[1]}</option>`).join('');
+ $.innerHTML=`<h1>Con ${esc(h.ten)}</h1><span class="m">${esc([h.lop&&'Lớp '+h.lop,h.truong,D.lich&&'Học '+D.lich.ngay.join(', ')+' lúc '+D.lich.gio,D.het_han&&'Gói đến '+D.het_han.split('-').reverse().join('/')].filter(Boolean).join(' · '))}</span>
+ <div class="c" style="margin-top:12px"><h2>📬 Tóm tắt học tập</h2><div class="tabs"><button class="t" data-ky="tuan" aria-pressed="${kyXem==='tuan'}">7 ngày</button><button class="t" data-ky="thang" aria-pressed="${kyXem==='thang'}">30 ngày</button></div>${bc(b)}</div>
+ <div class="c"><h2>📚 Môn học đã đăng ký</h2><p class="m" style="margin:0 0 6px">Bấm ▲ ▼ để đẩy môn lên hoặc xuống: môn ở trên được xếp trước trong menu của con. Bấm “Giao chủ đề” để giao bài cho con.</p>
+ ${ds.map((m,i)=>`<div class="mon"><div class="r"><div><b>${esc(m.mon)}</b>${m.loai==='chu_de'?' · 🎯 '+esc(m.chu_de):''}<br>
+  ${m.cho?'<span class="tag wait">⏳ chờ tài liệu</span>':''}<span class="tag">${m.dau_vao!=null?'đầu vào '+fmt(m.dau_vao)+'/10':'chưa làm đầu vào'}</span><span class="tag">${m.tong?m.buoi+'/'+m.tong+' buổi':m.buoi?'đã học '+m.buoi+' buổi':'chưa học'}</span>${m.diem_gan!=null?'<span class="tag">điểm gần nhất '+fmt(m.diem_gan)+'</span>':''}</div>
+  <div class="r"><button class="mv" data-a="len" data-k="${esc(m.key)}" aria-label="Đẩy lên" ${i===0||busy?'disabled':''}>▲</button><button class="mv" data-a="xuong" data-k="${esc(m.key)}" aria-label="Đẩy xuống" ${i===ds.length-1||busy?'disabled':''}>▼</button></div></div>
+  <button class="b" data-g="${i}" style="margin-top:8px">🎯 Giao chủ đề</button>
+  ${moGiao===i?`<div class="fx"><input id="cd" maxlength="80" placeholder="Chủ đề, ví dụ: Phân số" aria-label="Tên chủ đề"><button class="b p" data-gs="${i}" ${busy?'disabled':''}>Giao cho con</button><span class="m">Hôm nay đã giao ${D.giao.hom_nay}/${D.giao.toi_da} chủ đề trên web.</span></div>`:''}</div>`).join('')||'<p class="m">Con chưa có môn nào. Nhờ con hoàn tất bước đăng ký môn trong bot VeduAI.</p>'}</div>
+ <div class="c"><h2>⚙️ Cài đặt nhận báo cáo</h2><div class="fx">
+  <label class="l" for="s_ts">Báo cáo nhanh</label><select id="s_ts">${opt([['tat','Không nhận'],['ngay','Hằng ngày'],['tuan','Hằng tuần'],['thang','Hằng tháng']],ct)}</select>
+  <div class="row2"><div><label class="l" for="s_gio">Giờ gửi</label><input id="s_gio" type="time" value="${esc(k.gio)}"></div>
+  <div>${ct==='thang'?`<label class="l" for="s_ng">Ngày trong tháng</label><select id="s_ng">${opt([...Array(28).keys()].map(x=>[x+1,'Ngày '+(x+1)]),k.ngay)}</select>`:ct==='tuan'?`<label class="l" for="s_thu">Thứ</label><select id="s_thu">${opt(THU.map(x=>[x,x==='CN'?'Chủ nhật':'Thứ '+x.slice(1)]),k.thu)}</select>`:''}</div></div>
+  <label class="l" for="s_nhac">Nhắc ba/mẹ trước giờ học của con</label><select id="s_nhac">${opt([[0,'Không nhắc'],[10,'Trước 10 phút'],[30,'Trước 30 phút']],k.nhac)}</select>
+  <button class="b p" id="luu" ${busy?'disabled':''}>Lưu cài đặt</button></div></div>`}
+async function lam(b,okMsg){if(busy)return;busy=true;say('Đang xử lý…');ve();const j=await post('ph-mon-luu',b);busy=false;
+ if(j.ok){D.mon=j.mon;D.cai_dat=j.cai_dat;if(j.giao_hom_nay!=null)D.giao.hom_nay=j.giao_hom_nay;if(b.act==='giao')moGiao=null;say(j.thongbao||okMsg||'Đã lưu.','ok')}else say(j.loi||'Chưa lưu được, ba/mẹ thử lại nhé.','err');ve()}
+$.addEventListener('click',e=>{const t=e.target.closest('button');if(!t||!D)return;const d=t.dataset;
+ if(d.ky){kyXem=d.ky;ve()}
+ else if(d.a)lam({act:d.a,key:d.k});
+ else if(d.g!==undefined){moGiao=moGiao===Number(d.g)?null:Number(d.g);ve();const i=document.getElementById('cd');if(i)i.focus()}
+ else if(d.gs!==undefined){const cd=(document.getElementById('cd')||{}).value||'';lam({act:'giao',mon:D.mon[Number(d.gs)].mon,chu_de:cd})}
+ else if(t.id==='luu'){const g=id=>(document.getElementById(id)||{}).value;
+  lam({act:'cai_dat',cai_dat:{tan_suat:g('s_ts'),gio:g('s_gio')||D.cai_dat.gio,thu:g('s_thu')||D.cai_dat.thu,ngay:g('s_ng')||D.cai_dat.ngay,nhac:g('s_nhac')}})}});
+$.addEventListener('change',e=>{if(e.target.id==='s_ts'&&D){D.cai_dat=Object.assign({},D.cai_dat,{tan_suat:e.target.value,gio:(document.getElementById('s_gio')||{}).value||D.cai_dat.gio,nhac:Number((document.getElementById('s_nhac')||{}).value)||0});ve()}});
+tai();
+</script></body></html>
