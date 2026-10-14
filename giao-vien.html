@@ -20,7 +20,7 @@ const PAGE_BAI='https://veduai-vn.github.io/bai-tap.html', BOT='https://t.me/Mot
 const $=document.getElementById('app'),esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const q=new URLSearchParams(location.search);let cred={dl:(q.get('dl')||'').replace(/[^\w-]/g,''),k:(q.get('k')||'').replace(/[^\w-]/g,'')};
 try{if(!cred.dl){cred=JSON.parse(localStorage.getItem('gv')||'{}')}else{localStorage.setItem('gv',JSON.stringify(cred));history.replaceState(null,'',location.pathname)}}catch(e){}
-let D=null,tab='tq',view=null,form=null,msg='';
+let D=null,tab='tq',view=null,form=null,msg='',ai=null;
 const post=async(p,b)=>{try{return await (await fetch(API+'/'+p,{method:'POST',headers:H,body:JSON.stringify(Object.assign({},cred,b))})).json()}catch(e){return{ok:false,loi:'Không kết nối được, thử lại sau.'}}};
 async function vao(){if(!cred.dl||!cred.k)return dangNhap();$.innerHTML='<p class="m">Đang tải…</p>';const j=await post('gv-vao',{});if(!j.ok){msg=j.loi;return dangNhap()}D=j;ve()}
 function dangNhap(){$.innerHTML=`<h1>👩‍🏫 VeduAI – Cổng giáo viên</h1><p class="m">Gói giáo viên MIỄN PHÍ: giao bài, tạo bài kiểm tra online (trắc nghiệm, trả lời ngắn, tự luận chụp ảnh), chấm tự động và báo cáo điểm mạnh, điểm yếu của cả lớp.</p>
@@ -29,16 +29,16 @@ function dangNhap(){$.innerHTML=`<h1>👩‍🏫 VeduAI – Cổng giáo viên</
 function ve(){const g=D.gv,lops=[...new Set(D.hs.map(x=>x.ten_lop).filter(Boolean))].sort();
  const T=(k,t)=>`<button class="b l ${tab===k?'on':''}" data-t="${k}">${t}</button>`;
  let h=`<div class="r" style="justify-content:space-between"><div><h1>Xin chào ${esc(g.ten||g.ma)}</h1><span class="m">${esc(g.truong)} · mã ${esc(g.ma)}</span></div><button class="b l" id="out">Thoát</button></div><div class="r t" style="margin:10px 0">${T('tq','Tổng quan')}${T('hs','Học sinh ('+D.hs.length+')')}${T('bg','Bài giao ('+D.bai.length+')')}</div><p class="ok">${esc(msg)}</p>`;
- if(view)return $.innerHTML=h+vKQ();if(form)return $.innerHTML=h+vForm();
+ if(view)return $.innerHTML=h+vKQ();if(ai)return $.innerHTML=h+vAI();if(form)return $.innerHTML=h+vForm();
  if(tab==='tq'){const ln=PAGE_BAI;h+=`<div class="c"><h2>Tài khoản</h2>${g.ban?`<div class="s"><div><div class="n">${g.mua}</div><span class="m">Đã mua</span></div><div><div class="n">${g.dung+g.giu}</div><span class="m">Đã dùng/giữ</span></div><div><div class="n">${g.conLai}</div><span class="m">Còn lại</span></div></div><p class="m">Link bán (gửi hoặc in QR cho học sinh):</p><div class="bx">https://t.me/MotSachVedu_Bot?start=dl_${esc(g.ma)}</div>`:`<p>Tài khoản miễn phí: dùng đầy đủ giao bài và kiểm tra. Muốn bán gói học cho học sinh và nhận doanh thu, liên hệ admin để nâng cấp.</p><a class="b" href="${LIEN_HE}" style="display:inline-flex;align-items:center;text-decoration:none">Liên hệ nâng cấp</a>`}</div>
- <div class="c"><h2>Miễn phí cho giáo viên</h2><p class="m">✔ Giao bài tập, tạo bài kiểm tra: trắc nghiệm, trả lời ngắn, tự luận (học sinh chụp ảnh)<br>✔ Xem điểm cả lớp, chấm lại từng câu</p><button class="b" id="new">+ Tạo bài mới</button></div>`}
+ <div class="c"><h2>Miễn phí cho giáo viên</h2><p class="m">✔ Tải tài liệu (PDF, Word, ảnh, văn bản) lên, AI tự soạn bài tập hoặc bài kiểm tra, thầy/cô xem lại và chỉnh sửa<br>✔ Hoặc tự soạn: trắc nghiệm, trả lời ngắn, tự luận (học sinh chụp ảnh)<br>✔ Xem điểm cả lớp, chấm lại từng câu</p><div class="r"><button class="b" id="newai">✨ AI soạn bài từ tài liệu</button><button class="b l" id="new">+ Tự soạn bài</button></div></div>`}
  if(tab==='hs'){h+=`<div class="c"><div class="r"><select id="fl" style="max-width:180px"><option value="">Tất cả lớp</option>${lops.map(l=>`<option ${l===(window.FL||'')?'selected':''}>${esc(l)}</option>`).join('')}</select><button class="b l" id="csv">Tải CSV</button></div></div>
  <div class="c w"><table><tr><th>Họ tên</th><th>Ngày sinh</th><th>Lớp</th><th>Trường</th><th>Gói</th></tr>${D.hs.filter(x=>!window.FL||x.ten_lop===window.FL).map(x=>`<tr><td>${esc(x.ten)}</td><td>${esc(x.ngay_sinh.split('-').reverse().join('/'))}</td><td>${esc(x.ten_lop||x.lop)}</td><td>${esc(x.truong)}</td><td>${x.trang_thai==='active'?'✅ đến '+esc(x.het_han.split('-').reverse().join('/')):esc(x.trang_thai)}</td></tr>`).join('')||'<tr><td colspan=5 class="m">Chưa có học sinh nào.</td></tr>'}</table></div>`}
- if(tab==='bg'){h+=`<button class="b" id="new" style="margin-bottom:10px">+ Tạo bài mới</button>`+(D.bai.map(b=>`<div class="c"><b>${esc(b.tieu_de)}</b> <span class="m">${b.loai==='kiem_tra'?'Kiểm tra':'Bài tập'} · ${esc(b.mon||'')} ${b.ten_lop?'· Lớp '+esc(b.ten_lop):''}</span><br><span class="m">${b.so_cau||'?'} câu · ${b.so_bai_nop||0} bài nộp · ${b.trang_thai==='dong'?'🔒 đã đóng':'🟢 đang mở'}</span><div class="bx" style="margin:6px 0">${PAGE_BAI}?b=${esc(b.ma_bai)}</div><div class="r"><button class="b" data-kq="${esc(b.ma_bai)}">Xem điểm</button><button class="b l" data-cp="${esc(b.ma_bai)}">Chép link</button><button class="b l" data-dong="${esc(b.ma_bai)}" data-mo="${b.trang_thai==='dong'?1:0}">${b.trang_thai==='dong'?'Mở lại':'Đóng bài'}</button></div></div>`).join('')||'<p class="m">Chưa có bài nào.</p>')}
+ if(tab==='bg'){h+=`<div class="r" style="margin-bottom:10px"><button class="b" id="newai">✨ AI soạn bài từ tài liệu</button><button class="b l" id="new">+ Tự soạn bài</button></div>`+(D.bai.map(b=>`<div class="c"><b>${esc(b.tieu_de)}</b> <span class="m">${b.loai==='kiem_tra'?'Kiểm tra':'Bài tập'} · ${esc(b.mon||'')} ${b.ten_lop?'· Lớp '+esc(b.ten_lop):''}</span><br><span class="m">${b.so_cau||'?'} câu · ${b.so_bai_nop||0} bài nộp · ${b.trang_thai==='dong'?'🔒 đã đóng':'🟢 đang mở'}</span><div class="bx" style="margin:6px 0">${PAGE_BAI}?b=${esc(b.ma_bai)}</div><div class="r"><button class="b" data-kq="${esc(b.ma_bai)}">Xem điểm</button><button class="b l" data-cp="${esc(b.ma_bai)}">Chép link</button><button class="b l" data-dong="${esc(b.ma_bai)}" data-mo="${b.trang_thai==='dong'?1:0}">${b.trang_thai==='dong'?'Mở lại':'Đóng bài'}</button></div></div>`).join('')||'<p class="m">Chưa có bài nào.</p>')}
  $.innerHTML=h}
 const QT={tn:'Trắc nghiệm',ngan:'Trả lời ngắn',tl:'Tự luận (chụp ảnh)'};
 function newForm(){form={tieu_de:'',mon:'',ten_lop:'',loai:'bai_tap',thoi_gian_phut:0,han_nop:'',cho_xem_dap_an:true,cau:[{loai:'tn',kt:'',de:'',lc:'',dap_an:'A',diem:1}],err:''}}
-function vForm(){const f=form;return `<div class="c g"><h2>Bài mới</h2><input data-f="tieu_de" placeholder="Tiêu đề" value="${esc(f.tieu_de)}"><div class="s"><input data-f="mon" placeholder="Môn" value="${esc(f.mon)}"><input data-f="ten_lop" placeholder="Lớp (7A2)" value="${esc(f.ten_lop)}"><select data-f="loai"><option value="bai_tap" ${f.loai==='bai_tap'?'selected':''}>Bài tập</option><option value="kiem_tra" ${f.loai==='kiem_tra'?'selected':''}>Kiểm tra</option></select></div>
+function vForm(){const f=form;return (f.aiNote?`<div class="c"><span class="ok">${esc(f.aiNote)}</span></div>`:'')+`<div class="c g"><h2>Bài mới</h2><input data-f="tieu_de" placeholder="Tiêu đề" value="${esc(f.tieu_de)}"><div class="s"><input data-f="mon" placeholder="Môn" value="${esc(f.mon)}"><input data-f="ten_lop" placeholder="Lớp (7A2)" value="${esc(f.ten_lop)}"><select data-f="loai"><option value="bai_tap" ${f.loai==='bai_tap'?'selected':''}>Bài tập</option><option value="kiem_tra" ${f.loai==='kiem_tra'?'selected':''}>Kiểm tra</option></select></div>
 <div class="s"><input data-f="thoi_gian_phut" type="number" min="0" placeholder="Phút (0=không giới hạn)" value="${f.thoi_gian_phut||''}"><input data-f="han_nop" type="date" value="${esc(f.han_nop)}"><label class="m"><input type="checkbox" data-f="cho_xem_dap_an" ${f.cho_xem_dap_an?'checked':''} style="width:auto;min-height:0"> Cho xem đáp án</label></div></div>
 ${f.cau.map((c,i)=>`<div class="c g"><div class="r"><b>Câu ${i+1}</b><select data-c="${i}" data-p="loai" style="max-width:190px">${Object.entries(QT).map(([k,v])=>`<option value="${k}" ${c.loai===k?'selected':''}>${v}</option>`).join('')}</select><input data-c="${i}" data-p="diem" type="number" step="0.25" min="0.25" value="${c.diem}" style="max-width:90px" title="Điểm"><button class="b l" data-rm="${i}">Xoá</button></div>
 <textarea rows="2" data-c="${i}" data-p="de" placeholder="Đề bài">${esc(c.de)}</textarea>
@@ -59,21 +59,87 @@ ${(t.cau||[]).length?`<div class="w"><table><tr><th>Câu</th><th>Kiến thức</
 ${n.manh&&n.manh.length?`<br><span class="m">💪 Tốt: ${sm(n.manh)}</span>`:''}${n.yeu&&n.yeu.length?`<br><span class="m">⚠️ Cần ôn tăng cường: ${sm(n.yeu)}</span>`:''}
 ${n.chi_tiet.filter(d=>d.loai==='tl').map(d=>`<div class="g" style="margin-top:6px"><span class="m">Câu ${d.id.slice(1)} (tự luận${d.so_anh?', '+d.so_anh+' ảnh':''}): ${esc(d.tra_loi||'')} — ${esc(d.nhan_xet||'')}</span><input type="number" step="0.25" min="0" max="${d.toi_da}" value="${d.diem}" data-n="${i}" data-id="${d.id}" style="max-width:110px"></div>`).join('')}
 <div class="r" style="margin-top:6px"><button class="b l" data-cm="${i}">Lưu điểm đã sửa</button></div></div>`).join('')||'<p class="m">Chưa có ai nộp.</p>')}
+
+/* ===== v76: AI soạn bài từ tài liệu ===== */
+const LIB={mammoth:'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js',pdf:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',pdfw:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'};
+const MAXTXT=40000,MAXANH=6,MAXMB=25;
+const loadJs=u=>new Promise((ok,no)=>{const s=document.createElement('script');s.src=u;s.onload=ok;s.onerror=()=>no(new Error('Không tải được thư viện đọc tệp, kiểm tra mạng rồi thử lại.'));document.head.appendChild(s)});
+function newAI(){ai={files:[],text:'',mon:'',ten_lop:'',sl_tn:10,sl_ngan:3,sl_tl:1,diem_tn:1,diem_ngan:1,diem_tl:2,do_kho:'tron',ghi_chu:'',busy:false,rd:false,err:''}}
+function nenAnh(src,w,h,draw){const k=Math.min(1,1280/Math.max(w,h)),c=document.createElement('canvas');c.width=Math.round(w*k);c.height=Math.round(h*k);draw(c.getContext('2d'),c.width,c.height);return c.toDataURL('image/jpeg',.72).split(',')[1]}
+function nenFile(file){return new Promise((ok,no)=>{const r=new FileReader();r.onerror=()=>no(new Error('Không đọc được ảnh.'));r.onload=()=>{const im=new Image();im.onerror=()=>no(new Error('Ảnh không mở được.'));im.onload=()=>ok(nenAnh(im,im.width,im.height,(g,w,h)=>g.drawImage(im,0,0,w,h)));im.src=r.result};r.readAsDataURL(file)})}
+async function docTep(f){
+ const n=f.name.toLowerCase();
+ if(f.size>MAXMB*1048576)throw new Error('Tệp lớn quá '+MAXMB+'MB.');
+ if(/^image\//.test(f.type)||/\.(jpe?g|png|webp|heic)$/.test(n))return{ten:f.name,text:'',anh:[await nenFile(f)]};
+ if(/\.(txt|md|csv)$/.test(n)||f.type==='text/plain')return{ten:f.name,text:await f.text(),anh:[]};
+ if(n.endsWith('.docx')){if(!window.mammoth)await loadJs(LIB.mammoth);const r=await mammoth.extractRawText({arrayBuffer:await f.arrayBuffer()});return{ten:f.name,text:r.value||'',anh:[]}}
+ if(n.endsWith('.pdf')){
+  if(!window.pdfjsLib){await loadJs(LIB.pdf);pdfjsLib.GlobalWorkerOptions.workerSrc=LIB.pdfw}
+  const pdf=await pdfjsLib.getDocument({data:new Uint8Array(await f.arrayBuffer())}).promise;
+  let text='';const np=Math.min(pdf.numPages,80);
+  for(let i=1;i<=np&&text.length<MAXTXT;i++){const pg=await pdf.getPage(i),tc=await pg.getTextContent();text+=tc.items.map(x=>x.str+(x.hasEOL?'\n':' ')).join('')+'\n'}
+  if(text.replace(/\s/g,'').length>=200)return{ten:f.name,text,anh:[]};
+  const anh=[];  /* PDF scan: không có chữ -> chụp các trang đầu thành ảnh để AI đọc */
+  for(let i=1;i<=Math.min(pdf.numPages,MAXANH);i++){const pg=await pdf.getPage(i),vp=pg.getViewport({scale:1.5}),c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;anh.push(nenAnh(c,c.width,c.height,(g,w,h)=>g.drawImage(c,0,0,w,h)))}
+  return{ten:f.name,text:'',anh,ghi:pdf.numPages>MAXANH?'PDF scan: chỉ đọc '+MAXANH+' trang đầu.':''}}
+ if(n.endsWith('.doc'))throw new Error('Tệp .doc cũ chưa đọc được. Thầy/cô lưu lại thành .docx hoặc PDF nhé.');
+ throw new Error('Chưa hỗ trợ định dạng này. Dùng PDF, Word (.docx), ảnh hoặc tệp văn bản.')}
+async function aiFiles(list){
+ if(!ai||!list.length)return;ai.rd=true;ai.err='';ve();
+ for(const f of list){
+  try{const r=await docTep(f);
+   const dem=ai.files.reduce((s,x)=>s+x.anh.length,0);
+   if(dem+r.anh.length>MAXANH){ai.err='Tối đa '+MAXANH+' ảnh/trang scan cho mỗi lần soạn. Đã bỏ qua '+f.name+'.';continue}
+   if(!r.text.trim()&&!r.anh.length){ai.err='Không đọc được chữ trong '+f.name+'.';continue}
+   ai.files.push({ten:r.ten,text:r.text.replace(/\r/g,''),anh:r.anh,ghi:r.ghi||''})}
+  catch(e){ai.err=f.name+': '+(e.message||'không đọc được.')}}
+ ai.rd=false;ve()}
+function aiTong(){const t=ai.files.map(x=>x.text).concat(ai.text).filter(x=>x&&x.trim()).join('\n\n');return t}
+async function aiGo(){
+ if(!ai||ai.busy||ai.rd)return;
+ const txt=aiTong(),anh=ai.files.reduce((a,x)=>a.concat(x.anh),[]).slice(0,MAXANH);
+ const n=(+ai.sl_tn||0)+(+ai.sl_ngan||0)+(+ai.sl_tl||0);
+ if(txt.trim().length<80&&!anh.length){ai.err='Thầy/cô tải tài liệu lên hoặc dán nội dung (ít nhất vài câu) vào ô bên dưới.';return ve()}
+ if(!n){ai.err='Chọn ít nhất 1 câu hỏi.';return ve()}
+ if(n>50){ai.err='Mỗi lần soạn tối đa 50 câu.';return ve()}
+ ai.busy=true;ai.err='';ve();window.scrollTo({top:0,behavior:'smooth'});
+ const r=await post('gv-ai-tao-bai',{tai_lieu:txt.slice(0,MAXTXT),anh,mon:ai.mon,ten_lop:ai.ten_lop,sl_tn:ai.sl_tn,sl_ngan:ai.sl_ngan,sl_tl:ai.sl_tl,diem_tn:ai.diem_tn,diem_ngan:ai.diem_ngan,diem_tl:ai.diem_tl,do_kho:ai.do_kho,ghi_chu:ai.ghi_chu});
+ ai.busy=false;
+ if(!r.ok){if(r.dangNhap){ai=null;msg=r.loi;return dangNhap()}ai.err=r.loi||'AI chưa soạn được, thầy/cô thử lại nhé.';return ve()}
+ const a=ai;newForm();
+ Object.assign(form,{tieu_de:r.tieu_de||'',mon:r.mon||a.mon,ten_lop:a.ten_lop,cau:r.cau.map(c=>({loai:c.loai,kt:c.kt||'',de:c.de,lc:c.lc||'',dap_an:c.dap_an||(c.loai==='tn'?'A':''),diem:c.diem}))});
+ form.aiNote='✨ AI đã soạn '+r.so_cau+' câu từ tài liệu. Thầy/cô hãy đọc lại đề và đáp án, sửa nếu cần rồi bấm "Lưu & lấy link" để giao cho học sinh.'+(r.ghi_chu?' '+r.ghi_chu:'');
+ ai=null;ve();window.scrollTo({top:0})}
+const aiNum=(k,l,mx)=>`<div><label class="m">${l}</label><input data-a="${k}" type="number" min="0" max="${mx}" value="${ai[k]}"></div>`;
+function vAI(){const a=ai,txtLen=aiTong().length,anh=a.files.reduce((s,x)=>s+x.anh.length,0);
+ return `<div class="c g"><div class="r"><button class="b l" id="aiback" ${a.busy?'disabled':''}>← Quay lại</button><h2 style="margin:0">✨ AI soạn bài từ tài liệu</h2></div>
+<p class="m">Tải tài liệu (PDF, Word .docx, ảnh chụp, tệp văn bản) hoặc dán nội dung. AI soạn câu hỏi và đáp án; thầy/cô xem lại, sửa rồi mới giao cho học sinh. Tệp được đọc ngay trên máy thầy/cô, chỉ phần chữ hoặc ảnh cần thiết mới gửi đi soạn.</p>
+<input type="file" data-aif multiple accept=".pdf,.docx,.txt,.md,image/*" ${a.busy||a.rd?'disabled':''}>
+${a.rd?'<p class="m">⏳ Đang đọc tệp…</p>':''}
+${a.files.map((f,i)=>`<div class="r" style="justify-content:space-between"><span class="m">📄 ${esc(f.ten)} · ${f.text.trim()?f.text.length.toLocaleString('vi-VN')+' ký tự':f.anh.length+' ảnh/trang'}${f.ghi?' · '+esc(f.ghi):''}</span><button class="b l" data-aidel="${i}" ${a.busy?'disabled':''}>Bỏ</button></div>`).join('')}
+<textarea rows="5" data-a="text" placeholder="Hoặc dán nội dung bài học/đề cương vào đây" ${a.busy?'disabled':''}>${esc(a.text)}</textarea>
+<p class="m">Đã có ${txtLen.toLocaleString('vi-VN')} ký tự chữ${anh?' và '+anh+' ảnh':''}.${txtLen>MAXTXT?' Chỉ '+MAXTXT.toLocaleString('vi-VN')+' ký tự đầu được dùng.':''}</p></div>
+<div class="c g"><h2>Yêu cầu bài</h2><div class="s"><input data-a="mon" placeholder="Môn (vd Toán)" value="${esc(a.mon)}"><input data-a="ten_lop" placeholder="Lớp (7A2)" value="${esc(a.ten_lop)}"><select data-a="do_kho"><option value="tron" ${a.do_kho==='tron'?'selected':''}>Trộn dễ-vừa-khó</option><option value="de" ${a.do_kho==='de'?'selected':''}>Dễ</option><option value="vua" ${a.do_kho==='vua'?'selected':''}>Vừa</option><option value="kho" ${a.do_kho==='kho'?'selected':''}>Khó</option></select></div>
+<div class="s">${aiNum('sl_tn','Số câu trắc nghiệm',30)}${aiNum('sl_ngan','Số câu trả lời ngắn',20)}${aiNum('sl_tl','Số câu tự luận',10)}</div>
+<div class="s"><div><label class="m">Điểm/câu trắc nghiệm</label><input data-a="diem_tn" type="number" step="0.25" min="0.25" value="${a.diem_tn}"></div><div><label class="m">Điểm/câu trả lời ngắn</label><input data-a="diem_ngan" type="number" step="0.25" min="0.25" value="${a.diem_ngan}"></div><div><label class="m">Điểm/câu tự luận</label><input data-a="diem_tl" type="number" step="0.25" min="0.25" value="${a.diem_tl}"></div></div>
+<input data-a="ghi_chu" maxlength="500" placeholder="Ghi chú cho AI (không bắt buộc), vd: tập trung bài 3 và bài 4" value="${esc(a.ghi_chu)}">
+<div class="r"><button class="b" id="aigo" ${a.busy||a.rd?'disabled':''}>${a.busy?'⏳ AI đang soạn…':'✨ Soạn bài'}</button></div>
+${a.busy?'<p class="m">AI đang soạn, mất khoảng 1–3 phút. Thầy/cô đừng đóng trang nhé.</p>':''}<p class="err">${esc(a.err)}</p></div>`}
 $.addEventListener('click',async e=>{const t=e.target,d=t.dataset;msg='';
  if(t.id==='in'){cred={dl:document.getElementById('dl').value.trim(),k:document.getElementById('k').value.trim()};try{localStorage.setItem('gv',JSON.stringify(cred))}catch(x){}return vao()}
  if(t.id==='up'){const r=await post('gv-dang-ky',{ten:rt.value,truong:rr.value,sdt:rs.value,hp:hp.value});if(!r.ok)return ru.textContent=r.loi;cred={dl:r.dl,k:r.k};try{localStorage.setItem('gv',JSON.stringify(cred))}catch(x){}alert('Đăng ký xong! Hãy lưu lại:\nMã giáo viên: '+r.dl+'\nMã truy cập: '+r.k);return vao()}
  if(t.id==='out'){try{localStorage.removeItem('gv')}catch(x){}cred={};D=null;return dangNhap()}
- if(d.t){tab=d.t;view=form=null;return ve()}
- if(t.id==='new'){newForm();return ve()} if(t.id==='cancel'){form=null;return ve()} if(t.id==='back'){view=null;return ve()}
+ if(d.t){tab=d.t;view=form=ai=null;return ve()}
+ if(t.id==='newai'){newAI();return ve()} if(t.id==='aiback'){ai=null;return ve()} if(t.id==='aigo')return aiGo(); if(d.aidel!==undefined){ai.files.splice(+d.aidel,1);return ve()} if(t.id==='new'){newForm();return ve()} if(t.id==='cancel'){form=null;return ve()} if(t.id==='back'){view=null;return ve()}
  if(t.id==='add'){form.cau.push({loai:'tn',kt:'',de:'',lc:'',dap_an:'A',diem:1});return ve()} if(d.rm!==undefined){form.cau.splice(+d.rm,1);if(!form.cau.length)newForm();return ve()}
- if(t.id==='save'){const f=form,bai=Object.assign({},f,{cau:f.cau.map(c=>({loai:c.loai,kt:c.kt,de:c.de,diem:c.diem,lc:c.loai==='tn'?c.lc.split('\n').map(x=>x.replace(/^[A-Fa-f][.)]\s*/,'').trim()).filter(Boolean):undefined,dap_an:c.dap_an}))});delete bai.err;
+ if(t.id==='save'){const f=form,bai=Object.assign({},f,{cau:f.cau.map(c=>({loai:c.loai,kt:c.kt,de:c.de,diem:c.diem,lc:c.loai==='tn'?c.lc.split('\n').map(x=>x.replace(/^[A-Fa-f][.)]\s*/,'').trim()).filter(Boolean):undefined,dap_an:c.dap_an}))});delete bai.err;delete bai.aiNote;
   const r=await post('gv-luu-bai',{bai});if(!r.ok){f.err=r.loi;return ve()}form=null;tab='bg';msg='Đã tạo bài! Link: '+PAGE_BAI+'?b='+r.ma_bai;return vao()}
  if(d.kq){const r=await post('gv-ket-qua',{ma_bai:d.kq});if(!r.ok){msg=r.loi;return ve()}view=r;return ve()}
  if(d.cp){try{await navigator.clipboard.writeText(PAGE_BAI+'?b='+d.cp);msg='Đã chép link bài '+d.cp}catch(x){msg=PAGE_BAI+'?b='+d.cp}return ve()}
  if(d.dong){const r=await post('gv-dong-bai',{ma_bai:d.dong,mo:d.mo==='1'});msg=r.ok?'Đã cập nhật.':r.loi;return vao()}
  if(d.cm!==undefined){const i=+d.cm,dc={};document.querySelectorAll('input[data-n="'+i+'"]').forEach(x=>dc[x.dataset.id]=x.value);const r=await post('gv-cham-tay',{ma_nop:view.nop[i].ma_nop,diem_cau:dc});if(!r.ok){msg=r.loi;return ve()}const k=await post('gv-ket-qua',{ma_bai:view.bai.ma_bai});if(k.ok)view=k;msg='Đã lưu điểm.';return ve()}
  if(t.id==='csv'){const rows=[['Họ tên','Ngày sinh','Lớp','Trường','Trạng thái']].concat(D.hs.map(x=>[x.ten,x.ngay_sinh,x.ten_lop||x.lop,x.truong,x.trang_thai]));const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\ufeff'+encodeURIComponent(rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n'));a.download='hoc-sinh.csv';a.click()}});
-$.addEventListener('input',e=>{const t=e.target,d=t.dataset;if(d.f)form[d.f]=t.type==='checkbox'?t.checked:t.value;else if(d.c!==undefined&&t.tagName!=='SELECT')form.cau[+d.c][d.p]=t.value});
-$.addEventListener('change',e=>{const t=e.target,d=t.dataset;if(t.id==='fl'){window.FL=t.value;ve()}else if(d.f){form[d.f]=t.type==='checkbox'?t.checked:t.value}else if(d.c!==undefined&&t.tagName==='SELECT'){form.cau[+d.c][d.p]=t.value;if(d.p==='loai')form.cau[+d.c].dap_an=t.value==='tn'?'A':'';ve()}});
+$.addEventListener('input',e=>{const t=e.target,d=t.dataset;if(d.a&&ai){ai[d.a]=t.value;return}if(d.f)form[d.f]=t.type==='checkbox'?t.checked:t.value;else if(d.c!==undefined&&t.tagName!=='SELECT')form.cau[+d.c][d.p]=t.value});
+$.addEventListener('change',e=>{const t=e.target,d=t.dataset;if(d.aif!==undefined){aiFiles([...t.files]);t.value='';return}if(t.id==='fl'){window.FL=t.value;ve()}else if(d.f){form[d.f]=t.type==='checkbox'?t.checked:t.value}else if(d.c!==undefined&&t.tagName==='SELECT'){form.cau[+d.c][d.p]=t.value;if(d.p==='loai')form.cau[+d.c].dap_an=t.value==='tn'?'A':'';ve()}});
 vao();
 </script></body></html>
