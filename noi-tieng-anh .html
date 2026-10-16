@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VeduAI – Nói tiếng Anh cùng Bi</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EAF5FF;--card:#fff;--text:#24305E;--muted:#5F6B92;--line:#C9DAF2;--shadow:#B5CBEA;--mark:#FFD84D;--mark-d:#E3AE00;--mark-ink:#4A3700;--ok:#118A62;--err:#C2255C;
+--font:'Nunito',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;--disp:'Baloo 2','Nunito',system-ui,sans-serif}
+@media(prefers-color-scheme:dark){:root{--bg:#151B36;--card:#1F2850;--text:#F1F4FF;--muted:#AAB4DC;--line:#38437A;--shadow:#0E1328;--mark-d:#B88A00;--ok:#5FE0B0;--err:#FF9BB5}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-weight:500}
+body{min-height:100vh;padding:env(safe-area-inset-top,0) 14px calc(12px + env(safe-area-inset-bottom,0));display:flex;justify-content:center}
+.wrap{width:100%;max-width:520px;padding:14px 0}
+.card{background:var(--card);border:2px solid var(--line);border-radius:24px;box-shadow:0 4px 0 var(--shadow);padding:16px;margin-bottom:14px}
+h1{font:800 24px var(--disp);margin:0 0 4px}.m{color:var(--muted);font-size:14px;font-weight:600;margin:0}
+.opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;font-weight:700;font-size:16px;padding:10px 16px 10px 10px;margin:0 0 10px;border:2px solid var(--line);background:var(--card);color:var(--text);border-radius:999px;cursor:pointer;box-shadow:0 4px 0 var(--shadow);transition:transform .08s}
+.opt .n{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--mark);color:var(--mark-ink);font-size:18px}
+.opt:active,.opt.on{transform:translateY(3px);box-shadow:0 1px 0 var(--shadow);background:var(--mark);border-color:var(--mark-d);color:var(--mark-ink)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.two .opt{margin:0;justify-content:center;padding:12px}
+h2{font:800 17px var(--disp);margin:14px 0 8px}
+.go{appearance:none;border:0;width:100%;min-height:52px;border-radius:999px;background:var(--text);color:var(--card);font:800 18px var(--disp);cursor:pointer;margin-top:14px}.go:disabled{opacity:.4}
+/* scene */
+.scene{position:relative;height:330px;border-radius:24px;overflow:hidden;border:2px solid var(--line);box-shadow:0 4px 0 var(--shadow);background:linear-gradient(#2E6B73,#245A63 62%,#C98B4A 62%,#B77A3B)}
+.win{position:absolute;left:10px;top:34px;width:58px;height:96px;border-radius:8px;border:5px solid #E8C48A;background:linear-gradient(#9FD8FF,#E5F5FF)}
+.board{position:absolute;left:84px;right:14px;top:14px;height:140px;border:7px solid #B8742E;border-radius:8px;background:#2F6B4A;color:#EFF7E8;padding:10px 12px;font:800 20px var(--disp);line-height:1.2;overflow:hidden}
+.board small{display:block;font:700 13px var(--font);opacity:.85;margin-top:6px}
+.desk{position:absolute;left:0;right:0;bottom:0;height:46px;background:#9A622A;border-top:6px solid #C98B4A}
+.book{position:absolute;bottom:40px;width:34px;height:22px;border-radius:3px}
+.bi{position:absolute;left:50%;bottom:20px;width:170px;transform:translateX(-50%);transform-origin:50% 100%}
+.bi svg{width:100%;display:block}
+.mouth-o{display:none}
+.talk .mouth-o{display:block;animation:mo .28s steps(2) infinite}.talk .mouth-c{display:none}
+.talk .bi{animation:hop .5s ease-in-out infinite}
+@keyframes mo{50%{transform:scaleY(.45);transform-origin:100px 118px}}
+@keyframes hop{50%{transform:translateX(-50%) translateY(-6px)}}
+@media(prefers-reduced-motion:reduce){.talk .bi,.talk .mouth-o{animation:none}}
+.bubble{position:absolute;left:10px;right:10px;top:160px;background:var(--card);color:var(--text);border:2px solid var(--line);border-radius:18px;padding:8px 12px;font-weight:800;font-size:16px;box-shadow:0 3px 0 var(--shadow);min-height:44px;max-height:96px;overflow:auto}
+.hud{display:flex;justify-content:space-between;align-items:center;margin:0 0 10px;font-weight:800}
+.lv{display:flex;gap:6px;align-items:center}.dot{width:12px;height:12px;border-radius:50%;background:var(--line)}.dot.on{background:var(--mark-d)}
+.hint{font-size:14px;color:var(--muted);font-weight:700;margin:12px 0 4px;min-height:20px}
+.you{min-height:26px;font-weight:700;margin:0 0 10px;color:var(--ok)}
+.bar{display:flex;gap:8px;align-items:center}
+.mic{flex:none;width:68px;height:68px;border-radius:50%;border:0;background:var(--err);color:#fff;font-size:30px;cursor:pointer;box-shadow:0 4px 0 #7d1239}.mic.rec{animation:pl 1s infinite;background:#E53935}
+@keyframes pl{50%{box-shadow:0 0 0 12px rgba(229,57,53,.25)}}
+.bar input{flex:1;min-width:0;min-height:48px;border:2px solid var(--line);border-radius:999px;background:var(--card);color:var(--text);font:inherit;padding:0 14px}
+.sm{flex:none;min-height:48px;padding:0 16px;border:0;border-radius:999px;background:var(--text);color:var(--card);font:800 15px var(--font);cursor:pointer}
+.sm.l{background:var(--card);color:var(--text);border:2px solid var(--line)}
+.row{display:flex;gap:8px;margin-top:10px}.row .sm{flex:1}
+.end{text-align:center}.end .big{font-size:64px}
+.vf{text-align:center;font-size:12.5px;line-height:1.6;color:var(--muted)}.vf a{color:inherit;font-weight:800}
+.promo{background:linear-gradient(135deg,#FFD84D,#FFB84D);color:#4A3700;border-radius:20px;padding:12px 14px;margin:0 0 14px;font-weight:700;font-size:14.5px;line-height:1.5}.promo b{font:800 17px var(--disp)}.promo ul{margin:6px 0;padding-left:18px}.promo a{color:#4A3700;font-weight:800}#cbox{margin:0 0 10px}#cbox input{width:100%;min-height:48px;border:2px solid var(--line);border-radius:999px;background:var(--card);color:var(--text);font:inherit;padding:0 16px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- 0. Khoá: chưa mua gói -->
+<div id="lock" class="card end" hidden>
+  <div class="big">🔒</div><h1>Quà tặng cho gói Full</h1>
+  <p class="m">Luyện nói tiếng Anh cùng Bi được tặng kèm khi mua gói VeduAI Full.</p>
+  <a class="go" style="display:block;text-decoration:none;line-height:52px" id="buy" href="#">Xem gói Full</a>
+</div>
+
+<!-- 1. Chọn chủ đề -->
+<div id="setup" class="card" hidden>
+  <div class="promo"><b>🎁 Quà tặng cho học sinh gói Full</b> (Tiết kiệm hay Đầy đủ đều được tặng)<ul><li>🐻 Bi là bạn cùng lớp, trò chuyện tiếng Anh với em mỗi ngày</li><li>🎤 Nói bằng giọng, từ dễ đến khó, tự chọn chủ đề</li><li>⭐ Có sao thưởng, tiến bộ rõ sau mỗi buổi</li></ul><span id="badge"></span> <a id="pbuy" href="#" hidden>Xem gói Full →</a></div>
+  <h1>🐻 Nói tiếng Anh cùng Bi</h1>
+  <p class="m">Bi là bạn cùng lớp. Mình luyện nói từ dễ đến khó nhé!</p>
+  <h2>1. Chọn chủ đề</h2><div id="topics"></div>
+  <button class="opt" id="cust" type="button"><span class="n">✏️</span>Chủ đề khác…</button>
+  <div id="cbox" hidden><input id="ctxt" maxlength="40" placeholder="Em tự nhập: Du lịch, Bóng đá, Phim hoạt hình…" aria-label="Chủ đề em muốn"></div>
+  <h2>2. Ai nói trước?</h2>
+  <div class="two"><button class="opt" data-first="bot" type="button">🐻 Bi nói trước</button><button class="opt" data-first="me" type="button">🙋 Em nói trước</button></div>
+  <button class="go" id="start" disabled type="button">Bắt đầu 🚀</button>
+</div>
+
+<!-- 2. Hội thoại -->
+<div id="chat" hidden>
+  <div class="hud"><span id="tp"></span><span class="lv" id="lv"></span><span id="st">⭐ 0</span></div>
+  <div class="scene" id="scene" aria-live="polite">
+    <div class="win"></div>
+    <div class="board"><span id="bt"></span><small id="bl"></small></div>
+    <div class="bubble" id="bub">…</div>
+    <div class="desk"></div>
+    <span class="book" style="left:16px;background:#3FA2F7"></span><span class="book" style="left:44px;background:#F26B6B;width:28px"></span>
+    <div class="bi">
+      <svg viewBox="0 0 200 190" role="img" aria-label="Nhân vật Bi">
+        <rect x="52" y="108" width="96" height="72" rx="36" fill="#8C6A4F"/>
+        <ellipse cx="100" cy="146" rx="30" ry="28" fill="#F1D9B8"/>
+        <circle cx="52" cy="48" r="22" fill="#8C6A4F"/><circle cx="148" cy="48" r="22" fill="#8C6A4F"/>
+        <circle cx="52" cy="48" r="11" fill="#F4A3A3"/><circle cx="148" cy="48" r="11" fill="#F4A3A3"/>
+        <ellipse cx="100" cy="80" rx="62" ry="54" fill="#A57C5B"/>
+        <ellipse cx="100" cy="100" rx="34" ry="26" fill="#F1D9B8"/>
+        <g fill="#fff" stroke="#24305E" stroke-width="4"><circle cx="76" cy="74" r="17" fill="#fff"/><circle cx="124" cy="74" r="17" fill="#fff"/><path d="M93 74h14" fill="none"/></g>
+        <circle cx="78" cy="76" r="7" fill="#24305E"/><circle cx="122" cy="76" r="7" fill="#24305E"/>
+        <circle cx="80" cy="73" r="2.5" fill="#fff"/><circle cx="124" cy="73" r="2.5" fill="#fff"/>
+        <ellipse cx="100" cy="92" rx="9" ry="6" fill="#24305E"/>
+        <path class="mouth-c" d="M86 108q14 12 28 0" stroke="#24305E" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <ellipse class="mouth-o" cx="100" cy="112" rx="13" ry="11" fill="#7A1F3A"/>
+        <polygon points="100,12 160,32 100,50 40,32" fill="#24305E"/><rect x="82" y="40" width="36" height="12" fill="#24305E"/>
+        <path d="M160 32v22" stroke="#FFD84D" stroke-width="4"/><circle cx="160" cy="56" r="5" fill="#FFD84D"/>
+        <rect x="14" y="116" width="26" height="34" rx="10" fill="#F26B6B" transform="rotate(-18 27 133)"/>
+      </svg>
+    </div>
+  </div>
+  <div class="card">
+    <div class="hint" id="hint"></div>
+    <div class="you" id="you"></div>
+    <div class="bar">
+      <button class="mic" id="mic" type="button" aria-label="Bấm để nói, bấm lần nữa để dừng">🎤</button>
+      <input id="txt" placeholder="Hoặc gõ câu trả lời…" autocomplete="off" lang="en">
+      <button class="sm" id="send" type="button">Gửi</button>
+    </div>
+    <div class="row"><button class="sm l" id="again" type="button">🔊 Nghe lại</button><button class="sm l" id="skip" type="button">⏭ Câu khác</button><button class="sm l" id="quit" type="button">Thoát</button></div>
+  </div>
+</div>
+
+<!-- 3. Kết thúc -->
+<div id="end" class="card end" hidden>
+  <div class="big">🏆</div><h1 id="et"></h1><p class="m" id="es"></p>
+  <a class="go" id="ebuy" hidden style="display:block;text-decoration:none;text-align:center;line-height:52px;margin-bottom:10px" href="#">🎁 Mở khoá đủ 6 câu: xem gói Full</a>
+  <button class="go" id="re" type="button">Luyện chủ đề khác</button>
+</div>
+
+<footer class="vf"><b>VeduAI</b> – Vietnam Education AI Solutions<br>Hỗ trợ: Admin <a href="tel:0984048177">0984048177</a> (Telegram/Zalo)</footer>
+</div>
+
+<script>
+/* ===== CẤU HÌNH ===== */
+const AI_URL = '';            // Tuỳ chọn: webhook n8n, nhận {topic,level,history,text} trả {reply}. Để trống = dùng kịch bản có sẵn.
+const BUY_URL = 'https://veduai-vn.web.app';
+const ACCESS_URL = '';        // n8n: GET ?t=TOKEN -> {ok:true, goi:'full'|'tiet_kiem'}. Để trống = chế độ thử: ?goi=full hoặc ?goi=tk
+let LIMIT = 2;                // chưa mua: xem thử 2 câu. Gói Full (Tiết kiệm/Đầy đủ): 6 câu
+const TG = window.Telegram && Telegram.WebApp;
+if (TG){ try { TG.ready(); TG.expand(); } catch(e){} }
+let askedOpen = false;
+
+/* ===== NỘI DUNG: 6 câu/chủ đề, 2 câu đầu dễ, 2 câu giữa vừa, 2 câu cuối khó ===== */
+const TOPICS = [
+ {id:'intro', icon:'👋', vi:'Giới thiệu bản thân', en:'About me', q:[
+  ['Hi! What is your name?','Mẫu: My name is ...'],
+  ['How old are you?','Mẫu: I am ... years old.'],
+  ['Which school do you go to, and what grade are you in?','Mẫu: I go to ... school. I am in grade ...'],
+  ['What do you usually do after school?','Mẫu: After school, I usually ... and then I ...'],
+  ['Tell me about your best friend. What is he or she like?','Mẫu: My best friend is ... He/She is ... because ...'],
+  ['What do you want to be in the future, and why?','Mẫu: In the future, I want to be ... because ...']]},
+ {id:'school', icon:'🏫', vi:'Trường lớp', en:'School life', q:[
+  ['Do you like school?','Mẫu: Yes, I do. / No, I don\'t.'],
+  ['What is your favourite subject?','Mẫu: My favourite subject is ...'],
+  ['Why do you like that subject?','Mẫu: I like it because it is ...'],
+  ['What do you do at break time?','Mẫu: At break time, I ... with my friends.'],
+  ['What is the hardest thing about school for you? How do you deal with it?','Mẫu: The hardest thing is ... I try to ... by ...'],
+  ['If you could change one thing about your school, what would it be?','Mẫu: If I could change one thing, I would ... because ...']]},
+ {id:'family', icon:'🏠', vi:'Gia đình', en:'My family', q:[
+  ['How many people are there in your family?','Mẫu: There are ... people in my family.'],
+  ['Who is the oldest person in your family?','Mẫu: My ... is the oldest.'],
+  ['What does your mother or father do?','Mẫu: My mother/father is a ...'],
+  ['What do you do together on weekends?','Mẫu: On weekends, we often ... together.'],
+  ['Describe your home. What is your favourite room?','Mẫu: My house has ... My favourite room is ... because ...'],
+  ['Tell me about a happy memory with your family.','Mẫu: Last ... we went to ... It was ... because ...']]},
+ {id:'hobby', icon:'🎮', vi:'Sở thích', en:'Hobbies', q:[
+  ['Do you like sports?','Mẫu: Yes, I do. I like ...'],
+  ['What is your favourite colour?','Mẫu: My favourite colour is ...'],
+  ['What do you like to do in your free time?','Mẫu: In my free time, I like to ...'],
+  ['How often do you do your hobby?','Mẫu: I do it ... times a week.'],
+  ['Why is your hobby special to you? Does it help you in any way?','Mẫu: It is special because ... It helps me ...'],
+  ['What new hobby would you like to try, and what do you need to start?','Mẫu: I would like to try ... To start, I need ...']]},
+ {id:'food', icon:'🍜', vi:'Đồ ăn', en:'Food and drink', q:[
+  ['Do you like pizza?','Mẫu: Yes, I do. / No, I don\'t.'],
+  ['What do you eat for breakfast?','Mẫu: I eat ... for breakfast.'],
+  ['What is your favourite food, and what does it taste like?','Mẫu: My favourite food is ... It tastes ...'],
+  ['Can you cook anything? How do you make it?','Mẫu: I can cook ... First, ... Then, ...'],
+  ['Do you think fast food is good for teenagers? Why or why not?','Mẫu: I think ... because ...'],
+  ['If you were a chef for one day, what would you cook for your class?','Mẫu: I would cook ... because ...']]},
+];
+const REACT = ['Great job!','Nice answer!','Wow, well done!','Awesome!','Good one!','I like that!'];
+const MINW = [2,2,4,4,7,7];
+const LVNAME = ['Dễ','Vừa','Khó'];
+
+/* ===== TRẠNG THÁI ===== */
+const $ = id => document.getElementById(id);
+let topic=null, first=null, qi=0, tries=0, stars=0, started=false, hist=[], busy=false;
+let rec=null, recOn=false;
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+function show(id){ ['lock','setup','chat','end'].forEach(x => $(x).hidden = x !== id); }
+
+/* ===== GIỌNG NÓI ===== */
+let voice=null;
+function pickVoice(){ const v = speechSynthesis.getVoices().filter(x => /^en/i.test(x.lang)); voice = v.find(x => /US/.test(x.lang)) || v[0] || null; }
+if ('speechSynthesis' in window){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function speak(t, done){
+  $('bub').textContent = t; const sc = $('scene');
+  if (!('speechSynthesis' in window)){ sc.classList.add('talk'); setTimeout(() => { sc.classList.remove('talk'); done && done(); }, Math.min(3500, t.length * 55)); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(t); u.lang='en-US'; if (voice) u.voice = voice;
+  u.rate = qi < 2 ? .8 : qi < 4 ? .9 : 1; u.pitch = 1.25;
+  u.onstart = () => sc.classList.add('talk');
+  u.onend = u.onerror = () => { sc.classList.remove('talk'); done && done(); };
+  speechSynthesis.speak(u);
+}
+function listen(){
+  if (!SR){ if (TG && askedOpen){ TG.openLink(location.href); return; } askedOpen = !!TG; $('you').textContent = TG ? 'Telegram chưa hỗ trợ ghi âm: bấm 🎤 lần nữa để mở bằng trình duyệt, hoặc gõ vào ô bên cạnh.' : 'Ứng dụng này chưa hỗ trợ ghi âm, em gõ câu trả lời vào ô bên cạnh (hoặc mở bằng Chrome/Safari) nhé.'; $('txt').focus(); return; }
+  if (recOn){ rec && rec.stop(); return; }
+  speechSynthesis.cancel();
+  rec = new SR(); rec.lang='en-US'; rec.interimResults=true; rec.maxAlternatives=1;
+  rec.onstart = () => { recOn=true; $('mic').classList.add('rec'); $('you').textContent='🎧 Bi đang nghe…'; };
+  rec.onresult = e => { let s=''; for (const r of e.results) s += r[0].transcript; $('txt').value = s; $('you').textContent = '🎧 ' + s; };
+  rec.onerror = e => { $('you').textContent = e.error === 'not-allowed' ? 'Em hãy cho phép dùng micro, hoặc gõ vào ô bên cạnh nhé.' : 'Bi chưa nghe rõ, em thử lại nhé.'; };
+  rec.onend = () => { recOn=false; $('mic').classList.remove('rec'); if ($('txt').value.trim()) $('you').textContent = '✅ ' + $('txt').value + '  (bấm Gửi)'; };
+  try { rec.start(); } catch(e){}
+}
+
+/* ===== LUỒNG HỘI THOẠI ===== */
+function hud(){
+  $('tp').textContent = topic.icon + ' ' + topic.vi;
+  const L = Math.min(2, Math.floor(qi / 2));
+  $('lv').innerHTML = [0,1,2].map(i => '<span class="dot' + (i <= L ? ' on' : '') + '"></span>').join('') + ' <small>' + LVNAME[L] + '</small>';
+  $('st').textContent = '⭐ ' + stars;
+  $('bt').textContent = topic.en; $('bl').textContent = 'Câu ' + Math.min(qi + 1, LIMIT) + '/' + LIMIT;
+}
+function ask(){
+  if (qi >= LIMIT) return finish();
+  hud(); $('hint').textContent = '💡 ' + topic.q[qi][1]; $('txt').value=''; $('you').textContent='';
+  tries = 0; speak(topic.q[qi][0]);
+}
+function begin(){
+  qi=0; stars=0; hist=[]; started = first === 'bot'; show('chat'); hud();
+  if (first === 'bot') ask();
+  else { $('hint').textContent='💡 Em chào Bi và nói một câu về chủ đề "' + topic.vi + '" nhé.'; speak('Hi! I am Bi. You go first! Say hello and tell me something about ' + topic.en.toLowerCase() + '.'); }
+}
+async function submit(){
+  const t = $('txt').value.trim(); if (!t || busy) return;
+  if (recOn && rec) rec.stop();
+  busy = true; $('you').textContent = '🙋 ' + t; $('txt').value=''; hist.push({role:'student', text:t});
+  const words = t.split(/\s+/).filter(Boolean).length;
+  let reply = '', advance = false;
+  if (!started){ started = true; reply = 'Nice to meet you! Let me ask you something.'; advance = false; }
+  else if (words >= MINW[qi] || tries >= 1){
+    stars += words >= MINW[qi] ? 1 : 0; advance = true;
+    reply = words >= MINW[qi] ? REACT[Math.floor(Math.random() * REACT.length)] : 'Good try! Let us move on.';
+  } else { tries++; reply = 'Good! Can you say a longer sentence? Try: ' + topic.q[qi][1].replace('Mẫu: ', ''); }
+  if (AI_URL){
+    try { const r = await fetch(AI_URL, {method:'POST', headers:{'Content-Type':'application/json','ngrok-skip-browser-warning':'1'}, body:JSON.stringify({topic:topic.id, level:Math.min(2, Math.floor(qi/2)), question:topic.q[qi][0], history:hist.slice(-8), text:t})});
+      const j = await r.json(); if (j && j.reply) reply = j.reply; } catch(e){}
+  }
+  hist.push({role:'bot', text:reply});
+  if (!started || (started && !advance && reply)) { /* giữ nguyên câu hỏi */ }
+  const wasFirst = (first === 'me' && hist.length === 2);
+  if (advance) qi++;
+  hud();
+  if (wasFirst){ speak(reply, () => { busy=false; ask(); }); return; }
+  if (advance){ qi >= LIMIT ? speak(reply, () => { busy=false; finish(); }) : speak(reply + ' ' + topic.q[qi][0], () => { busy=false; }), $('hint').textContent = qi < LIMIT ? '💡 ' + topic.q[qi][1] : ''; tries = 0; }
+  else speak(reply, () => { busy=false; });
+}
+function finish(){
+  show('end'); const rt = stars / LIMIT, g = rt >= .8 ? 'Siêu sao tiếng Anh!' : rt >= .5 ? 'Em nói rất tốt!' : 'Cố gắng tốt lắm!'; $('ebuy').hidden = LIMIT >= 6; $('re').textContent = 'Luyện chủ đề khác';
+  $('et').textContent = g; $('es').textContent = 'Em được ' + stars + '/' + LIMIT + ' ⭐ ở chủ đề "' + topic.vi + '". ' + (LIMIT >= 6 ? 'Luyện thêm để đạt đủ sao nhé!' : 'Bi còn nhiều câu khó hơn đang chờ em ở gói Full!');
+}
+
+/* ===== SỰ KIỆN ===== */
+$('topics').innerHTML = TOPICS.map((t,i) => '<button class="opt" type="button" data-t="' + i + '"><span class="n">' + t.icon + '</span>' + t.vi + '</button>').join('');
+document.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.t !== undefined){ topic = TOPICS[+b.dataset.t]; $('cbox').hidden = true; $('cust').classList.remove('on'); document.querySelectorAll('[data-t]').forEach(x => x.classList.toggle('on', x === b)); }
+  if (b.id === 'cust'){ $('cbox').hidden = false; document.querySelectorAll('[data-t]').forEach(x => x.classList.remove('on')); b.classList.add('on'); topic = custom($('ctxt').value); $('ctxt').focus(); }
+  if (b.dataset.first){ first = b.dataset.first; document.querySelectorAll('[data-first]').forEach(x => x.classList.toggle('on', x === b)); }
+  $('start').disabled = !(topic && first);
+});
+function custom(v){ v = v.trim(); if (!v) return null; const T = v;
+  return {id:'custom', icon:'✨', vi:T, en:T, q:[
+  ['Do you like '+T+'?','Mẫu: Yes, I do. / No, I don\'t.'],
+  ['Tell me one thing about '+T+'.','Mẫu: '+T+' is ...'],
+  ['Why do you like or dislike '+T+'?','Mẫu: I like/dislike it because ...'],
+  ['When did you first learn about '+T+'?','Mẫu: I first learned about it when ...'],
+  ['Why is '+T+' important in your life or in your country?','Mẫu: It is important because ...'],
+  ['What do you think will happen with '+T+' in the future?','Mẫu: I think in the future ...']]}; }
+$('ctxt').addEventListener('input', () => { topic = custom($('ctxt').value); $('start').disabled = !(topic && first); });
+$('start').onclick = begin;
+$('mic').onclick = listen;
+$('send').onclick = submit;
+$('txt').addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+$('again').onclick = () => speak($('bub').textContent);
+$('skip').onclick = () => { if (busy) return; qi++; tries = 0; qi >= LIMIT ? finish() : ask(); };
+$('quit').onclick = () => { speechSynthesis && speechSynthesis.cancel(); show('setup'); };
+$('re').onclick = () => { topic = null; first = null; $('start').disabled = true; document.querySelectorAll('.opt.on').forEach(x => x.classList.remove('on')); show('setup'); };
+['buy','ebuy','pbuy'].forEach(id => { const a = $(id); a.href = BUY_URL; a.onclick = e => { if (TG){ e.preventDefault(); TG.openLink(BUY_URL); } }; });
+(async () => {
+  const q = new URLSearchParams(location.search), tok = ((TG && TG.initDataUnsafe && TG.initDataUnsafe.start_param) || q.get('t') || '').replace(/[^A-Za-z0-9]/g, '');
+  const NAME = {full:'Đầy đủ', tiet_kiem:'Tiết kiệm', tk:'Tiết kiệm'}; let goi = '';
+  if (ACCESS_URL && tok){ try { const j = await (await fetch(ACCESS_URL + '?t=' + tok, {headers:{'ngrok-skip-browser-warning':'1'}})).json(); if (j && j.ok) goi = j.goi || 'full'; } catch(e){} }
+  else if (!ACCESS_URL){ goi = q.get('goi') || (TG && TG.initDataUnsafe && TG.initDataUnsafe.start_param) || ''; if (!NAME[goi]) goi = ''; }
+  if (goi){ LIMIT = 6; $('badge').textContent = '✅ Em đang dùng gói ' + (NAME[goi] || 'Full') + ': dùng đủ, không giới hạn!'; }
+  else { $('badge').textContent = '🔓 Em đang xem thử 2 câu đầu.'; $('pbuy').hidden = false; }
+  show('setup');
+})();
+</script>
+</body>
+</html>
