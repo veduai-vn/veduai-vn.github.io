@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VeduAI – Học ngay</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#EAF5FF; --card:#fff; --text:#24305E; --muted:#5F6B92; --line:#C9DAF2; --shadow:#B5CBEA; --mark:#FFD84D; --mark-d:#E3AE00; --mark-ink:#4A3700; --ok:#118A62; --okbg:#E3F7EE; --err:#C2255C; --errbg:#FDE8F0;
+    --font:'Nunito',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif; --disp:'Baloo 2','Nunito',system-ui,sans-serif; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#151B36; --card:#1F2850; --text:#F1F4FF; --muted:#AAB4DC; --line:#38437A; --shadow:#0E1328; --mark-d:#B88A00; --ok:#5FE0B0; --okbg:#173B3A; --err:#FF9BB5; --errbg:#4A2440; }
+  }
+  * { box-sizing:border-box; }
+  html,body { margin:0; background:var(--bg); color:var(--text); font-family:var(--font); font-weight:500; }
+  body { min-height:100vh; padding:env(safe-area-inset-top,0) 16px env(safe-area-inset-bottom,0); background-image:radial-gradient(var(--line) 1.5px,transparent 1.5px); background-size:26px 26px; display:flex; justify-content:center; }
+  .wrap { width:100%; max-width:560px; padding:20px 0 28px; }
+  .hero { display:flex; gap:10px; align-items:flex-end; margin-bottom:12px; }
+  .mascot { font-size:52px; line-height:1; flex:none; }
+  .bubble { background:var(--card); border:2px solid var(--line); border-radius:22px 22px 22px 6px; padding:8px 16px 10px; box-shadow:0 4px 0 var(--shadow); font-weight:700; }
+  .card { background:var(--card); border:2px solid var(--line); border-radius:24px; box-shadow:0 4px 0 var(--shadow); padding:18px 16px; }
+  .msg { white-space:pre-wrap; line-height:1.5; font-size:17px; font-weight:700; margin:0 0 14px; }
+  .crumb { appearance:none; border:0; background:none; color:var(--muted); font:700 14px var(--font); cursor:pointer; padding:0 0 10px; }
+  button.opt { display:flex; align-items:center; gap:12px; width:100%; text-align:left; font:inherit; font-weight:700; font-size:16px; padding:10px 16px 10px 10px; margin:0 0 10px; border:2px solid var(--line); background:var(--card); color:var(--text); border-radius:999px; cursor:pointer; line-height:1.35; box-shadow:0 4px 0 var(--shadow); transition:transform .08s, box-shadow .08s; }
+  button.opt .n { flex:none; display:inline-grid; place-items:center; min-width:34px; height:34px; padding:0 6px; border-radius:17px; background:var(--mark); color:var(--mark-ink); font:800 16px var(--disp); }
+  button.opt:active { transform:translateY(3px); box-shadow:0 1px 0 var(--shadow); background:var(--mark); border-color:var(--mark-d); color:var(--mark-ink); }
+  button.opt:disabled { opacity:.6; cursor:default; }
+  button.opt.ok { background:var(--okbg); border-color:var(--ok); }
+  button.opt.bad { background:var(--errbg); border-color:var(--err); }
+  button.opt.main { background:var(--mark); border-color:var(--mark-d); color:var(--mark-ink); }
+  .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .grid button.opt { justify-content:center; padding:12px 4px; margin:0; border-radius:18px; }
+  .chap { font:800 16px var(--disp); margin:14px 0 8px; color:var(--muted); }
+  .tabs { display:flex; gap:8px; margin:0 0 6px; }
+  .tab { appearance:none; flex:1; border:2px solid var(--line); background:var(--card); color:var(--text); border-radius:999px; font:700 15px var(--font); padding:8px 0; cursor:pointer; }
+  .tab[aria-pressed=true] { background:var(--mark); border-color:var(--mark-d); color:var(--mark-ink); }
+  .bar { height:10px; background:var(--line); border-radius:99px; overflow:hidden; margin:0 0 14px; }
+  .bar i { display:block; height:100%; background:var(--ok); border-radius:99px; transition:width .25s; }
+  .phase { font:700 13px var(--font); color:var(--muted); margin:0 0 6px; }
+  .q { white-space:pre-wrap; line-height:1.55; font-size:18px; font-weight:700; margin:0 0 14px; }
+  .fb { border-radius:16px; padding:12px 14px; margin:6px 0 12px; line-height:1.5; font-weight:600; white-space:pre-wrap; }
+  .fb.ok { background:var(--okbg); border:2px solid var(--ok); } .fb.bad { background:var(--errbg); border:2px solid var(--err); } .fb.info { background:var(--card); border:2px solid var(--line); }
+  textarea,input[type=text] { width:100%; font:inherit; font-weight:600; font-size:16px; padding:10px 14px; border:2px solid var(--line); border-radius:16px; background:var(--card); color:var(--text); margin:0 0 10px; }
+  textarea { min-height:90px; resize:vertical; }
+  .state { text-align:center; padding:22px 8px; line-height:1.6; }
+  .state .big { font-size:60px; line-height:1.1; margin-bottom:8px; }
+  .state .t { font:800 21px var(--disp); }
+  .muted { color:var(--muted); font-size:14px; font-weight:600; }
+  .score { font:800 44px var(--disp); }
+  .vf { max-width:560px; margin:8px auto 0; padding:10px 8px; text-align:center; font-size:12.5px; line-height:1.6; color:var(--muted); }
+  .vf a { color:inherit; font-weight:800; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero"><span class="mascot" aria-hidden="true">🦉</span><div class="bubble" id="say">Mình học ngay thôi!</div></div>
+  <div class="card" id="card" aria-live="polite"><div class="state"><div class="big" aria-hidden="true">🐣</div>Đang tải...</div></div>
+  <footer class="vf"><b>VeduAI</b> – Vietnam Education AI Solutions<br>Hỗ trợ: Admin <a href="tel:0984048177">0984048177</a> (Telegram/Zalo)</footer>
+</div>
+<script>
+// Địa chỉ n8n (workflow "VeduAI - Hoc ngay (cau noi web)"). Đổi ở đây nếu địa chỉ ngrok thay đổi.
+const API = 'https://devotee-outclass-couch.ngrok-free.dev/webhook/hoc-ngay-7c3a';
+const H = { 'ngrok-skip-browser-warning': '1', 'Content-Type': 'application/json' };
+const TG = window.Telegram && Telegram.WebApp;
+if (TG) { try { TG.ready(); TG.expand(); } catch (e) {} }
+const card = document.getElementById('card');
+const say = m => { document.getElementById('say').textContent = m; };
+const KEY = 'vedu_hoc_v1';
+let SAVE = {}; try { SAVE = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { SAVE = {}; }
+const luu = () => { try { localStorage.setItem(KEY, JSON.stringify(SAVE)); } catch (e) {} };
+const qs = new URLSearchParams(location.search);
+const PHAN = [['on_bai_cu', 'Ôn bài cũ'], ['luyen_tap', 'Luyện tập'], ['kiem_tra_cuoi', 'Kiểm tra cuối tiết']];
+
+async function goi(body) {
+  try {
+    const r = await fetch(API, { method: 'POST', headers: H, body: JSON.stringify(body) });
+    return await r.json();
+  } catch (e) { return { ok: false, loi: 'mang' }; }
+}
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+function xoa() { card.replaceChildren(); }
+function btn(nhan, label, fn, cls) {
+  const b = el('button', 'opt' + (cls ? ' ' + cls : '')); b.type = 'button';
+  if (nhan !== '') b.append(el('span', 'n', nhan));
+  b.append(document.createTextNode(label)); b.onclick = fn; return b;
+}
+function crumb(text, fn) { const b = el('button', 'crumb', text); b.type = 'button'; b.onclick = fn; return b; }
+function trangThai(icon, tieu, phu, nutLai) {
+  xoa(); const s = el('div', 'state'); s.append(el('div', 'big', icon), el('div', 't', tieu));
+  if (phu) s.append(el('div', 'muted', phu));
+  if (nutLai) { const b = btn('', 'Thử lại', nutLai, 'main'); b.style.marginTop = '14px'; s.append(b); }
+  card.append(s);
+}
+const loiMang = fn => { say('Mạng đang chập chờn…'); trangThai('📡', 'Chưa kết nối được', 'Kiểm tra mạng rồi bấm Thử lại. Nếu vẫn lỗi, nhờ admin kiểm tra máy chủ học.', fn); };
+
+/* ---------- 1. Chọn lớp ---------- */
+function manLop() {
+  xoa(); say('Em học lớp mấy nhỉ? 👇');
+  if (SAVE.tiep && SAVE.tiep.id) {
+    const t = SAVE.tiep;
+    card.append(btn('▶', 'Học tiếp: ' + t.mon + ' lớp ' + t.lop + ' – ' + t.ten, () => vaoBai(t.id, t.ten, t.lop, t.mon, t.tap), 'main'));
+    card.append(el('p', 'muted', 'hoặc chọn bài khác:'));
+  }
+  card.append(el('p', 'msg', 'Chọn lớp:'));
+  const g = el('div', 'grid');
+  for (let l = 1; l <= 12; l++) g.append(btn('', String(l), () => manMon(l)));
+  card.append(g);
+}
+/* ---------- 2. Chọn môn ---------- */
+async function manMon(lop) {
+  trangThai('🐣', 'Đang tải môn học...');
+  const j = await goi({ act: 'muc_luc', lop });
+  if (j.loi === 'mang' || j.loi === 'may_chu_hoc_dang_tat') return loiMang(() => manMon(lop));
+  xoa(); say('Chọn môn nhé 👇');
+  card.append(crumb('← Chọn lớp khác', manLop), el('p', 'msg', 'Lớp ' + lop + ': học môn nào?'));
+  if (!j.ok || !j.mon || !j.mon.length) { card.append(el('p', 'muted', 'Lớp này chưa có bài soạn sẵn. Em chọn lớp khác hoặc nhắn bot để được hỗ trợ.')); return; }
+  j.mon.forEach(m => card.append(btn(m.so_bai, m.mon, () => manBai(lop, m.mon))));
+}
+/* ---------- 3. Chọn bài (tập > chương > bài) ---------- */
+let tapChon = null;
+async function manBai(lop, mon, tapMo) {
+  trangThai('🐣', 'Đang tải danh sách bài...');
+  const j = await goi({ act: 'muc_luc', lop, mon });
+  if (j.loi === 'mang' || j.loi === 'may_chu_hoc_dang_tat') return loiMang(() => manBai(lop, mon));
+  xoa(); say('Chọn bài em muốn học 👇');
+  card.append(crumb('← Chọn môn khác', () => manMon(lop)), el('p', 'msg', j.mon + ' lớp ' + lop));
+  const dsTap = (j.tap || []).filter(t => t.chuong && t.chuong.length);
+  if (!dsTap.length) { card.append(el('p', 'muted', 'Môn này chưa có bài soạn sẵn.')); return; }
+  if (tapChon == null || !dsTap.some(t => t.tap === tapChon)) tapChon = tapMo || dsTap[0].tap;
+  if (dsTap.length > 1) {
+    const tabs = el('div', 'tabs');
+    dsTap.forEach(t => { const b = el('button', 'tab', t.tap ? 'Tập ' + t.tap : 'Tất cả'); b.type = 'button'; b.setAttribute('aria-pressed', String(t.tap === tapChon)); b.onclick = () => { tapChon = t.tap; manBai(lop, mon, t.tap); }; tabs.append(b); });
+    card.append(tabs);
+  }
+  const t = dsTap.find(x => x.tap === tapChon) || dsTap[0];
+  t.chuong.forEach(c => {
+    card.append(el('div', 'chap', c.ten));
+    c.bai.forEach(b => card.append(btn(b.so, String(b.ten).replace(/^B[àa]i\s*\d+\s*[.:]?\s*/i, '') || ('Bài ' + b.so), () => vaoBai(b.id, b.ten, lop, mon, t.tap))));
+  });
+}
+/* ---------- 4. Làm bài ---------- */
+let Q = null;
+async function vaoBai(id, ten, lop, mon, tap) {
+  trangThai('🐣', 'Đang mở bài...');
+  const j = await goi({ act: 'bai', id, bo: (SAVE.bo && SAVE.bo[id]) || 1 });
+  if (j.loi === 'mang' || j.loi === 'may_chu_hoc_dang_tat') return loiMang(() => vaoBai(id, ten, lop, mon, tap));
+  if (!j.ok) { trangThai('📭', 'Bài này chưa có câu hỏi', 'Em chọn bài khác nhé.', () => manBai(lop, mon, tap)); return; }
+  if (j.bai) { lop = lop || j.bai.lop; mon = mon || j.bai.mon; tap = tap || j.bai.tap || 0; if (!ten || ten === 'Bài học') ten = j.bai.tieu_de || ten; }
+  const ds = [];
+  PHAN.forEach(([k, nhan]) => (j.phan[k] || []).forEach(c => ds.push({ c, phan: k, nhan })));
+  if (!ds.length) { trangThai('📭', 'Bài này chưa có câu hỏi', 'Em chọn bài khác nhé.', () => manBai(lop, mon, tap)); return; }
+  Q = { id, ten, lop, mon, tap, bo: j.bo, so_bo: j.so_bo, ds, i: 0, dung: 0, tong: 0, kt_dung: 0, kt_tong: 0 };
+  if (SAVE.tiep && SAVE.tiep.id === id && SAVE.tiep.i > 0 && SAVE.tiep.i < ds.length) Q.i = SAVE.tiep.i;
+  SAVE.tiep = { id, ten, lop, mon, tap, i: Q.i }; luu();
+  hienCau();
+}
+function thanh() { const b = el('div', 'bar'), i = el('i'); i.style.width = Math.round(Q.i / Q.ds.length * 100) + '%'; b.append(i); return b; }
+function hienCau() {
+  if (Q.i >= Q.ds.length) return tongKet();
+  const it = Q.ds[Q.i], c = it.c; xoa(); say('Làm từng câu nhé, cố lên! 💪');
+  card.append(crumb('← Danh sách bài', () => manBai(Q.lop, Q.mon, Q.tap)), thanh());
+  card.append(el('div', 'phase', it.nhan + ' · câu ' + (Q.i + 1) + '/' + Q.ds.length), el('p', 'q', c.de || ''));
+  const gui = tl => cham(it, tl);
+  if (c.dang === 'trac_nghiem' && (c.lua_chon || []).length) {
+    c.lua_chon.forEach(lc => { const m = String(lc).match(/^\s*([A-D])\s*[.)]\s*(.*)$/s); card.append(btn(m ? m[1] : '•', m ? m[2] : String(lc), e => gui(m ? m[1] : String(lc)))); });
+  } else if (c.dang === 'dung_sai') {
+    card.append(btn('✔', 'Đúng', () => gui('Đúng')), btn('✖', 'Sai', () => gui('Sai')));
+  } else {
+    const ta = (c.dang === 'dien_khuyet') ? el('input') : el('textarea');
+    if (c.dang === 'dien_khuyet') ta.type = 'text';
+    ta.placeholder = c.dang === 'dien_khuyet' ? 'Em điền đáp án vào đây' : 'Em viết bài làm vào đây (không bắt buộc)';
+    card.append(ta, btn('', c.dang === 'dien_khuyet' ? 'Kiểm tra' : 'Xem đáp án mẫu', () => gui(ta.value), 'main'));
+  }
+}
+async function cham(it, tl) {
+  card.querySelectorAll('button.opt').forEach(b => b.disabled = true);
+  const j = await goi({ act: 'cham', id: Q.id, bo: Q.bo, phan: it.phan, stt: it.c.stt, tra_loi: tl });
+  if (!j.ok) { card.querySelectorAll('button.opt').forEach(b => b.disabled = false); say('Chưa chấm được, em bấm lại nhé.'); return; }
+  const tuLuan = !!j.can_ai_cham;
+  if (!tuLuan) { Q.tong++; if (j.dung) Q.dung++; if (it.phan === 'kiem_tra_cuoi') { Q.kt_tong++; if (j.dung) Q.kt_dung++; } }
+  // đánh dấu đáp án trắc nghiệm
+  if (it.c.dang === 'trac_nghiem') {
+    card.querySelectorAll('button.opt').forEach(b => { const l = (b.firstChild && b.firstChild.textContent) || ''; if (l === j.dap_an) b.classList.add('ok'); else if (l === String(tl)) b.classList.add('bad'); });
+  }
+  if (tuLuan) {
+    const f = el('div', 'fb info'); f.textContent = 'Đáp án mẫu:\n' + (j.dap_an_mau || j.dap_an || '') + ((j.tieu_chi_cham || []).length ? '\n\nTiêu chí: ' + j.tieu_chi_cham.join('; ') : '') + (j.giai_thich ? '\n\n' + j.giai_thich : '');
+    card.append(f, el('p', 'muted', 'Em tự so với đáp án mẫu nhé:'));
+    card.append(btn('✔', 'Em làm đúng', () => { Q.tong++; Q.dung++; if (it.phan === 'kiem_tra_cuoi') { Q.kt_tong++; Q.kt_dung++; } tiep(); }),
+                btn('✖', 'Em chưa đúng', () => { Q.tong++; if (it.phan === 'kiem_tra_cuoi') Q.kt_tong++; tiep(); }));
+    return;
+  }
+  const f = el('div', 'fb ' + (j.dung ? 'ok' : 'bad'));
+  let t = j.dung ? '🎉 Chính xác!' : '❌ Chưa đúng. Đáp án: ' + j.dap_an;
+  if (!j.dung && j.vi_sao_chon_sai) t += '\n' + j.vi_sao_chon_sai;
+  if (j.giai_thich) t += '\n\n' + j.giai_thich;
+  f.textContent = t; card.append(f, btn('', Q.i + 1 >= Q.ds.length ? 'Xem kết quả' : 'Câu tiếp theo →', tiep, 'main'));
+}
+function tiep() { Q.i++; SAVE.tiep = { id: Q.id, ten: Q.ten, lop: Q.lop, mon: Q.mon, tap: Q.tap, i: Q.i >= Q.ds.length ? 0 : Q.i }; luu(); hienCau(); }
+function tongKet() {
+  xoa(); say('Em làm tốt lắm!');
+  const diem = Q.kt_tong ? Math.round(Q.kt_dung / Q.kt_tong * 100) / 10 : (Q.tong ? Math.round(Q.dung / Q.tong * 100) / 10 : 0);
+  const s = el('div', 'state'); s.append(el('div', 'big', diem >= 8 ? '🏆' : diem >= 5 ? '👍' : '💪'), el('div', 'score', String(diem).replace('.', ',') + '/10'),
+    el('div', 'muted', 'Đúng ' + Q.dung + '/' + Q.tong + ' câu' + (Q.kt_tong ? ' · kiểm tra cuối tiết ' + Q.kt_dung + '/' + Q.kt_tong : '')));
+  card.append(s);
+  SAVE.tiep = { id: Q.id, ten: Q.ten, lop: Q.lop, mon: Q.mon, tap: Q.tap, i: 0 }; luu();
+  if (Q.so_bo > 1) card.append(btn('🔁', 'Làm bộ câu hỏi khác của bài này', () => { SAVE.bo = SAVE.bo || {}; SAVE.bo[Q.id] = (Q.bo % Q.so_bo) + 1; luu(); vaoBai(Q.id, Q.ten, Q.lop, Q.mon, Q.tap); }));
+  card.append(btn('📚', 'Chọn bài khác', () => manBai(Q.lop, Q.mon, Q.tap), 'main'));
+  if (TG) card.append(btn('💬', 'Quay lại chat', () => { try { TG.close(); } catch (e) {} }));
+}
+/* ---------- khởi động ---------- */
+(function khoiDong() {
+  const lop = parseInt(qs.get('lop'), 10), mon = qs.get('mon'), b = (qs.get('b') || '').replace(/[^a-f0-9]/g, '');
+  if (b) return vaoBai(b, 'Bài học', lop || 0, mon || '', 0);
+  if (lop && mon) return manBai(lop, mon);
+  if (lop) return manMon(lop);
+  manLop();
+})();
+</script>
+</body>
+</html>
