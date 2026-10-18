@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bi – Nói tiếng Anh nhanh</title>
+<style>
+  :root{--bg:#fffaf0;--ink:#2b2b2b;--ok:#1a9a4a;--weak:#d98a00;--bad:#d33;--card:#fff;--line:#e8dfc8}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,Arial,sans-serif;background:var(--bg);color:var(--ink);padding:16px;max-width:640px;margin:auto}
+  h1{font-size:20px;margin:0 0 10px}
+  .tabs{display:flex;gap:8px;margin-bottom:12px}
+  .tabs button{flex:1;padding:10px;border:1px solid var(--line);background:var(--card);border-radius:10px;font-size:15px}
+  .tabs button.on{background:#ffe9a8;font-weight:600}
+  #log{min-height:160px;margin-bottom:12px}
+  .b{padding:10px 12px;border-radius:12px;margin:6px 0;max-width:90%;line-height:1.4}
+  .me{background:#e6f1ff;margin-left:auto}
+  .bi{background:var(--card);border:1px solid var(--line)}
+  .target{font-size:22px;font-weight:600;padding:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:8px}
+  .w{display:inline-block;margin:2px 3px;padding:2px 6px;border-radius:8px}
+  .w.ok{color:var(--ok)} .w.weak{color:var(--weak);background:#fff3d6} .w.wrong,.w.missing{color:var(--bad);background:#ffe3e3}
+  .row{display:flex;gap:8px;margin:6px 0}
+  .row button,.mini{padding:8px 12px;border:1px solid var(--line);background:var(--card);border-radius:10px;font-size:14px}
+  #mic{width:100%;padding:18px;font-size:18px;border:0;border-radius:14px;background:#ff8a00;color:#fff;font-weight:700}
+  #mic.rec{background:#d33}
+  #stat{font-size:13px;color:#666;margin-top:8px;min-height:18px}
+  .fb{font-size:15px;line-height:1.6}
+  .score{font-size:28px;font-weight:700}
+  #gear{float:right;border:0;background:none;font-size:20px}
+</style>
+</head>
+<body>
+<button id="gear" title="Cài đặt kết nối">⚙️</button>
+<h1>🐻 Bi – Nói tiếng Anh</h1>
+
+<div class="tabs">
+  <button data-m="free" class="on">Nói chuyện với Bi</button>
+  <button data-m="read">Đọc theo câu mẫu</button>
+</div>
+
+<div id="readbox" hidden>
+  <div class="target" id="target"></div>
+  <div class="row">
+    <button id="hear">🔊 Nghe mẫu</button>
+    <button id="slow">🐢 Nghe chậm</button>
+    <button id="next">➡️ Câu khác</button>
+  </div>
+</div>
+
+<div id="log"></div>
+<button id="mic">🎤 Bấm để nói</button>
+<div id="stat"></div>
+
+<script>
+(function(){
+  var SENTENCES=[
+    "I like to play football with my friends.",
+    "What is the weather like today?",
+    "My favorite subject is math because it is fun.",
+    "Could you please speak more slowly?",
+    "I usually get up at six o'clock every morning.",
+    "She is reading an interesting book in the library.",
+    "We are going to visit our grandparents this weekend.",
+    "How much does this notebook cost?"
+  ];
+  var mode="free", sIdx=0, history=[], rec=null, chunks=[], stream=null, tStop=0, timer=null;
+
+  function $(id){return document.getElementById(id);}
+  function ls(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v);}catch(e){return null;} }
+
+  function config(force){
+    var base=ls("bi_base"), key=ls("bi_key");
+    if(force||!base){ base=prompt("Địa chỉ server của Bi (ví dụ https://xxxx.ngrok-free.app):", base||""); if(base) ls("bi_base", base.replace(/\/+$/,"")); }
+    if(force||!key){ key=prompt("Khóa BI_KEY (đã đặt trong file .bat):", key||""); if(key) ls("bi_key", key); }
+    return {base:(ls("bi_base")||""), key:(ls("bi_key")||"")};
+  }
+  function hdr(extra){
+    var c=config(false), h={"X-Key":c.key,"ngrok-skip-browser-warning":"1"};
+    for(var k in (extra||{})) h[k]=extra[k];
+    return h;
+  }
+  function stat(t){ $("stat").textContent=t||""; }
+
+  function addBubble(cls,text){
+    var d=document.createElement("div"); d.className="b "+cls; d.textContent=text;
+    $("log").appendChild(d); d.scrollIntoView({block:"end"}); return d;
+  }
+
+  // ---------- Doc thanh tieng: tai truoc cac cau, phat lien tiep ----------
+  function fetchTTS(text,slow){
+    return fetch(ls("bi_base")+"/tts",{method:"POST",headers:hdr({"Content-Type":"application/json"}),
+      body:JSON.stringify({text:text,slow:!!slow})})
+      .then(function(r){ if(!r.ok) throw new Error("tts "+r.status); return r.blob(); })
+      .then(function(b){ return URL.createObjectURL(b); });
+  }
+  function playUrl(url,onStart){
+    return new Promise(function(res){
+      var a=new Audio(url);
+      a.onplaying=function(){ if(onStart){onStart(); onStart=null;} };
+      a.onended=res; a.onerror=res;
+      a.play().catch(res);
+    });
+  }
+  function speak(text,slow,onFirst){
+    var parts=text.split(/(?<=[.!?])\s+/).filter(Boolean);
+    if(!parts.length) return Promise.resolve();
+    var pre=parts.map(function(p){ return fetchTTS(p,slow); }); // tai song song
+    var chain=Promise.resolve();
+    pre.forEach(function(pr,i){
+      chain=chain.then(function(){ return pr; }).then(function(u){ return playUrl(u, i===0?onFirst:null); })
+        .catch(function(){});
+    });
+    return chain;
+  }
+
+  // ---------- Ghi am ----------
+  function pickType(){
+    var c=["audio/webm;codecs=opus","audio/webm","audio/mp4"];
+    for(var i=0;i<c.length;i++){ if(window.MediaRecorder && MediaRecorder.isTypeSupported(c[i])) return c[i]; }
+    return "";
+  }
+  function startRec(){
+    if(!config(false).base){ return; }
+    navigator.mediaDevices.getUserMedia({audio:true}).then(function(s){
+      stream=s; chunks=[];
+      var t=pickType(); rec=t?new MediaRecorder(s,{mimeType:t}):new MediaRecorder(s);
+      rec.ondataavailable=function(e){ if(e.data&&e.data.size) chunks.push(e.data); };
+      rec.onstop=function(){
+        stream.getTracks().forEach(function(x){x.stop();});
+        tStop=performance.now();
+        send(new Blob(chunks,{type:rec.mimeType||"audio/webm"}));
+      };
+      rec.start();
+      $("mic").classList.add("rec"); $("mic").textContent="⏹ Bấm để dừng"; stat("Đang nghe em nói…");
+      timer=setTimeout(stopRec,12000);
+    }).catch(function(){ stat("Không mở được micro. Hãy cho phép dùng micro."); });
+  }
+  function stopRec(){
+    clearTimeout(timer);
+    if(rec && rec.state!=="inactive"){ rec.stop(); }
+    $("mic").classList.remove("rec"); $("mic").textContent="🎤 Bấm để nói";
+  }
+  $("mic").onclick=function(){ (rec && rec.state==="recording") ? stopRec() : startRec(); };
+
+  // ---------- Gui len server ----------
+  function send(blob){
+    stat("🐻 Bi đang nghe…");
+    var fd=new FormData();
+    var ext=(blob.type.indexOf("mp4")>-1)?"mp4":"webm";
+    fd.append("audio",blob,"nói."+ext);
+    if(mode==="read") fd.append("target",SENTENCES[sIdx]);
+    fd.append("history",JSON.stringify(history));
+    fetch(ls("bi_base")+"/bi",{method:"POST",headers:hdr(),body:fd})
+      .then(function(r){ if(r.status===401) throw new Error("Sai khóa. Bấm ⚙️ để nhập lại."); if(!r.ok) throw new Error("Lỗi server "+r.status); return r.json(); })
+      .then(handle)
+      .catch(function(e){ stat("⚠️ "+e.message); });
+  }
+
+  function timing(d,firstMs){
+    var m=d.ms||{};
+    var s="⏱ Nhận giọng "+(m.stt/1000).toFixed(1)+"s";
+    if(m.ai!==undefined) s+=" · AI "+(m.ai/1000).toFixed(1)+"s";
+    if(firstMs!==undefined) s+=" · từ lúc em nói xong đến khi Bi lên tiếng "+(firstMs/1000).toFixed(1)+"s";
+    stat(s);
+  }
+
+  function handle(d){
+    if(d.empty){ stat("Bi chưa nghe rõ, em nói lại nhé."); return; }
+    if(d.mode==="free"){
+      addBubble("me",d.heard);
+      if(!d.reply){ stat("Bi nghe được rồi, nhưng chưa nối AI (xem BI_AI_URL trong file .bat)."); return; }
+      addBubble("bi",d.reply);
+      history.push({role:"user",content:d.heard},{role:"assistant",content:d.reply});
+      history=history.slice(-6);
+      timing(d);
+      speak(d.reply,false,function(){ timing(d, performance.now()-tStop); });
+    } else {
+      renderScore(d);
+      timing(d);
+    }
+  }
+
+  function renderScore(d){
+    var box=document.createElement("div"); box.className="b bi";
+    var sc=document.createElement("div"); sc.className="score"; sc.textContent=d.score+"/100"; box.appendChild(sc);
+    var line=document.createElement("div");
+    d.words.forEach(function(w){
+      var s=document.createElement("span"); s.className="w "+w.status; s.textContent=w.word; line.appendChild(s);
+    });
+    box.appendChild(line);
+    var fb=document.createElement("div"); fb.className="fb";
+    d.feedback.forEach(function(t){ var p=document.createElement("div"); p.textContent=t; fb.appendChild(p); });
+    box.appendChild(fb);
+    var r=document.createElement("div"); r.className="row";
+    d.words.filter(function(w){return w.status!=="ok";}).forEach(function(w){
+      var b=document.createElement("button"); b.className="mini"; b.textContent="🔊 "+w.word;
+      b.onclick=function(){ speak(w.word,true); }; r.appendChild(b);
+    });
+    box.appendChild(r);
+    $("log").appendChild(box); box.scrollIntoView({block:"end"});
+  }
+
+  // ---------- Giao dien ----------
+  function showTarget(){ $("target").textContent=SENTENCES[sIdx]; }
+  document.querySelectorAll(".tabs button").forEach(function(b){
+    b.onclick=function(){
+      document.querySelectorAll(".tabs button").forEach(function(x){x.classList.remove("on");});
+      b.classList.add("on"); mode=b.getAttribute("data-m");
+      $("readbox").hidden=(mode!=="read"); $("log").innerHTML=""; stat("");
+      if(mode==="read") showTarget();
+    };
+  });
+  $("hear").onclick=function(){ speak(SENTENCES[sIdx],false); };
+  $("slow").onclick=function(){ speak(SENTENCES[sIdx],true); };
+  $("next").onclick=function(){ sIdx=(sIdx+1)%SENTENCES.length; showTarget(); $("log").innerHTML=""; };
+  $("gear").onclick=function(){ config(true); };
+  if(!ls("bi_base")) stat("Bấm ⚙️ để nhập địa chỉ server và khóa trước khi nói.");
+})();
+</script>
+</body>
+</html>
