@@ -70,7 +70,7 @@
 
   function config(force){
     var base=ls("bi_base"), key=ls("bi_key");
-    if(force||!base){ base=prompt("Địa chỉ server của Bi (ví dụ https://xxxx.ngrok-free.app):", base||""); if(base) ls("bi_base", base.replace(/\/+$/,"")); }
+    if(force||!base){ base=prompt("Địa chỉ server của Bi (dạng https://TEN-CUA-BAN.ngrok-free.app/bivoice – nhớ có đuôi /bivoice):", base||""); if(base) ls("bi_base", base.replace(/\/+$/,"")); }
     if(force||!key){ key=prompt("Khóa BI_KEY (đã đặt trong file .bat):", key||""); if(key) ls("bi_key", key); }
     return {base:(ls("bi_base")||""), key:(ls("bi_key")||"")};
   }
@@ -78,6 +78,14 @@
     var c=config(false), h={"X-Key":c.key,"ngrok-skip-browser-warning":"1"};
     for(var k in (extra||{})) h[k]=extra[k];
     return h;
+  }
+  var unlocked=false;
+  function unlockAudio(){
+    if(unlocked) return; unlocked=true;
+    try{
+      var a=new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=");
+      a.play().catch(function(){});
+    }catch(e){}
   }
   function stat(t){ $("stat").textContent=t||""; }
 
@@ -102,7 +110,7 @@
     });
   }
   function speak(text,slow,onFirst){
-    var parts=text.split(/(?<=[.!?])\s+/).filter(Boolean);
+    var parts=(text.match(/[^.!?]+[.!?]*/g)||[]).map(function(x){return x.trim();}).filter(Boolean);
     if(!parts.length) return Promise.resolve();
     var pre=parts.map(function(p){ return fetchTTS(p,slow); }); // tai song song
     var chain=Promise.resolve();
@@ -140,7 +148,7 @@
     if(rec && rec.state!=="inactive"){ rec.stop(); }
     $("mic").classList.remove("rec"); $("mic").textContent="🎤 Bấm để nói";
   }
-  $("mic").onclick=function(){ (rec && rec.state==="recording") ? stopRec() : startRec(); };
+  $("mic").onclick=function(){ unlockAudio(); (rec && rec.state==="recording") ? stopRec() : startRec(); };
 
   // ---------- Gui len server ----------
   function send(blob){
@@ -168,7 +176,10 @@
     if(d.empty){ stat("Bi chưa nghe rõ, em nói lại nhé."); return; }
     if(d.mode==="free"){
       addBubble("me",d.heard);
-      if(!d.reply){ stat("Bi nghe được rồi, nhưng chưa nối AI (xem BI_AI_URL trong file .bat)."); return; }
+      if(!d.reply){
+        stat(d.ai_error==="chua dat BI_AI_URL" ? "Bi nghe được rồi, nhưng chưa nối AI (xem BI_AI_URL trong file .bat)." : "⚠️ Bi nghe được rồi nhưng AI chưa trả lời ("+(d.ai_error||"không rõ lý do")+"). Xem log_bi_voice.txt.");
+        return;
+      }
       addBubble("bi",d.reply);
       history.push({role:"user",content:d.heard},{role:"assistant",content:d.reply});
       history=history.slice(-6);
@@ -210,11 +221,19 @@
       if(mode==="read") showTarget();
     };
   });
-  $("hear").onclick=function(){ speak(SENTENCES[sIdx],false); };
-  $("slow").onclick=function(){ speak(SENTENCES[sIdx],true); };
+  $("hear").onclick=function(){ unlockAudio(); speak(SENTENCES[sIdx],false); };
+  $("slow").onclick=function(){ unlockAudio(); speak(SENTENCES[sIdx],true); };
   $("next").onclick=function(){ sIdx=(sIdx+1)%SENTENCES.length; showTarget(); $("log").innerHTML=""; };
-  $("gear").onclick=function(){ config(true); };
-  if(!ls("bi_base")) stat("Bấm ⚙️ để nhập địa chỉ server và khóa trước khi nói.");
+  function checkConn(){
+    var c=config(false); if(!c.base){ return; }
+    stat("Đang kiểm tra kết nối…");
+    fetch(c.base+"/health",{headers:hdr()})
+      .then(function(r){ if(!r.ok) throw new Error("mã "+r.status); return r.json(); })
+      .then(function(j){ stat(j&&j.ok?("✅ Kết nối tốt (máy "+j.device+", model "+j.model+"). Bấm 🎤 để nói."):"⚠️ Server trả lời lạ."); })
+      .catch(function(e){ stat("⚠️ Chưa nối được server ("+e.message+"). Kiểm tra địa chỉ có đuôi /bivoice và máy chủ đang chạy."); });
+  }
+  $("gear").onclick=function(){ config(true); checkConn(); };
+  if(!ls("bi_base")) stat("Bấm ⚙️ để nhập địa chỉ server và khóa trước khi nói."); else checkConn();
 })();
 </script>
 </body>
