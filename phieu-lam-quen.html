@@ -314,7 +314,7 @@ async function gui() {
 
 function xong(j) {
   trang(`<div class="big" aria-hidden="true">🎉</div><h1>Đã gửi phiếu rồi!</h1>
-    <p>Cô/thầy đã nhận đủ thông tin. ${laZalo() ? 'Con quay lại <b>Zalo</b> và gõ số <b>1</b> (“Sẵn sàng bắt đầu”) để làm bài kiểm tra đầu vào nhé.' : 'Con quay lại khung chat và bấm <b>“Sẵn sàng bắt đầu”</b> để làm bài kiểm tra đầu vào nhé.'}</p>
+    <p>Cô/thầy đã nhận đủ thông tin. ${laZalo() ? 'Con quay lại <b>Zalo</b>, cô/thầy đã gửi sẵn menu các dịch vụ để con chọn nhé.' : 'Con quay lại khung chat, cô/thầy đã gửi sẵn menu các dịch vụ để con chọn nhé.'}</p>
     <p class="hint">${j.linkPhuHuynh || laZalo() ? '' : 'Cửa sổ này sẽ tự đóng.'}</p>
     ${j.linkPhuHuynh ? `<p>Con gửi đường dẫn này cho ba/mẹ để nhận báo cáo sau mỗi buổi học:</p><div class="box" id="lk">${esc(j.linkPhuHuynh)}</div>
       <button type="button" class="chip" id="cp">Sao chép đường dẫn</button>` : ''}`);
