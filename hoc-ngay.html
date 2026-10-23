@@ -145,6 +145,15 @@ function trangThai(icon, tieu, phu, nutLai) {
 }
 const loiMang = fn => { say('Mạng đang chập chờn…'); trangThai('📡', 'Chưa kết nối được', 'Kiểm tra mạng rồi bấm Thử lại. Nếu vẫn lỗi, nhờ admin kiểm tra máy chủ học.', fn); };
 
+/* v136: khoi 'Cau hoi khac' - luon co loi ra, khong de hoc sinh phai doan */
+function chanTrang() {
+  const w = el('div'); w.style.marginTop = '14px';
+  w.append(el('div', 'chap', '❓ Câu hỏi khác'));
+  if (TG) w.append(btn('💬', 'Về chat để chọn mục khác', () => { try { TG.close(); } catch (e) {} }));
+  else w.append(el('p', 'muted', 'Quay lại Zalo, gõ “menu” hoặc chọn “Câu hỏi khác” để xem tất cả dịch vụ.'));
+  const a = btn('📞', 'Gặp Admin', () => { location.href = 'tel:0984048177'; }); w.append(a);
+  return w;
+}
 /* ---------- 1. Chọn lớp ---------- */
 function manLop() {
   xoa(); say('Em học lớp mấy nhỉ? 👇');
@@ -158,7 +167,7 @@ function manLop() {
   card.append(el('p', 'msg', 'Chọn lớp:'));
   const g = el('div', 'grid');
   for (let l = 1; l <= 12; l++) g.append(btn('', String(l), () => manMon(l)));
-  card.append(g);
+  card.append(g, chanTrang());
 }
 // Nút "▶ Học tiếp" theo máy chủ: môn học gần nhất → bài kế tiếp sau bài vừa xong (không đè lên bài đang làm dở trên máy này)
 async function hocTiepMayChu(slot) {
@@ -183,6 +192,7 @@ async function manMon(lop) {
   card.append(el('p', 'msg', 'Lớp ' + lop + ': học môn nào?'));
   if (!j.ok || !j.mon || !j.mon.length) { card.append(el('p', 'muted', 'Lớp này chưa có bài soạn sẵn. Em chọn lớp khác hoặc nhắn bot để được hỗ trợ.')); return; }
   j.mon.forEach(m => card.append(btn(m.so_bai, m.mon, () => manBai(lop, m.mon))));
+  card.append(chanTrang());
 }
 /* ---------- 3. Chọn bài (tập > chương > bài) ---------- */
 let tapChon = null;
@@ -205,7 +215,7 @@ async function manBai(lop, mon, tapMo) {
   t.chuong.forEach(c => {
     card.append(el('div', 'chap', c.ten));
     c.bai.forEach(b => { const kq = tm && tm.bai && tm.bai[b.id]; card.append(btn(b.so, tenNgan(b) + (kq ? '  ✔ ' + String(kq[0]).replace('.', ',') + '/10' : ''), () => vaoBai(b.id, b.ten, lop, mon, t.tap))); });
-  });
+  });  card.append(chanTrang());
 }
 /* ---------- 4. Làm bài ---------- */
 let Q = null;
@@ -308,7 +318,11 @@ function tongKet() {
   await layTienDo();
   const lop = parseInt(qs.get('lop'), 10), mon = qs.get('mon'), b = (qs.get('b') || '').replace(/[^a-f0-9]/g, '');
   if (b) return vaoBai(b, 'Bài học', lop || 0, mon || '', 0);
-  if (lop && mon) return manBai(lop, mon);
+  if (lop && mon) {
+    const jm = await goi({ act: 'muc_luc', lop }), k = unz(mon);
+    const hit = jm && jm.ok && (jm.mon || []).find(m => unz(m.mon) === k || (k && (unz(m.mon).startsWith(k) || k.startsWith(unz(m.mon)))));
+    return hit ? manBai(lop, hit.mon) : manMon(lop);
+  }
   if (lop) return manMon(lop);
   manLop();
 })();

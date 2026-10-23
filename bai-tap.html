@@ -47,7 +47,7 @@ function draw(){const b=S.bai, L='ABCDEF', ys=[];for(let y=new Date().getFullYea
  const opt=(a,t)=>`<option value="">${t}</option>`+a.map(x=>`<option ${String(x)===String(S[{Ngày:'nd',Tháng:'nt',Năm:'nn'}[t]])?'selected':''}>${x}</option>`).join('');
  $.innerHTML=`<h1>${esc(b.tieu_de)}</h1><p class="m">${esc([b.mon,b.ten_lop&&'Lớp '+b.ten_lop,b.ten_gv&&'GV '+b.ten_gv,b.thoi_gian_phut&&b.thoi_gian_phut+' phút'].filter(Boolean).join(' · '))}</p>
  <div class="c"><b>👤 ${esc(CR.ten)}</b><span class="m"> · Lớp ${esc(CR.lop)} · ${esc(CR.truong)}</span><br><a href="#" id="doi" class="m">Không phải em? Đổi tài khoản</a> · <a href="${HSPAGE}" class="m">Bài đã làm</a></div>
- ${b.cau.map((q,i)=>`<div class="c"><b>Câu ${i+1}</b> <span class="m">(${q.diem} điểm)</span><p style="white-space:pre-wrap;margin:6px 0">${esc(q.de)}</p>`+
+ ${b.cau.map((q,i)=>`<div class="c"><b>Câu ${i+1}</b> <span class="m">(${q.diem} điểm)</span><p style="white-space:pre-wrap;margin:6px 0">${esc(q.de)}</p>${hinhSvg(q.hinh)}`+
   (q.loai==='tn'?q.lc.map((x,k)=>`<label class="o ${S.a[q.id]===L[k]?'on':''}"><input type="radio" name="${q.id}" data-q="${q.id}" value="${L[k]}" ${S.a[q.id]===L[k]?'checked':''}><span><b>${L[k]}.</b> ${esc(x)}</span></label>`).join(''):
    q.loai==='ngan'?`<input data-q="${q.id}" placeholder="Đáp án của em" value="${esc(S.a[q.id]||'')}">`:
    `<textarea data-q="${q.id}" rows="3" placeholder="Gõ bài làm (hoặc chụp ảnh bên dưới)">${esc(S.a[q.id]||'')}</textarea><input type="file" accept="image/*" multiple data-f="${q.id}" style="margin-top:8px"><div class="ph">${(S.anh[q.id]||[]).map(x=>`<img src="data:image/jpeg;base64,${x}">`).join('')}</div>`)+`</div>`).join('')}
@@ -181,6 +181,23 @@ async function phTai(){S.ph=null;phVe();
  try{const j=await (await fetch(API+'/hs-ph-link',{method:'POST',headers:{'Content-Type':'application/json',...H},body:JSON.stringify({hs:CR.hs,k:CR.k})})).json();
   S.ph=j.ok?{url:j.ph_url,tg:j.tg_url,n:j.so_ph||0}:{}}catch(e){S.ph={}}
  phVe()}
+
+/* ===== v72: ve hinh cau hoi (q.hinh = {kind,points,segments,faces,circles}) - chi hien khi cau co hinh ===== */
+function hinhSvg(h){try{
+ if(!h||!Array.isArray(h.points)||h.points.length<2)return '';
+ const d3=h.kind==='3d',P={};
+ h.points.forEach(p=>{const x=+p.x,y=+p.y,z=+p.z||0;if(!isFinite(x)||!isFinite(y))return;P[p.name]=d3?[x+0.5*y,z+0.45*y]:[x,y]});
+ const ks=Object.keys(P);if(ks.length<2)return '';
+ const xs=ks.map(k=>P[k][0]),ys=ks.map(k=>P[k][1]);let x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+ (h.circles||[]).forEach(c=>{const o=P[c.center];if(o){x0=Math.min(x0,o[0]-c.r);x1=Math.max(x1,o[0]+c.r);y0=Math.min(y0,o[1]-c.r);y1=Math.max(y1,o[1]+c.r)}});
+ const W=300,Hh=220,m=26,k=Math.min((W-2*m)/Math.max(x1-x0,1e-6),(Hh-2*m)/Math.max(y1-y0,1e-6));
+ const X=v=>(m+(v-x0)*k+((W-2*m)-(x1-x0)*k)/2).toFixed(1),Y=v=>(Hh-m-(v-y0)*k-((Hh-2*m)-(y1-y0)*k)/2).toFixed(1);
+ let o='';const line=(a,b,dash)=>P[a]&&P[b]?`<line x1="${X(P[a][0])}" y1="${Y(P[a][1])}" x2="${X(P[b][0])}" y2="${Y(P[b][1])}" stroke="currentColor" stroke-width="2" ${dash?'stroke-dasharray="6 4"':''}/>`:'';
+ (h.faces||[]).forEach(f=>{if(Array.isArray(f))f.forEach((a,i)=>{o+=line(a,f[(i+1)%f.length],false)})});
+ (h.segments||[]).forEach(s=>{o+=line(s.from,s.to,s.style==='dashed')});
+ (h.circles||[]).forEach(c=>{const q=P[c.center];if(q)o+=`<circle cx="${X(q[0])}" cy="${Y(q[1])}" r="${(c.r*k).toFixed(1)}" fill="none" stroke="currentColor" stroke-width="2"/>`});
+ ks.forEach(n=>{o+=`<circle cx="${X(P[n][0])}" cy="${Y(P[n][1])}" r="2.6" fill="currentColor"/><text x="${+X(P[n][0])+6}" y="${+Y(P[n][1])-6}" font-size="14" font-weight="800" fill="currentColor">${esc(n)}</text>`});
+ return `<div style="text-align:center;margin:8px 0"><svg viewBox="0 0 ${W} ${Hh}" width="100%" style="max-width:360px;color:var(--ink)" role="img" aria-label="Hình vẽ của câu hỏi">${o}</svg></div>`}catch(e){return ''}}
 
 load();
 </script></body></html>
