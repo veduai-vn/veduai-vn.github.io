@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>VeduAI – Phiếu làm quen</title>
+<title>Mọt sách – Phiếu làm quen</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -82,8 +82,11 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid 
   @keyframes fall{to{transform:translateY(112vh) rotate(380deg)}}
 }
 .vf{max-width:560px;margin:6px auto 0;padding:10px 8px;text-align:center;font-size:12.5px;line-height:1.6;color:var(--mut,var(--muted,#5F6B92))}.vf a{color:inherit;font-weight:800}</style>
+<link rel="stylesheet" href="mot-sach.css?v=2">
 </head>
-<body>
+<body class="ms">
+<header class="ms-head"><div class="ms-hw"><span class="ms-logo"><img src="assets/logo-mark.png" alt=""><span>Mọt<b>sách</b></span></span></div></header>
+
 <div id="app"><div class="state"><div class="big bounce" aria-hidden="true">🐣</div><p>Đang mở phiếu…</p></div></div>
 
 <footer class="vf"><b>VeduAI</b> – Vietnam Education AI Solutions<br>Hỗ trợ: Admin <a href="tel:0984048177">0984048177</a> (Telegram/Zalo)</footer><script>
@@ -125,12 +128,12 @@ function pop() {   // 1 lần pháo giấy khi gửi xong (bỏ qua nếu bật 
 function trang(html) { $app.innerHTML = '<div class="state">' + html + '</div>'; }
 
 async function khoiDong() {
-  if (!/^[A-Za-z0-9]{16,64}$/.test(token)) return trang('<div class="big" aria-hidden="true">🔍</div><h1>Link chưa đúng</h1><p>Bạn mở lại phiếu từ nút trong tin nhắn của cô/thầy nhé.</p>');
+  if (!/^[A-Za-z0-9]{16,64}$/.test(token)) return trang('<div class="big" aria-hidden="true">🔍</div><h1>Link chưa đúng</h1><p>Bạn mở lại phiếu từ nút trong tin nhắn của mình nhé.</p>');
   try {
     const r = await fetch(API + '/phieu-info?t=' + encodeURIComponent(token), { headers: { 'ngrok-skip-browser-warning': '1' } });
     S.cfg = await r.json();
-  } catch (e) { return trang('<div class="big" aria-hidden="true">📡</div><h1>Chưa mở được phiếu</h1><p>Kiểm tra kết nối mạng rồi tải lại trang giúp cô/thầy nhé.</p>'); }
-  if (!S.cfg || !S.cfg.ok) return trang('<div class="big" aria-hidden="true">🔒</div><h1>Phiếu không còn dùng được</h1><p>Phiếu này đã được gửi rồi, hoặc link đã hết hiệu lực. Nếu cần sửa thông tin, bạn nhắn trực tiếp cho cô/thầy trong khung chat.</p>');
+  } catch (e) { return trang('<div class="big" aria-hidden="true">📡</div><h1>Chưa mở được phiếu</h1><p>Kiểm tra kết nối mạng rồi tải lại trang giúp mình nhé.</p>'); }
+  if (!S.cfg || !S.cfg.ok) return trang('<div class="big" aria-hidden="true">🔒</div><h1>Phiếu không còn dùng được</h1><p>Phiếu này đã được gửi rồi, hoặc link đã hết hiệu lực. Nếu cần sửa thông tin, bạn nhắn trực tiếp cho mình trong khung chat.</p>');
   if (S.cfg.goiYTen && !S.ten) S.ten = S.cfg.goiYTen;
   if (S.cfg.truongMacDinh && !S.truong) S.truong = S.cfg.truongMacDinh;
   ve();
@@ -148,18 +151,18 @@ function ve() {
 
   $app.innerHTML = `
   <main>
-    <div class="hero"><span class="mascot" aria-hidden="true">🦉</span><div class="bubble"><h1>Mình làm quen nhé!</h1><p class="lead">Điền một lần, cô/thầy lập lộ trình học cho con ngay. Chỉ khoảng 1 phút thôi.</p>${gv.ten ? `<p class="lead" style="margin-top:6px">👩‍🏫 Lớp của ${esc(gv.ten)}${gv.truong ? ' · ' + esc(gv.truong) : ''}</p>` : ''}</div></div>
+    <div class="hero"><span class="mascot" aria-hidden="true"><svg viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><ellipse cx="100" cy="100" rx="66" ry="62" fill="#A56BE0" stroke="#3B2A55" stroke-width="3"/><ellipse cx="32" cy="132" rx="17" ry="44" fill="#A56BE0" stroke="#3B2A55" stroke-width="3" transform="rotate(10 32 132)"/><ellipse cx="168" cy="132" rx="17" ry="44" fill="#A56BE0" stroke="#3B2A55" stroke-width="3" transform="rotate(-10 168 132)"/><rect x="91" y="156" width="18" height="16" fill="#FFE4D2" stroke="#3B2A55" stroke-width="2.5"/><path d="M56 170 Q100 150 144 170 L154 230 H46 Z" fill="#24305E" stroke="#3B2A55" stroke-width="3" stroke-linejoin="round"/><path d="M78 163 L100 190 L122 163 Q100 154 78 163 Z" fill="#fff" stroke="#3B2A55" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="100" cy="108" rx="58" ry="54" fill="#FFE4D2" stroke="#3B2A55" stroke-width="3"/><g class="eyes"><ellipse cx="76" cy="112" rx="12" ry="15" fill="#2BB5C8"/><ellipse cx="76" cy="115" rx="7" ry="9.5" fill="#1d1a3a"/><circle cx="71" cy="106" r="4.8" fill="#fff"/><circle cx="81" cy="120" r="2.4" fill="#fff"/><ellipse cx="124" cy="112" rx="12" ry="15" fill="#2BB5C8"/><ellipse cx="124" cy="115" rx="7" ry="9.5" fill="#1d1a3a"/><circle cx="119" cy="106" r="4.8" fill="#fff"/><circle cx="129" cy="120" r="2.4" fill="#fff"/></g><path d="M60 103 Q76 91 92 103 M108 103 Q124 91 140 103" stroke="#3B2A55" stroke-width="3.2" fill="none" stroke-linecap="round"/><ellipse cx="57" cy="130" rx="10" ry="5.5" fill="#FF8FAB" opacity=".65"/><ellipse cx="143" cy="130" rx="10" ry="5.5" fill="#FF8FAB" opacity=".65"/><path d="M90 130 Q100 135 110 130 Q108 147 100 147 Q92 147 90 130Z" fill="#E8546E" stroke="#3B2A55" stroke-width="2.2" stroke-linejoin="round"/><path d="M94 141 Q100 138 106 141 Q103 145 100 145 Q97 145 94 141Z" fill="#FF9EB5"/><path d="M38 102 Q38 40 100 36 Q162 40 162 102 Q146 72 124 86 Q112 60 96 84 Q74 64 38 102 Z" fill="#A56BE0" stroke="#3B2A55" stroke-width="3" stroke-linejoin="round"/><path d="M62 54 Q82 44 104 46" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".55" fill="none"/><path d="M24 63 L38 72 L24 81Z M52 63 L38 72 L52 81Z" fill="#FF5C8A" stroke="#3B2A55" stroke-width="2.5" stroke-linejoin="round"/><circle cx="38" cy="72" r="4.5" fill="#FFB3C9" stroke="#3B2A55" stroke-width="2"/><path d="M148 63 L162 72 L148 81Z M176 63 L162 72 L176 81Z" fill="#FF5C8A" stroke="#3B2A55" stroke-width="2.5" stroke-linejoin="round"/><circle cx="162" cy="72" r="4.5" fill="#FFB3C9" stroke="#3B2A55" stroke-width="2"/><circle cx="64" cy="156" r="10" fill="#FFE4D2" stroke="#3B2A55" stroke-width="2.5"/><circle cx="136" cy="156" r="10" fill="#FFE4D2" stroke="#3B2A55" stroke-width="2.5"/><path class="stw" style="animation-delay:0s" d="M22 31 Q22 40 31 40 Q22 40 22 49 Q22 40 13 40 Q22 40 22 31Z" fill="#FFC400"/><path class="stw" style="animation-delay:0.6s" d="M182 27 Q182 34 189 34 Q182 34 182 41 Q182 34 175 34 Q182 34 182 27Z" fill="#FF8FAB"/><path class="stw" style="animation-delay:1.1s" d="M176 94 Q176 100 182 100 Q176 100 176 106 Q176 100 170 100 Q176 100 176 94Z" fill="#14C7D8"/></svg></span><div class="bubble"><h1>Mình làm quen nhé!</h1><p class="lead">Điền một lần, mình lập lộ trình học cho bạn ngay. Chỉ khoảng 1 phút thôi.</p>${gv.ten ? `<p class="lead" style="margin-top:6px">👩‍🏫 Lớp của ${esc(gv.ten)}${gv.truong ? ' · ' + esc(gv.truong) : ''}</p>` : ''}</div></div>
 
     <section>
-      <h2><i class="em" aria-hidden="true">🎒</i>Con học lớp mấy?</h2>
+      <h2><i class="em" aria-hidden="true">🎒</i>Bạn học lớp mấy?</h2>
       <div class="row lop" role="group" aria-label="Lớp">
         ${[1,2,3,4,5,6,7,8,9,10,11,12].map(n => `<button type="button" class="chip" data-lop="${n}" aria-pressed="${S.lop===n}">Lớp ${n}</button>`).join('')}
       </div>${E('lop')}
     </section>
 
     <section ${S.lop ? '' : 'hidden'}>
-      <h2><i class="em" aria-hidden="true">📚</i>Con muốn học môn nào?</h2>
-      <p class="hint">${full ? 'Gói Full: con học đủ các môn của lớp ' + S.lop + '.' : 'Gói của con được chọn tối đa ' + gioiHan + ' môn (đã chọn ' + nChon + ').'} Mỗi môn chọn cách học: bám sách giáo khoa, theo chủ đề con muốn học sâu, hoặc cả hai. Hỏi đáp tự do luôn có cho mọi môn.</p>
+      <h2><i class="em" aria-hidden="true">📚</i>Bạn muốn học môn nào?</h2>
+      <p class="hint">${full ? 'Gói Full: bạn học đủ các môn của lớp ' + S.lop + '.' : 'Gói của bạn được chọn tối đa ' + gioiHan + ' môn (đã chọn ' + nChon + ').'} Mỗi môn chọn cách học: bám sách giáo khoa, theo chủ đề bạn muốn học sâu, hoặc cả hai. Hỏi đáp tự do luôn có cho mọi môn.</p>
       <div>
       ${dsMon.map(m => { const x = S.mons[m]; return `
         <div class="mon">
@@ -168,9 +171,9 @@ function ve() {
             <div class="seg" role="group" aria-label="Cách học môn ${esc(m)}">
               ${HT.map(h => `<button type="button" data-ht="${h[0]}" data-m="${esc(m)}" aria-pressed="${x.ht===h[0]}">${h[1]}</button>`).join('')}
             </div>
-            <div><label class="f">Con đang học tới bài/chương nào? (không bắt buộc)</label>
+            <div><label class="f">Bạn đang học tới bài/chương nào? (không bắt buộc)</label>
               <input type="text" maxlength="60" data-td="${esc(m)}" value="${esc(x.td)}" placeholder="Ví dụ: Bài 5"></div>
-            ${x.ht !== 'sgk' ? `<div><label class="f">Chủ đề con muốn học</label>
+            ${x.ht !== 'sgk' ? `<div><label class="f">Chủ đề bạn muốn học</label>
               <input type="text" maxlength="60" data-cd="${esc(m)}" value="${esc(x.cd)}" placeholder="Ví dụ: Phân số, Hằng đẳng thức">${E('cd:' + m)}</div>` : ''}
           </div>` : ''}
         </div>`; }).join('')}
@@ -178,13 +181,13 @@ function ve() {
     </section>
 
     <section ${S.lop ? '' : 'hidden'}>
-      <h2><i class="em" aria-hidden="true">📖</i>Con đang dùng bộ sách nào?</h2>
+      <h2><i class="em" aria-hidden="true">📖</i>Bạn đang dùng bộ sách nào?</h2>
       <div class="row" role="group" aria-label="Bộ sách">
         ${SACH.map(s => `<button type="button" class="chip" data-sach="${esc(s)}" aria-pressed="${S.sach===s}">${esc(s)}</button>`).join('')}
       </div>
       ${S.sach === 'Khác' ? `<div style="margin-top:10px"><input type="text" maxlength="40" data-sachkhac value="${esc(S.sachKhac)}" placeholder="Tên bộ sách"></div>` : ''}
       ${E('sach')}
-      <p class="hint" style="margin-top:14px">Con đang học học kì mấy? (Học kì 1 = tập 1, học kì 2 = tập 2)</p>
+      <p class="hint" style="margin-top:14px">Bạn đang học học kì mấy? (Học kì 1 = tập 1, học kì 2 = tập 2)</p>
       <div class="seg" role="group" aria-label="Học kì" style="max-width:240px">
         <button type="button" data-hk="1" aria-pressed="${S.hk==='1'}">Học kì 1</button>
         <button type="button" data-hk="2" aria-pressed="${S.hk==='2'}">Học kì 2</button>
@@ -192,9 +195,9 @@ function ve() {
     </section>
 
     <section>
-      <h2><i class="em" aria-hidden="true">🌟</i>Về con</h2>
+      <h2><i class="em" aria-hidden="true">🌟</i>Về bạn</h2>
       <div style="display:grid;gap:12px">
-        <div><label class="f" for="ten">Họ và tên của con</label>
+        <div><label class="f" for="ten">Họ và tên của bạn</label>
           <input id="ten" type="text" maxlength="60" autocomplete="name" value="${esc(S.ten)}" placeholder="Ví dụ: Nguyễn Minh Anh">${E('ten')}</div>
         <div><label class="f">Ngày tháng năm sinh</label>
           <div class="dob">
@@ -202,7 +205,7 @@ function ve() {
             <select id="nt" aria-label="Tháng"><option value="">Tháng</option>${months.map(y => `<option ${String(y)===String(S.nt)?'selected':''}>${y}</option>`).join('')}</select>
             <select id="ns" aria-label="Năm"><option value="">Năm</option>${years.map(y => `<option ${String(y)===String(S.nn)?'selected':''}>${y}</option>`).join('')}</select>
           </div>${E('ns')}</div>
-        <div><label class="f">Con là</label>
+        <div><label class="f">Bạn là</label>
           <div class="seg" role="group" aria-label="Giới tính" style="max-width:240px">
             <button type="button" data-gt="Nam" aria-pressed="${S.gt==='Nam'}">Nam</button>
             <button type="button" data-gt="Nữ" aria-pressed="${S.gt==='Nữ'}">Nữ</button>
@@ -218,7 +221,7 @@ function ve() {
 
     <section>
       <h2><i class="em" aria-hidden="true">⏰</i>Lịch học</h2>
-      <p class="hint">Chọn các ngày con học trong tuần và giờ học. Cô/thầy sẽ nhắc con đúng giờ.</p>
+      <p class="hint">Chọn các ngày bạn học trong tuần và giờ học. Mình sẽ nhắc bạn đúng giờ.</p>
       <div class="row" role="group" aria-label="Ngày học">
         ${NGAY.map(d => `<button type="button" class="chip" data-ngay="${d}" aria-pressed="${S.ngay.includes(d)}">${d}</button>`).join('')}
       </div>
@@ -228,9 +231,9 @@ function ve() {
 
     <section>
       <h2><i class="em" aria-hidden="true">💌</i>Ba/mẹ nhận báo cáo thế nào?</h2>
-      ${[['chung','Dùng chung tài khoản này', laZalo() ? 'Ba/mẹ nhận báo cáo qua chính tài khoản Zalo của con.' : 'Ba/mẹ nhận báo cáo qua chính tài khoản của con.'],
-         ['rieng','Gửi link cho ba/mẹ','Ba/mẹ có tài khoản Telegram riêng. Con sẽ nhận một đường dẫn để gửi cho ba/mẹ.'],
-         ['boqua','Bỏ qua','Con có thể liên kết với ba/mẹ sau.']]
+      ${[['chung','Dùng chung tài khoản này', laZalo() ? 'Ba/mẹ nhận báo cáo qua chính tài khoản Zalo của bạn.' : 'Ba/mẹ nhận báo cáo qua chính tài khoản của bạn.'],
+         ['rieng','Gửi link cho ba/mẹ','Ba/mẹ có tài khoản Telegram riêng. Bạn sẽ nhận một đường dẫn để gửi cho ba/mẹ.'],
+         ['boqua','Bỏ qua','Bạn có thể liên kết với ba/mẹ sau.']]
         .filter(o => !(laZalo() && o[0] === 'rieng'))
         .map(o => `<label class="radio ${S.ph===o[0]?'on':''}"><input type="radio" name="ph" value="${o[0]}" ${S.ph===o[0]?'checked':''}><div><b>${o[1]}</b><span>${o[2]}</span></div></label>`).join('')}
       ${E('ph')}
@@ -245,7 +248,7 @@ function ve() {
       ${S.bc !== 'tat' ? `<div style="margin-top:12px;max-width:200px"><label class="f" for="bcgio">Giờ gửi báo cáo</label><input id="bcgio" type="time" value="${esc(S.bcGio)}"></div>` : ''}
       ${S.bc === 'tuan' ? `<p class="hint" style="margin-top:12px">Gửi vào thứ mấy?</p><div class="row" role="group" aria-label="Thứ gửi báo cáo">${NGAY.map(d => `<button type="button" class="chip" data-bcthu="${d}" aria-pressed="${S.bcThu === d}">${d}</button>`).join('')}</div>` : ''}
       ${S.bc === 'thang' ? `<div style="margin-top:12px;max-width:200px"><label class="f" for="bcngay">Ngày trong tháng</label><select id="bcngay">${[...Array(28).keys()].map(i => `<option value="${i + 1}" ${String(S.bcNgay) === String(i + 1) ? 'selected' : ''}>Ngày ${i + 1}</option>`).join('')}</select></div>` : ''}
-      <p class="hint" style="margin-top:12px">Nhắc ba/mẹ trước giờ học của con</p>
+      <p class="hint" style="margin-top:12px">Nhắc ba/mẹ trước giờ học của bạn</p>
       <div class="row" role="group" aria-label="Nhắc trước giờ học">
         ${[['0','Không nhắc'],['10','Trước 10 phút'],['30','Trước 30 phút']].map(o => `<button type="button" class="chip" data-nhac="${o[0]}" aria-pressed="${S.nhac === o[0]}">${o[1]}</button>`).join('')}
       </div>
@@ -274,13 +277,13 @@ function thieu() {
 
 function kiemTra() {
   const L = {};
-  if (!S.lop) L.lop = 'Chọn lớp của con.';
+  if (!S.lop) L.lop = 'Chọn lớp của bạn.';
   const ms = Object.keys(S.mons);
   if (!ms.length) L.mons = 'Chọn ít nhất một môn.';
   ms.forEach(m => { const x = S.mons[m]; if (x.ht !== 'sgk' && !x.cd.trim()) L['cd:' + m] = 'Nhập chủ đề, hoặc đổi sang “Bám SGK”.'; });
-  if (!S.sach) L.sach = 'Chọn bộ sách con đang dùng.';
+  if (!S.sach) L.sach = 'Chọn bộ sách bạn đang dùng.';
   else if (S.sach === 'Khác' && !S.sachKhac.trim()) L.sach = 'Nhập tên bộ sách.';
-  if (S.ten.trim().split(/\s+/).filter(Boolean).length < 2) L.ten = 'Nhập đủ họ và tên của con.';
+  if (S.ten.trim().split(/\s+/).filter(Boolean).length < 2) L.ten = 'Nhập đủ họ và tên của bạn.';
   if (!S.nd || !S.nt || !S.nn) L.ns = 'Chọn đủ ngày, tháng, năm sinh.';
   else if (!ngaySinhHopLe()) L.ns = 'Ngày sinh chưa đúng, bạn kiểm tra lại nhé.';
   if (!S.gt) L.gt = 'Chọn nam hoặc nữ.';
@@ -314,9 +317,9 @@ async function gui() {
 
 function xong(j) {
   trang(`<div class="big" aria-hidden="true">🎉</div><h1>Đã gửi phiếu rồi!</h1>
-    <p>Cô/thầy đã nhận đủ thông tin. ${laZalo() ? 'Con quay lại <b>Zalo</b>, cô/thầy đã gửi sẵn menu các dịch vụ để con chọn nhé.' : 'Con quay lại khung chat, cô/thầy đã gửi sẵn menu các dịch vụ để con chọn nhé.'}</p>
+    <p>Mình đã nhận đủ thông tin. ${laZalo() ? 'Con quay lại <b>Zalo</b>, mình đã gửi sẵn menu các dịch vụ để bạn chọn nhé.' : 'Con quay lại khung chat, mình đã gửi sẵn menu các dịch vụ để bạn chọn nhé.'}</p>
     <p class="hint">${j.linkPhuHuynh || laZalo() ? '' : 'Cửa sổ này sẽ tự đóng.'}</p>
-    ${j.linkPhuHuynh ? `<p>Con gửi đường dẫn này cho ba/mẹ để nhận báo cáo sau mỗi buổi học:</p><div class="box" id="lk">${esc(j.linkPhuHuynh)}</div>
+    ${j.linkPhuHuynh ? `<p>Bạn gửi đường dẫn này cho ba/mẹ để nhận báo cáo sau mỗi buổi học:</p><div class="box" id="lk">${esc(j.linkPhuHuynh)}</div>
       <button type="button" class="chip" id="cp">Sao chép đường dẫn</button>` : ''}`);
   pop();
   if (TG && !j.linkPhuHuynh) setTimeout(() => { try { TG.close(); } catch (e) {} }, 1600);   // không có link cần sao chép -> tự đóng, quay lại chat
@@ -343,7 +346,7 @@ $app.addEventListener('change', e => {
   const t = e.target;
   if (t.dataset.mon) {
     const m = t.dataset.mon, gh = S.cfg.soMon === 'full' ? 99 : Number(S.cfg.soMon) || 1;
-    if (t.checked) { if (Object.keys(S.mons).length >= gh) { S.loi = { mons: 'Gói của con chỉ được chọn tối đa ' + gh + ' môn.' }; return ve(); } S.mons[m] = { ht: 'sgk', cd: '', td: '' }; }
+    if (t.checked) { if (Object.keys(S.mons).length >= gh) { S.loi = { mons: 'Gói của bạn chỉ được chọn tối đa ' + gh + ' môn.' }; return ve(); } S.mons[m] = { ht: 'sgk', cd: '', td: '' }; }
     else delete S.mons[m];
     S.loi = {}; ve();
   } else if (t.id === 'nd' || t.id === 'nt' || t.id === 'ns') { if (t.id === 'nd') S.nd = t.value; else if (t.id === 'nt') S.nt = t.value; else S.nn = t.value; S.loi = {}; ve(); }
