@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>VeduAI – Làm bài</title>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Mọt sách – Làm bài</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 :root{--bg:#EAF5FF;--card:#fff;--ink:#24305E;--mut:#5F6B92;--line:#C9DAF2;--sh:#B5CBEA;--mark:#FFD84D;--ok:#118A62;--err:#C2255C}
@@ -25,7 +25,11 @@ label.o input{width:20px;min-height:20px;margin-top:3px}
 .rq{white-space:pre-wrap;margin:6px 0}.op{border:2px solid var(--line);border-radius:12px;padding:8px 10px;margin:6px 0}
 .op.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}.op.bad{border-color:var(--err);background:color-mix(in srgb,var(--err) 14%,transparent)}
 .gt{margin:8px 0 2px;padding:10px 12px;border-radius:12px;background:var(--mark);color:#4A3700;font-size:15px}
-</style></head><body><main id="app"><div class="ct"><div class="big">🐣</div>Đang mở bài…</div></main>
+</style><link rel="stylesheet" href="mot-sach.css?v=2">
+</head><body class="ms">
+<header class="ms-head"><div class="ms-hw"><span class="ms-logo"><img src="assets/logo-mark.png" alt=""><span>Mọt<b>sách</b></span></span></div></header>
+<div class="ms-mate"><span class="mascot" aria-hidden="true"><svg viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><ellipse cx="100" cy="100" rx="66" ry="62" fill="#A56BE0" stroke="#3B2A55" stroke-width="3"/><ellipse cx="32" cy="132" rx="17" ry="44" fill="#A56BE0" stroke="#3B2A55" stroke-width="3" transform="rotate(10 32 132)"/><ellipse cx="168" cy="132" rx="17" ry="44" fill="#A56BE0" stroke="#3B2A55" stroke-width="3" transform="rotate(-10 168 132)"/><rect x="91" y="156" width="18" height="16" fill="#FFE4D2" stroke="#3B2A55" stroke-width="2.5"/><path d="M56 170 Q100 150 144 170 L154 230 H46 Z" fill="#24305E" stroke="#3B2A55" stroke-width="3" stroke-linejoin="round"/><path d="M78 163 L100 190 L122 163 Q100 154 78 163 Z" fill="#fff" stroke="#3B2A55" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="100" cy="108" rx="58" ry="54" fill="#FFE4D2" stroke="#3B2A55" stroke-width="3"/><g class="eyes"><ellipse cx="76" cy="112" rx="12" ry="15" fill="#2BB5C8"/><ellipse cx="76" cy="115" rx="7" ry="9.5" fill="#1d1a3a"/><circle cx="71" cy="106" r="4.8" fill="#fff"/><circle cx="81" cy="120" r="2.4" fill="#fff"/><ellipse cx="124" cy="112" rx="12" ry="15" fill="#2BB5C8"/><ellipse cx="124" cy="115" rx="7" ry="9.5" fill="#1d1a3a"/><circle cx="119" cy="106" r="4.8" fill="#fff"/><circle cx="129" cy="120" r="2.4" fill="#fff"/></g><path d="M60 103 Q76 91 92 103 M108 103 Q124 91 140 103" stroke="#3B2A55" stroke-width="3.2" fill="none" stroke-linecap="round"/><ellipse cx="57" cy="130" rx="10" ry="5.5" fill="#FF8FAB" opacity=".65"/><ellipse cx="143" cy="130" rx="10" ry="5.5" fill="#FF8FAB" opacity=".65"/><path d="M90 130 Q100 135 110 130 Q108 147 100 147 Q92 147 90 130Z" fill="#E8546E" stroke="#3B2A55" stroke-width="2.2" stroke-linejoin="round"/><path d="M94 141 Q100 138 106 141 Q103 145 100 145 Q97 145 94 141Z" fill="#FF9EB5"/><path d="M38 102 Q38 40 100 36 Q162 40 162 102 Q146 72 124 86 Q112 60 96 84 Q74 64 38 102 Z" fill="#A56BE0" stroke="#3B2A55" stroke-width="3" stroke-linejoin="round"/><path d="M62 54 Q82 44 104 46" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".55" fill="none"/><path d="M24 63 L38 72 L24 81Z M52 63 L38 72 L52 81Z" fill="#FF5C8A" stroke="#3B2A55" stroke-width="2.5" stroke-linejoin="round"/><circle cx="38" cy="72" r="4.5" fill="#FFB3C9" stroke="#3B2A55" stroke-width="2"/><path d="M148 63 L162 72 L148 81Z M176 63 L162 72 L176 81Z" fill="#FF5C8A" stroke="#3B2A55" stroke-width="2.5" stroke-linejoin="round"/><circle cx="162" cy="72" r="4.5" fill="#FFB3C9" stroke="#3B2A55" stroke-width="2"/><circle cx="64" cy="156" r="10" fill="#FFE4D2" stroke="#3B2A55" stroke-width="2.5"/><circle cx="136" cy="156" r="10" fill="#FFE4D2" stroke="#3B2A55" stroke-width="2.5"/><path class="stw" style="animation-delay:0s" d="M22 31 Q22 40 31 40 Q22 40 22 49 Q22 40 13 40 Q22 40 22 31Z" fill="#FFC400"/><path class="stw" style="animation-delay:0.6s" d="M182 27 Q182 34 189 34 Q182 34 182 41 Q182 34 175 34 Q182 34 182 27Z" fill="#FF8FAB"/><path class="stw" style="animation-delay:1.1s" d="M176 94 Q176 100 182 100 Q176 100 176 106 Q176 100 170 100 Q176 100 176 94Z" fill="#14C7D8"/></svg></span><div class="bubble">Làm bài thôi nào, mình ở đây rồi!</div></div>
+<main id="app"><div class="ct"><div class="big">🐣</div>Đang mở bài…</div></main>
 <footer class="vf"><b>VeduAI</b> – Vietnam Education AI Solutions<br>Hỗ trợ: Admin <a href="tel:0984048177">0984048177</a> (Telegram/Zalo)</footer><script>
 const API='https://devotee-outclass-couch.ngrok-free.dev/webhook', H={'ngrok-skip-browser-warning':'1'}, BOT='https://t.me/MotSachVedu_Bot';
 const TG=window.Telegram&&Telegram.WebApp; if(TG){try{TG.ready();TG.expand()}catch(e){}}
@@ -39,17 +43,17 @@ const st=(i,t,s)=>{$.innerHTML=`<div class="ct"><div class="big">${i}</div><h1>$
 async function botVao(){ if(!ub)return;
  try{const j=await (await fetch(API+'/bai-bot-vao',{method:'POST',headers:{'Content-Type':'application/json',...H},body:JSON.stringify({u:ub})})).json();
   if(j&&j.ok&&j.hs&&j.k){CR={hs:j.hs,k:j.k,ten:j.ten,lop:j.lop,truong:j.truong};S.bot=true;try{localStorage.setItem(HK,JSON.stringify(CR))}catch(e){}}}catch(e){}}
-async function load(){ if(!mb)return st('🔍','Link chưa đúng','Em mở lại đường dẫn bài từ thầy/cô nhé.');
+async function load(){ if(!mb)return st('🔍','Link chưa đúng','Bạn mở lại đường dẫn bài từ thầy/cô nhé.');
  try{const j=await (await fetch(API+'/gv-bai?b='+mb,{headers:H})).json(); if(!j.ok)return st('🔍',j.loi||'Không tìm thấy bài'); S.bai=j.bai; if(!j.bai.mo)return st('⏰','Bài đã đóng','Bài này đã hết hạn hoặc thầy/cô đã đóng.'); S.reg.lop=j.bai.ten_lop||'';S.reg.tr=j.bai.truong||''; await botVao(); CR&&CR.hs&&CR.k?draw():dangKy();}
  catch(e){st('📡','Không kết nối được','Kiểm tra mạng rồi tải lại trang.')}}
 function dobOk(){const v=new Date(S.nn+'-'+String(S.nt).padStart(2,'0')+'-'+String(S.nd).padStart(2,'0')+'T00:00:00');return S.nn&&v.getFullYear()==S.nn&&v.getMonth()+1==S.nt&&v.getDate()==S.nd}
 function draw(){const b=S.bai, L='ABCDEF', ys=[];for(let y=new Date().getFullYear()-5;y>=1995;y--)ys.push(y);
  const opt=(a,t)=>`<option value="">${t}</option>`+a.map(x=>`<option ${String(x)===String(S[{Ngày:'nd',Tháng:'nt',Năm:'nn'}[t]])?'selected':''}>${x}</option>`).join('');
  $.innerHTML=`<h1>${esc(b.tieu_de)}</h1><p class="m">${esc([b.mon,b.ten_lop&&'Lớp '+b.ten_lop,b.ten_gv&&'GV '+b.ten_gv,b.thoi_gian_phut&&b.thoi_gian_phut+' phút'].filter(Boolean).join(' · '))}</p>
- <div class="c"><b>👤 ${esc(CR.ten)}</b><span class="m"> · Lớp ${esc(CR.lop)} · ${esc(CR.truong)}</span><br><a href="#" id="doi" class="m">Không phải em? Đổi tài khoản</a> · <a href="${HSPAGE}" class="m">Bài đã làm</a></div>
+ <div class="c"><b>👤 ${esc(CR.ten)}</b><span class="m"> · Lớp ${esc(CR.lop)} · ${esc(CR.truong)}</span><br><a href="#" id="doi" class="m">Không phải bạn? Đổi tài khoản</a> · <a href="${HSPAGE}" class="m">Bài đã làm</a></div>
  ${b.cau.map((q,i)=>`<div class="c"><b>Câu ${i+1}</b> <span class="m">(${q.diem} điểm)</span><p style="white-space:pre-wrap;margin:6px 0">${esc(q.de)}</p>${hinhSvg(q.hinh)}`+
   (q.loai==='tn'?q.lc.map((x,k)=>`<label class="o ${S.a[q.id]===L[k]?'on':''}"><input type="radio" name="${q.id}" data-q="${q.id}" value="${L[k]}" ${S.a[q.id]===L[k]?'checked':''}><span><b>${L[k]}.</b> ${esc(x)}</span></label>`).join(''):
-   q.loai==='ngan'?`<input data-q="${q.id}" placeholder="Đáp án của em" value="${esc(S.a[q.id]||'')}">`:
+   q.loai==='ngan'?`<input data-q="${q.id}" placeholder="Đáp án của bạn" value="${esc(S.a[q.id]||'')}">`:
    `<textarea data-q="${q.id}" rows="3" placeholder="Gõ bài làm (hoặc chụp ảnh bên dưới)">${esc(S.a[q.id]||'')}</textarea><input type="file" accept="image/*" multiple data-f="${q.id}" style="margin-top:8px"><div class="ph">${(S.anh[q.id]||[]).map(x=>`<img src="data:image/jpeg;base64,${x}">`).join('')}</div>`)+`</div>`).join('')}
  <p class="err" id="er">${esc(S.err)}</p><div class="bar"><span class="m" id="tm"></span><button class="b" id="go" ${S.sending?'disabled':''}>${S.sending?'Đang chấm…':'Nộp bài 🚀'}</button></div>`;
  if(b.thoi_gian_phut&&!timer){S.left=b.thoi_gian_phut*60;timer=setInterval(()=>{S.left--;const t=document.getElementById('tm');if(t)t.textContent='⏱ '+Math.floor(S.left/60)+':'+String(S.left%60).padStart(2,'0');if(S.left<=0){clearInterval(timer);send(true)}},1000)}}
@@ -57,7 +61,7 @@ function draw(){const b=S.bai, L='ABCDEF', ys=[];for(let y=new Date().getFullYea
 function dangKy(msg){const R=S.reg,ys=[];for(let y=new Date().getFullYear()-5;y>=1995;y--)ys.push(y);
  const o=(a,t,k)=>`<option value="">${t}</option>`+a.map(x=>`<option ${String(x)===String(R[k])?'selected':''}>${x}</option>`).join('');
  $.innerHTML=`<h1>🎒 Đăng ký miễn phí để làm bài</h1><p class="m">${esc(S.bai.tieu_de)}${S.bai.ten_gv?' · GV '+esc(S.bai.ten_gv):''}</p>
- <div class="c g"><p class="m" style="margin:0">Em chỉ đăng ký một lần (khoảng 30 giây), lần sau làm bài thầy/cô giao không phải nhập lại và xem lại điểm các bài đã làm. Đã đăng ký rồi thì nhập lại đúng thông tin để đăng nhập.</p>
+ <div class="c g"><p class="m" style="margin:0">Bạn chỉ đăng ký một lần (khoảng 30 giây), lần sau làm bài thầy/cô giao không phải nhập lại và xem lại điểm các bài đã làm. Đã đăng ký rồi thì nhập lại đúng thông tin để đăng nhập.</p>
  <input data-r="ten" placeholder="Họ và tên" value="${esc(R.ten)}" autocomplete="name">
  <div class="dob"><select data-r="nd">${o([...Array(31).keys()].map(i=>i+1),'Ngày','nd')}</select><select data-r="nt">${o([...Array(12).keys()].map(i=>i+1),'Tháng','nt')}</select><select data-r="nn">${o(ys,'Năm','nn')}</select></div>
  <div class="dob" style="grid-template-columns:1fr 2fr"><input data-r="lop" placeholder="Lớp (7A2)" value="${esc(R.lop)}"><input data-r="tr" placeholder="Trường" value="${esc(R.tr)}"></div>
@@ -69,7 +73,7 @@ async function dkGo(){const R=S.reg;
  if(!R.tr.trim()||!R.lop.trim()){R.err='Nhập lớp và trường.';return dangKy()}
  R.busy=true;R.err='';dangKy();
  try{const j=await (await fetch(API+'/hs-dang-ky',{method:'POST',headers:{'Content-Type':'application/json',...H},body:JSON.stringify({ho_ten:R.ten,ngay_sinh:ns,ten_lop:R.lop,truong:R.tr,hp:(document.getElementById('hp')||{}).value||''})})).json();
-  R.busy=false;if(!j.ok){R.err=j.loi||'Chưa đăng ký được, em thử lại nhé.';return dangKy()}
+  R.busy=false;if(!j.ok){R.err=j.loi||'Chưa đăng ký được, bạn thử lại nhé.';return dangKy()}
   CR={hs:j.hs,k:j.k,ten:j.ten,lop:j.lop,truong:j.truong};try{localStorage.setItem(HK,JSON.stringify(CR))}catch(e){}draw()}
  catch(e){R.busy=false;R.err='Không kết nối được. Kiểm tra mạng rồi thử lại.';dangKy()}}
 $.addEventListener('input',e=>{const t=e.target;if(t.dataset.r)S.reg[t.dataset.r]=t.value});
@@ -83,11 +87,11 @@ $.addEventListener('change',async e=>{const t=e.target;
 $.addEventListener('click',e=>{const id=e.target.id;if(id==='go')send(false);else if(id==='dk')dkGo();else if(id==='share')guiPH(phTxtKQ());else if(id==='shtg'&&S.ph&&S.ph.tg)guiPH(phTxtTG());else if(id==='doi'){e.preventDefault();CR=null;try{localStorage.removeItem(HK)}catch(x){}clearInterval(timer);timer=null;dangKy()}});
 async function send(auto){if(S.sending)return;const b=S.bai;
  if(!auto){
-  const thieu=b.cau.filter(q=>q.loai==='tl'?!(S.a[q.id]||'').trim()&&!(S.anh[q.id]||[]).length:!(S.a[q.id]||'').trim()).length; if(thieu&&!confirm('Em còn '+thieu+' câu chưa làm. Vẫn nộp bài?'))return}
+  const thieu=b.cau.filter(q=>q.loai==='tl'?!(S.a[q.id]||'').trim()&&!(S.anh[q.id]||[]).length:!(S.a[q.id]||'').trim()).length; if(thieu&&!confirm('Bạn còn '+thieu+' câu chưa làm. Vẫn nộp bài?'))return}
   S.sending=true;clearInterval(timer);draw();
  const tl={};b.cau.forEach(q=>{tl[q.id]=q.loai==='tl'?{text:S.a[q.id]||'',anh:S.anh[q.id]||[]}:(S.a[q.id]||'')});
  try{const j=await (await fetch(API+'/gv-nop',{method:'POST',headers:{'Content-Type':'application/json',...H},body:JSON.stringify({b:mb,hs:CR.hs,k:CR.k,tra_loi:tl})})).json();
-  S.sending=false; if(!j.ok&&j.dangKy){CR=null;try{localStorage.removeItem(HK)}catch(x){}timer=null;return dangKy(j.loi)} if(!j.ok){S.err=j.loi||'Chưa nộp được, em thử lại nhé.';return j.daNop?st('✅','Em đã nộp bài này rồi',j.loi):draw()} ket(j)}
+  S.sending=false; if(!j.ok&&j.dangKy){CR=null;try{localStorage.removeItem(HK)}catch(x){}timer=null;return dangKy(j.loi)} if(!j.ok){S.err=j.loi||'Chưa nộp được, bạn thử lại nhé.';return j.daNop?st('✅','Bạn đã nộp bài này rồi',j.loi):draw()} ket(j)}
  catch(x){S.sending=false;S.err='Chưa nộp được. Kiểm tra mạng rồi bấm Nộp lại nhé.';draw()}}
 function er(m){S.err=m;draw();window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})}
 
@@ -140,8 +144,8 @@ function rv(j){const L='ABCDEF',cau=(S.bai&&S.bai.cau)||[];
   const ic=d.dung===true?'✅':d.dung===false?'❌':'📝';
   let b='<p class="rq">'+esc(q.de||'')+'</p>';
   if(q.loai==='tn'&&Array.isArray(q.lc)){b+=q.lc.map((x,k)=>{const dung=L[k]===d.dap_an,chon=L[k]===d.tra_loi;
-    return '<div class="op'+(dung?' ok':chon?' bad':'')+'"><b>'+L[k]+'.</b> '+esc(x)+(dung?' ✓':'')+(chon?' <span class="m">(em chọn)</span>':'')+'</div>'}).join('')}
-  else if(d.loai==='ngan'){b+='<p class="m">Em trả lời: <b>'+esc(d.tra_loi||'(bỏ trống)')+'</b>'+(d.dap_an&&d.dung===false?' · Đáp án: <b>'+esc(d.dap_an)+'</b>':'')+'</p>'}
+    return '<div class="op'+(dung?' ok':chon?' bad':'')+'"><b>'+L[k]+'.</b> '+esc(x)+(dung?' ✓':'')+(chon?' <span class="m">(bạn chọn)</span>':'')+'</div>'}).join('')}
+  else if(d.loai==='ngan'){b+='<p class="m">Bạn trả lời: <b>'+esc(d.tra_loi||'(bỏ trống)')+'</b>'+(d.dap_an&&d.dung===false?' · Đáp án: <b>'+esc(d.dap_an)+'</b>':'')+'</p>'}
   else if(d.dap_an){b+='<p class="m">Đáp án mẫu: '+esc(d.dap_an)+'</p>'}
   if(d.nhan_xet)b+='<p class="m">'+esc(d.nhan_xet)+'</p>';
   if(d.gt)b+='<div class="gt">💡 <b>Giải thích:</b> '+esc(d.gt)+'</div>';
@@ -153,9 +157,9 @@ function ketXong(){window.scrollTo(0,0);
 function ket(j){
  S.kq={diem:j.diem,toi_da:j.toi_da,diem10:j.diem10,trang_thai:j.trang_thai};
  const lis=a=>(a||[]).map(x=>esc(x.kt)+' ('+x.pct+'%'+(x.lop_tb!=null?', lớp TB '+x.lop_tb+'%':'')+')').join('; ');
- const rk=j.hang?`<p class="m">🏅 Xếp hạng tạm thời: <b>${j.hang}/${j.tong_nop}</b>${j.tb_lop10!=null?' · điểm TB lớp '+String(j.tb_lop10).replace('.',','):''} (có thể đổi khi các bạn khác nộp)</p>`:(j.cho_cham?'<p class="m">🏅 Xếp hạng sẽ có khi thầy/cô chấm xong các câu còn lại.</p>':'<p class="m">🏅 Em là bạn nộp đầu tiên nên chưa có bạn khác để xếp hạng.</p>');
- const pt=((j.manh&&j.manh.length)||(j.yeu&&j.yeu.length))?`<div class="c"><b>📊 Nhận xét kiến thức</b>${j.manh&&j.manh.length?`<p style="margin:8px 0">💪 <b>Em làm tốt:</b> ${lis(j.manh)}</p>`:''}${j.yeu&&j.yeu.length?`<p style="margin:8px 0">⚠️ <b>Cần ôn tập tăng cường:</b> ${lis(j.yeu)}</p>`:'<p class="m">Chưa có phần nào yếu rõ rệt, em giỏi lắm!</p>'}</div>`:'';
-const b=S.bai,cta=(j.co_tai_khoan||S.bot)?'':`<div class="c"><b>🎁 Học cùng VeduAI – gia sư AI của em</b><p class="m">Em chưa có tài khoản VeduAI. Dùng thử miễn phí 5 ngày: học và làm bài mọi lúc mọi nơi, không cần sách giáo khoa, có báo cáo điểm mạnh, điểm yếu và kế hoạch khắc phục!</p><a href="${BOT}${j.ban_duoc?'?start=dl_'+encodeURIComponent(b.ma_dai_ly):''}">Mở VeduAI trên Telegram →</a></div>`;
+ const rk=j.hang?`<p class="m">🏅 Xếp hạng tạm thời: <b>${j.hang}/${j.tong_nop}</b>${j.tb_lop10!=null?' · điểm TB lớp '+String(j.tb_lop10).replace('.',','):''} (có thể đổi khi các bạn khác nộp)</p>`:(j.cho_cham?'<p class="m">🏅 Xếp hạng sẽ có khi thầy/cô chấm xong các câu còn lại.</p>':'<p class="m">🏅 Bạn là bạn nộp đầu tiên nên chưa có bạn khác để xếp hạng.</p>');
+ const pt=((j.manh&&j.manh.length)||(j.yeu&&j.yeu.length))?`<div class="c"><b>📊 Nhận xét kiến thức</b>${j.manh&&j.manh.length?`<p style="margin:8px 0">💪 <b>Bạn làm tốt:</b> ${lis(j.manh)}</p>`:''}${j.yeu&&j.yeu.length?`<p style="margin:8px 0">⚠️ <b>Cần ôn tập tăng cường:</b> ${lis(j.yeu)}</p>`:'<p class="m">Chưa có phần nào yếu rõ rệt, bạn giỏi lắm!</p>'}</div>`:'';
+const b=S.bai,cta=(j.co_tai_khoan||S.bot)?'':`<div class="c"><b>🎁 Học cùng Mọt sách – bạn học của bạn</b><p class="m">Bạn chưa có tài khoản Mọt sách. Dùng thử miễn phí 5 ngày: học và làm bài mọi lúc mọi nơi, không cần sách giáo khoa, có báo cáo điểm mạnh, điểm yếu và kế hoạch khắc phục!</p><a href="${BOT}${j.ban_duoc?'?start=dl_'+encodeURIComponent(b.ma_dai_ly):''}">Mở Mọt sách trên Telegram →</a></div>`;
  $.innerHTML=`<div class="ct">${veKQ(j.diem10)}<h1>Đã nộp bài!</h1><p class="ok" style="font-size:26px;margin:4px 0">${j.diem} / ${j.toi_da} điểm</p><p class="m">Thang 10: ${j.diem10}${j.trang_thai==='cho_giao_vien'?' (còn câu chờ thầy/cô chấm)':''}</p>${rk}</div>
  ${j.nhan_xet?`<div class="c"><b>Nhận xét</b><p style="white-space:pre-wrap">${esc(j.nhan_xet)}</p></div>`:''}
  ${pt}
@@ -168,15 +172,15 @@ function cpOld(t){try{const a=document.createElement('textarea');a.value=t;a.sty
 async function guiPH(t,tb){
  if(navigator.share){try{await navigator.share({text:t});return}catch(e){if(e&&e.name==='AbortError')return}}
  const ok=await copyTxt(t);const m=document.getElementById('phmsg');
- if(m)m.textContent=ok?'✅ Đã sao chép. Em dán vào Zalo/Messenger/tin nhắn gửi phụ huynh nhé.':'Chưa sao chép được. Em chụp màn hình điểm gửi phụ huynh nhé.'}
-function phTxtKQ(){const k=S.kq||{},b=S.bai||{},u=S.ph&&S.ph.url?' Phụ huynh xem tất cả điểm của con tại: '+S.ph.url:'';
+ if(m)m.textContent=ok?'✅ Đã sao chép. Bạn dán vào Zalo/Messenger/tin nhắn gửi phụ huynh nhé.':'Chưa sao chép được. Bạn chụp màn hình điểm gửi phụ huynh nhé.'}
+function phTxtKQ(){const k=S.kq||{},b=S.bai||{},u=S.ph&&S.ph.url?' Phụ huynh xem tất cả điểm của bạn tại: '+S.ph.url:'';
  return 'Kết quả của '+CR.ten+': '+b.tieu_de+' – '+k.diem+'/'+k.toi_da+' điểm (thang 10: '+k.diem10+')'+(k.trang_thai==='cho_giao_vien'?', còn câu chờ thầy/cô chấm':'')+'.'+u}
 function phTxtTG(){return 'Phụ huynh bấm link này một lần để nhận kết quả bài làm của '+CR.ten+' tự động qua Telegram (miễn phí, có thể ngừng bất cứ lúc nào): '+S.ph.tg}
 function phVe(){const el=document.getElementById('phbox');if(!el)return;const p=S.ph;
- el.innerHTML='<div class="c"><b>👨‍👩‍👧 Gửi kết quả cho phụ huynh</b><p class="m" style="margin:6px 0 10px">Em tự gửi từ máy của em, không cần nhập số điện thoại phụ huynh.</p>'+
+ el.innerHTML='<div class="c"><b>👨‍👩‍👧 Gửi kết quả cho phụ huynh</b><p class="m" style="margin:6px 0 10px">Bạn tự gửi từ máy của bạn, không cần nhập số điện thoại phụ huynh.</p>'+
  '<div class="g"><button class="b" id="share">📨 Gửi kết quả này cho phụ huynh</button>'+
  (p&&p.tg?'<button class="b" id="shtg" style="background:var(--card);color:var(--ink);border:2px solid var(--line)">🔔 Mời phụ huynh nhận điểm tự động qua Telegram</button>':'')+'</div>'+
- '<p class="m" style="margin:10px 0 0">'+(p===null?'Đang tạo link cho phụ huynh…':p&&p.url?('Link xem điểm của em: <a href="'+esc(p.url)+'" target="_blank" rel="noopener">mở trang phụ huynh</a>'+(p.n?' · '+p.n+' phụ huynh đã đăng ký nhận thông báo':'')):'Chưa tạo được link xem điểm, nhưng em vẫn gửi được kết quả bằng nút trên.')+'</p><p class="m" id="phmsg" style="margin:6px 0 0;font-weight:700"></p></div>'}
+ '<p class="m" style="margin:10px 0 0">'+(p===null?'Đang tạo link cho phụ huynh…':p&&p.url?('Link xem điểm của bạn: <a href="'+esc(p.url)+'" target="_blank" rel="noopener">mở trang phụ huynh</a>'+(p.n?' · '+p.n+' phụ huynh đã đăng ký nhận thông báo':'')):'Chưa tạo được link xem điểm, nhưng bạn vẫn gửi được kết quả bằng nút trên.')+'</p><p class="m" id="phmsg" style="margin:6px 0 0;font-weight:700"></p></div>'}
 async function phTai(){S.ph=null;phVe();
  try{const j=await (await fetch(API+'/hs-ph-link',{method:'POST',headers:{'Content-Type':'application/json',...H},body:JSON.stringify({hs:CR.hs,k:CR.k})})).json();
   S.ph=j.ok?{url:j.ph_url,tg:j.tg_url,n:j.so_ph||0}:{}}catch(e){S.ph={}}

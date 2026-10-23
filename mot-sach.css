@@ -1,0 +1,105 @@
+/* ===== Mọt sách – giao diện chung cho các trang phụ (v2, 23/10/2026) =====
+   Theo đúng trang chủ: giấy kẻ vở + lề đỏ, mực xanh đậm, bút dạ vàng, viền mực + bóng cứng,
+   nhân vật chibi, chữ Be Vietnam Pro. Mỗi trang: <link rel="stylesheet" href="mot-sach.css?v=2"> cuối <head>
+   và <body class="ms">. Sửa file này một lần là mọi trang đổi theo (đổi ?v= để điện thoại tải bản mới). */
+@import url("https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;800&display=swap");
+
+:root{
+  --ink:#0A305C;--blue:#13547C;--cyan:#14C7D8;--paper:#F4F8FC;--line:#D3E2F2;--mute:#4A5A7C;
+  --mark:#FFE066;--mark-d:#E0B800;--mark-ink:#0A305C;--red:#D64045;--white:#fff;
+  /* tên cũ các trang đang dùng -> trỏ về cùng một bảng màu */
+  --bg:#F4F8FC;--card:#fff;--text:#0A305C;--mut:#4A5A7C;--muted:#4A5A7C;--sh:#0A305C;--shadow:#0A305C;
+  --ok:#118A62;--err:#D64045;--bad:#D64045;--weak:#B45309;--warn:#B45309;--bar:#13547C;--pop:#14C7D8;--stage:#F4F8FC;
+  --font:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--disp:var(--font);
+  color-scheme:light;
+}
+/* trang chủ chỉ có giao diện sáng nên các trang phụ cũng vậy (chặn bảng màu tối riêng của từng trang) */
+@media(prefers-color-scheme:dark){:root{
+  --ink:#0A305C;--bg:#F4F8FC;--paper:#F4F8FC;--card:#fff;--text:#0A305C;--mut:#4A5A7C;--muted:#4A5A7C;--line:#D3E2F2;
+  --sh:#0A305C;--shadow:#0A305C;--mark:#FFE066;--mark-d:#E0B800;--ok:#118A62;--err:#D64045;--bad:#D64045;--weak:#B45309;--warn:#B45309;--bar:#13547C;--stage:#F4F8FC}}
+
+/* nền giấy kẻ vở + lề đỏ */
+[hidden]{display:none!important}
+body.ms{display:block!important}
+body.ms>.wrap{margin-left:auto;margin-right:auto}
+html{scroll-behavior:smooth}
+body.ms{background-color:var(--paper);background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 31px,var(--line) 31px,var(--line) 32px);background-size:auto;color:var(--ink);line-height:1.6;-webkit-tap-highlight-color:transparent}
+body.ms::before{content:"";position:fixed;top:0;bottom:0;left:max(6px,calc(50% - 292px));width:3px;background:var(--red);pointer-events:none;z-index:0}
+body.ms-bi::before{left:max(6px,calc(50% - 332px))}
+body.ms,body.ms *{font-family:var(--font)}
+body.ms h1,body.ms h2,body.ms h3{font-weight:800;letter-spacing:-.01em;line-height:1.25}
+body.ms ::selection{background:var(--mark);color:var(--ink)}
+body.ms a{color:var(--blue)}
+
+/* đầu trang giống trang chủ */
+.ms-head{border-bottom:2px solid var(--ink);background:rgba(244,248,252,.96);position:relative;z-index:1}
+.ms-hw{max-width:560px;margin:0 auto;padding:max(8px,env(safe-area-inset-top,0px)) 16px 8px;display:flex;align-items:center;gap:10px}
+.ms-logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.25rem;color:var(--ink)}
+.ms-logo img{height:34px;width:auto}.ms-logo b{background:var(--mark);padding:0 4px;margin-left:1px}
+body.ms-bi .ms-hw{max-width:640px}
+
+/* nhân vật chibi + lời thoại */
+.ms-mate,body.ms .hero{display:flex;gap:10px;align-items:flex-end;position:relative;z-index:1}
+.ms-mate{max-width:560px;margin:14px auto 6px;padding:0 16px}
+body.ms-bi .ms-mate{max-width:640px}
+body.ms .mascot{font-size:0;line-height:0;flex:none;display:block;width:92px}
+body.ms .mascot svg{display:block;width:100%;height:auto}
+body.ms .bubble{background:var(--card);border:2px solid var(--ink);border-radius:16px 16px 16px 4px;box-shadow:3px 3px 0 var(--ink);padding:8px 14px;font-weight:700;color:var(--ink)}
+body.ms .bubble h1{margin:0}
+@media(prefers-reduced-motion:no-preference){
+  .mascot svg{animation:ms-bob 3.4s ease-in-out infinite}
+  .mascot .eyes{transform-box:fill-box;transform-origin:center;animation:ms-blink 4.5s infinite}
+  .mascot .stw{transform-box:fill-box;transform-origin:center;animation:ms-twinkle 2s ease-in-out infinite}
+  @keyframes ms-bob{50%{transform:translateY(-6px)}}
+  @keyframes ms-blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.08)}}
+  @keyframes ms-twinkle{0%,100%{transform:scale(.5) rotate(0);opacity:.5}50%{transform:scale(1.25) rotate(45deg);opacity:1}}
+}
+
+/* thẻ: viền mực + bóng cứng */
+body.ms .c,body.ms .card{background:var(--card);border:2px solid var(--ink);border-radius:12px;box-shadow:5px 5px 0 var(--ink);position:relative;z-index:1}
+body.ms .k{border:2px solid var(--ink);border-radius:10px}
+body.ms .bar{background:var(--line)}
+body.ms details{border-color:var(--line)}
+
+/* nút */
+body.ms .b,body.ms .btn,body.ms .mv,body.ms button.t,body.ms .tabs button,body.ms button.opt,body.ms a.opt{
+  border:2px solid var(--ink);border-radius:8px;font-weight:700;min-height:44px;box-shadow:3px 3px 0 var(--ink);
+  transition:transform .08s,box-shadow .08s,background .12s}
+body.ms .b:not(.l):not(.p),body.ms .btn.main{background:var(--mark);color:var(--ink)}
+body.ms .b.l,body.ms .btn:not(.main),body.ms button.opt,body.ms a.opt,body.ms .mv,body.ms button.t,body.ms .tabs button{background:var(--white);color:var(--ink)}
+body.ms .b.p,body.ms button.t[aria-pressed=true],body.ms .tabs button.on,body.ms .tabs button[aria-selected=true]{background:var(--ink);color:#fff}
+body.ms .b:active,body.ms .btn:active,body.ms .mv:active,body.ms button.t:active,body.ms .tabs button:active,body.ms button.opt:active,body.ms a.opt:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink);background:var(--mark);color:var(--ink)}
+body.ms button:disabled{opacity:.5;box-shadow:none;transform:none}
+@media(hover:hover){body.ms button.opt:not(:disabled):hover,body.ms a.opt:hover,body.ms .b.l:hover,body.ms .btn:not(.main):hover{background:var(--mark)}}
+body.ms button.opt{border-radius:10px;padding-left:10px}
+body.ms .opt .n{background:var(--ink);color:#fff;font-weight:800}
+body.ms .opt.lk .n{background:var(--line);color:var(--ink)}
+body.ms :focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+
+/* ô nhập */
+body.ms input,body.ms select,body.ms textarea{border:2px solid var(--ink);border-radius:8px;background:#fff;color:var(--ink);font-weight:500}
+body.ms input:focus,body.ms select:focus,body.ms textarea:focus{outline:3px solid var(--cyan);outline-offset:1px}
+
+/* màu trạng thái */
+body.ms .ok{color:var(--ok)}body.ms .err{color:var(--err)}
+
+/* chân trang */
+.vf{max-width:560px;margin:6px auto 0;padding:10px 16px 18px;text-align:center;font-size:12.5px;line-height:1.6;color:var(--mute);position:relative;z-index:1}
+.vf a{color:inherit;font-weight:800}
+
+/* riêng trang Bi nói nhanh */
+body.ms-bi{max-width:none;padding:0}
+body.ms-bi>#readbox,body.ms-bi>#log,body.ms-bi>#mic,body.ms-bi>#stat,body.ms-bi>.tabs,body.ms-bi>h1,body.ms-bi>#gear,body.ms-bi>.vf{max-width:608px;margin-left:auto;margin-right:auto}
+body.ms-bi>.tabs{display:flex}
+body.ms-bi>h1{padding:0;margin-top:6px;margin-bottom:10px}
+body.ms-bi #gear{float:none;position:absolute;right:16px;top:calc(env(safe-area-inset-top,0px) + 62px);width:auto;border:0;background:none;box-shadow:none;min-height:0}
+body.ms-bi #mic{min-height:64px;font-size:18px;background:var(--mark);color:var(--ink);border:2px solid var(--ink);border-radius:10px;box-shadow:4px 4px 0 var(--ink);font-weight:800}
+body.ms-bi #mic.rec{background:var(--err);color:#fff}
+body.ms-bi .b.me{background:var(--blue);color:#fff;border-radius:14px 14px 3px 14px}
+body.ms-bi .b.bi{background:#EAF1FA;border:2px solid var(--line);border-radius:14px 14px 14px 3px}
+body.ms-bi .target{background:var(--card);border:2px solid var(--ink);border-radius:12px;box-shadow:4px 4px 0 var(--ink)}
+body.ms-bi .w.weak{background:var(--mark);color:var(--ink)}
+body.ms-bi .w.wrong,body.ms-bi .w.missing{background:#FBE1E2;color:var(--err)}
+body.ms-bi #stat{color:var(--mute);font-weight:500}
+
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}body.ms *{animation:none!important;transition:none!important}}

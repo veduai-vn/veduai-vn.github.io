@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>VeduAI – Học ngay</title>
+<title>Mọt sách – Học ngay</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,15 +58,18 @@
   .vf { max-width:560px; margin:8px auto 0; padding:10px 8px; text-align:center; font-size:12.5px; line-height:1.6; color:var(--muted); }
   .vf a { color:inherit; font-weight:800; }
 </style>
+<link rel="stylesheet" href="mot-sach.css?v=2">
 </head>
-<body>
+<body class="ms">
+<header class="ms-head"><div class="ms-hw"><span class="ms-logo"><img src="assets/logo-mark.png" alt=""><span>Mọt<b>sách</b></span></span></div></header>
+
 <div class="wrap">
-  <div class="hero"><span class="mascot" aria-hidden="true">🦉</span><div class="bubble" id="say">Mình học ngay thôi!</div></div>
+  <div class="hero"><span class="mascot" aria-hidden="true"><svg viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><ellipse cx="100" cy="100" rx="66" ry="62" fill="#A56BE0" stroke="#3B2A55" stroke-width="3"/><ellipse cx="32" cy="132" rx="17" ry="44" fill="#A56BE0" stroke="#3B2A55" stroke-width="3" transform="rotate(10 32 132)"/><ellipse cx="168" cy="132" rx="17" ry="44" fill="#A56BE0" stroke="#3B2A55" stroke-width="3" transform="rotate(-10 168 132)"/><rect x="91" y="156" width="18" height="16" fill="#FFE4D2" stroke="#3B2A55" stroke-width="2.5"/><path d="M56 170 Q100 150 144 170 L154 230 H46 Z" fill="#24305E" stroke="#3B2A55" stroke-width="3" stroke-linejoin="round"/><path d="M78 163 L100 190 L122 163 Q100 154 78 163 Z" fill="#fff" stroke="#3B2A55" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="100" cy="108" rx="58" ry="54" fill="#FFE4D2" stroke="#3B2A55" stroke-width="3"/><g class="eyes"><ellipse cx="76" cy="112" rx="12" ry="15" fill="#2BB5C8"/><ellipse cx="76" cy="115" rx="7" ry="9.5" fill="#1d1a3a"/><circle cx="71" cy="106" r="4.8" fill="#fff"/><circle cx="81" cy="120" r="2.4" fill="#fff"/><ellipse cx="124" cy="112" rx="12" ry="15" fill="#2BB5C8"/><ellipse cx="124" cy="115" rx="7" ry="9.5" fill="#1d1a3a"/><circle cx="119" cy="106" r="4.8" fill="#fff"/><circle cx="129" cy="120" r="2.4" fill="#fff"/></g><path d="M60 103 Q76 91 92 103 M108 103 Q124 91 140 103" stroke="#3B2A55" stroke-width="3.2" fill="none" stroke-linecap="round"/><ellipse cx="57" cy="130" rx="10" ry="5.5" fill="#FF8FAB" opacity=".65"/><ellipse cx="143" cy="130" rx="10" ry="5.5" fill="#FF8FAB" opacity=".65"/><path d="M90 130 Q100 135 110 130 Q108 147 100 147 Q92 147 90 130Z" fill="#E8546E" stroke="#3B2A55" stroke-width="2.2" stroke-linejoin="round"/><path d="M94 141 Q100 138 106 141 Q103 145 100 145 Q97 145 94 141Z" fill="#FF9EB5"/><path d="M38 102 Q38 40 100 36 Q162 40 162 102 Q146 72 124 86 Q112 60 96 84 Q74 64 38 102 Z" fill="#A56BE0" stroke="#3B2A55" stroke-width="3" stroke-linejoin="round"/><path d="M62 54 Q82 44 104 46" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".55" fill="none"/><path d="M24 63 L38 72 L24 81Z M52 63 L38 72 L52 81Z" fill="#FF5C8A" stroke="#3B2A55" stroke-width="2.5" stroke-linejoin="round"/><circle cx="38" cy="72" r="4.5" fill="#FFB3C9" stroke="#3B2A55" stroke-width="2"/><path d="M148 63 L162 72 L148 81Z M176 63 L162 72 L176 81Z" fill="#FF5C8A" stroke="#3B2A55" stroke-width="2.5" stroke-linejoin="round"/><circle cx="162" cy="72" r="4.5" fill="#FFB3C9" stroke="#3B2A55" stroke-width="2"/><circle cx="64" cy="156" r="10" fill="#FFE4D2" stroke="#3B2A55" stroke-width="2.5"/><circle cx="136" cy="156" r="10" fill="#FFE4D2" stroke="#3B2A55" stroke-width="2.5"/><path class="stw" style="animation-delay:0s" d="M22 31 Q22 40 31 40 Q22 40 22 49 Q22 40 13 40 Q22 40 22 31Z" fill="#FFC400"/><path class="stw" style="animation-delay:0.6s" d="M182 27 Q182 34 189 34 Q182 34 182 41 Q182 34 175 34 Q182 34 182 27Z" fill="#FF8FAB"/><path class="stw" style="animation-delay:1.1s" d="M176 94 Q176 100 182 100 Q176 100 176 106 Q176 100 170 100 Q176 100 176 94Z" fill="#14C7D8"/></svg></span><div class="bubble" id="say">Mình học ngay thôi!</div></div>
   <div class="card" id="card" aria-live="polite"><div class="state"><div class="big" aria-hidden="true">🐣</div>Đang tải...</div></div>
   <footer class="vf"><b>VeduAI</b> – Vietnam Education AI Solutions<br>Hỗ trợ: Admin <a href="tel:0984048177">0984048177</a> (Telegram/Zalo)</footer>
 </div>
 <script>
-// Địa chỉ n8n (workflow "VeduAI - Hoc ngay (cau noi web)"). Đổi ở đây nếu địa chỉ ngrok thay đổi.
+// Địa chỉ n8n (workflow "Mọt sách - Hoc ngay (cau noi web)"). Đổi ở đây nếu địa chỉ ngrok thay đổi.
 const API = 'https://devotee-outclass-couch.ngrok-free.dev/webhook/hoc-ngay-7c3a';
 const H = { 'ngrok-skip-browser-warning': '1', 'Content-Type': 'application/json' };
 const TG = window.Telegram && Telegram.WebApp;
@@ -82,7 +85,7 @@ const RES = 'https://devotee-outclass-couch.ngrok-free.dev/webhook/hoc-ket-qua';
 { const u = qs.get('u'), t = qs.get('t'); if (u && t) { SAVE.u = u.slice(0, 80); SAVE.t = t.replace(/[^a-f0-9]/g, '').slice(0, 64); luu(); } }
 async function guiKetQua(tt) {
   if (Q.daGui) return;
-  if (!SAVE.u || !SAVE.t) { tt.textContent = 'Em mở từ nút 📚 Học ngay trong /menu của bot để lưu điểm nhé.'; return; }
+  if (!SAVE.u || !SAVE.t) { tt.textContent = 'Bạn mở từ nút 📚 Học ngay trong /menu của bot để lưu điểm nhé.'; return; }
   Q.daGui = true; tt.textContent = 'Đang lưu kết quả...';
   try {
     const r = await fetch(RES, { method: 'POST', headers: H, body: JSON.stringify({ u: SAVE.u, t: SAVE.t, id: Q.id, ten: Q.ten, mon: Q.mon, lop: Q.lop, tap: Q.tap, bo: Q.bo, dung: Q.dung, tong: Q.tong, kt_dung: Q.kt_dung, kt_tong: Q.kt_tong }) });
@@ -90,7 +93,7 @@ async function guiKetQua(tt) {
     tt.textContent = j.ok ? '✅ Đã lưu kết quả học' : '⚠️ Chưa lưu được kết quả'; if (j.ok) layTienDo();
   } catch (e) { tt.textContent = '⚠️ Chưa lưu được kết quả (mạng)'; }
 }
-// CS5: tiến độ theo MÔN lấy từ máy chủ (workflow "VeduAI - Hoc tien do"): bài đã xong + điểm cao nhất, môn học gần nhất
+// CS5: tiến độ theo MÔN lấy từ máy chủ (workflow "Mọt sách - Hoc tien do"): bài đã xong + điểm cao nhất, môn học gần nhất
 const TD = 'https://devotee-outclass-couch.ngrok-free.dev/webhook/hoc-tien-do';
 const unz = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[đĐ]/g, 'd').toLowerCase().replace(/y/g, 'i').replace(/[^a-z0-9]/g, '');
 let TIEN = null;
@@ -156,7 +159,7 @@ function chanTrang() {
 }
 /* ---------- 1. Chọn lớp ---------- */
 function manLop() {
-  xoa(); say('Em học lớp mấy nhỉ? 👇');
+  xoa(); say('Bạn học lớp mấy nhỉ? 👇');
   const slot = el('div'); card.append(slot);
   if (SAVE.tiep && SAVE.tiep.id) {
     const t = SAVE.tiep;
@@ -190,7 +193,7 @@ async function manMon(lop) {
   if (SAVE.tiep && SAVE.tiep.id && SAVE.tiep.i > 0) { const t = SAVE.tiep; slot.append(btn('▶', 'Học tiếp: ' + t.mon + ' lớp ' + t.lop + ' – ' + t.ten, () => vaoBai(t.id, t.ten, t.lop, t.mon, t.tap), 'main'), el('p', 'muted', 'hoặc chọn môn khác:')); }
   hocTiepMayChu(slot);
   card.append(el('p', 'msg', 'Lớp ' + lop + ': học môn nào?'));
-  if (!j.ok || !j.mon || !j.mon.length) { card.append(el('p', 'muted', 'Lớp này chưa có bài soạn sẵn. Em chọn lớp khác hoặc nhắn bot để được hỗ trợ.')); return; }
+  if (!j.ok || !j.mon || !j.mon.length) { card.append(el('p', 'muted', 'Lớp này chưa có bài soạn sẵn. Bạn chọn lớp khác hoặc nhắn bot để được hỗ trợ.')); return; }
   j.mon.forEach(m => card.append(btn(m.so_bai, m.mon, () => manBai(lop, m.mon))));
   card.append(chanTrang());
 }
@@ -200,7 +203,7 @@ async function manBai(lop, mon, tapMo) {
   trangThai('🐣', 'Đang tải danh sách bài...');
   const j = await goi({ act: 'muc_luc', lop, mon });
   if (j.loi === 'mang' || j.loi === 'may_chu_hoc_dang_tat') return loiMang(() => manBai(lop, mon));
-  xoa(); say('Chọn bài em muốn học 👇');
+  xoa(); say('Chọn bài bạn muốn học 👇');
   card.append(crumb('← Chọn môn khác', () => manMon(lop)), el('p', 'msg', j.mon + ' lớp ' + lop));
   const dsTap = (j.tap || []).filter(t => t.chuong && t.chuong.length);
   if (!dsTap.length) { card.append(el('p', 'muted', 'Môn này chưa có bài soạn sẵn.')); return; }
@@ -223,11 +226,11 @@ async function vaoBai(id, ten, lop, mon, tap) {
   trangThai('🐣', 'Đang mở bài...');
   const j = await goi({ act: 'bai', id, bo: (SAVE.bo && SAVE.bo[id]) || 1 });
   if (j.loi === 'mang' || j.loi === 'may_chu_hoc_dang_tat') return loiMang(() => vaoBai(id, ten, lop, mon, tap));
-  if (!j.ok) { trangThai('📭', 'Bài này chưa có câu hỏi', 'Em chọn bài khác nhé.', () => manBai(lop, mon, tap)); return; }
+  if (!j.ok) { trangThai('📭', 'Bài này chưa có câu hỏi', 'Bạn chọn bài khác nhé.', () => manBai(lop, mon, tap)); return; }
   if (j.bai) { lop = lop || j.bai.lop; mon = mon || j.bai.mon; tap = tap || j.bai.tap || 0; if (!ten || ten === 'Bài học') ten = j.bai.tieu_de || ten; }
   const ds = [];
   PHAN.forEach(([k, nhan]) => (j.phan[k] || []).forEach(c => ds.push({ c, phan: k, nhan })));
-  if (!ds.length) { trangThai('📭', 'Bài này chưa có câu hỏi', 'Em chọn bài khác nhé.', () => manBai(lop, mon, tap)); return; }
+  if (!ds.length) { trangThai('📭', 'Bài này chưa có câu hỏi', 'Bạn chọn bài khác nhé.', () => manBai(lop, mon, tap)); return; }
   Q = { id, ten, lop, mon, tap, bo: j.bo, so_bo: j.so_bo, ds, i: 0, dung: 0, tong: 0, kt_dung: 0, kt_tong: 0, tuMoi: (j.tu_moi && ((j.tu_moi.tu || []).length || (j.tu_moi.cum || []).length)) ? j.tu_moi : null };
   if (SAVE.tiep && SAVE.tiep.id === id && SAVE.tiep.i > 0 && SAVE.tiep.i < ds.length) Q.i = SAVE.tiep.i;
   SAVE.tiep = { id, ten, lop, mon, tap, i: Q.i }; luu();
@@ -270,14 +273,14 @@ function hienCau() {
   } else {
     const ta = (c.dang === 'dien_khuyet') ? el('input') : el('textarea');
     if (c.dang === 'dien_khuyet') ta.type = 'text';
-    ta.placeholder = c.dang === 'dien_khuyet' ? 'Em điền đáp án vào đây' : 'Em viết bài làm vào đây (không bắt buộc)';
+    ta.placeholder = c.dang === 'dien_khuyet' ? 'Bạn điền đáp án vào đây' : 'Bạn viết bài làm vào đây (không bắt buộc)';
     card.append(ta, btn('', c.dang === 'dien_khuyet' ? 'Kiểm tra' : 'Xem đáp án mẫu', () => gui(ta.value), 'main'));
   }
 }
 async function cham(it, tl) {
   card.querySelectorAll('button.opt').forEach(b => b.disabled = true);
   const j = await goi({ act: 'cham', id: Q.id, bo: Q.bo, phan: it.phan, stt: it.c.stt, tra_loi: tl });
-  if (!j.ok) { card.querySelectorAll('button.opt').forEach(b => b.disabled = false); say('Chưa chấm được, em bấm lại nhé.'); return; }
+  if (!j.ok) { card.querySelectorAll('button.opt').forEach(b => b.disabled = false); say('Chưa chấm được, bạn bấm lại nhé.'); return; }
   const tuLuan = !!j.can_ai_cham;
   if (!tuLuan) { Q.tong++; if (j.dung) Q.dung++; if (it.phan === 'kiem_tra_cuoi') { Q.kt_tong++; if (j.dung) Q.kt_dung++; } }
   // đánh dấu đáp án trắc nghiệm
@@ -286,9 +289,9 @@ async function cham(it, tl) {
   }
   if (tuLuan) {
     const f = el('div', 'fb info'); f.textContent = 'Đáp án mẫu:\n' + (j.dap_an_mau || j.dap_an || '') + ((j.tieu_chi_cham || []).length ? '\n\nTiêu chí: ' + j.tieu_chi_cham.join('; ') : '') + (j.giai_thich ? '\n\n' + j.giai_thich : '');
-    card.append(f, el('p', 'muted', 'Em tự so với đáp án mẫu nhé:'));
-    card.append(btn('✔', 'Em làm đúng', () => { Q.tong++; Q.dung++; if (it.phan === 'kiem_tra_cuoi') { Q.kt_tong++; Q.kt_dung++; } tiep(); }),
-                btn('✖', 'Em chưa đúng', () => { Q.tong++; if (it.phan === 'kiem_tra_cuoi') Q.kt_tong++; tiep(); }));
+    card.append(f, el('p', 'muted', 'Bạn tự so với đáp án mẫu nhé:'));
+    card.append(btn('✔', 'Bạn làm đúng', () => { Q.tong++; Q.dung++; if (it.phan === 'kiem_tra_cuoi') { Q.kt_tong++; Q.kt_dung++; } tiep(); }),
+                btn('✖', 'Bạn chưa đúng', () => { Q.tong++; if (it.phan === 'kiem_tra_cuoi') Q.kt_tong++; tiep(); }));
     return;
   }
   const f = el('div', 'fb ' + (j.dung ? 'ok' : 'bad'));
@@ -299,7 +302,7 @@ async function cham(it, tl) {
 }
 function tiep() { Q.i++; SAVE.tiep = { id: Q.id, ten: Q.ten, lop: Q.lop, mon: Q.mon, tap: Q.tap, i: Q.i >= Q.ds.length ? 0 : Q.i }; luu(); hienCau(); }
 function tongKet() {
-  xoa(); say('Em làm tốt lắm!');
+  xoa(); say('Bạn làm tốt lắm!');
   const diem = Q.kt_tong ? Math.round(Q.kt_dung / Q.kt_tong * 100) / 10 : (Q.tong ? Math.round(Q.dung / Q.tong * 100) / 10 : 0);
   const s = el('div', 'state'); s.append(el('div', 'big', diem >= 8 ? '🏆' : diem >= 5 ? '👍' : '💪'), el('div', 'score', String(diem).replace('.', ',') + '/10'),
     el('div', 'muted', 'Đúng ' + Q.dung + '/' + Q.tong + ' câu' + (Q.kt_tong ? ' · kiểm tra cuối tiết ' + Q.kt_dung + '/' + Q.kt_tong : '')));

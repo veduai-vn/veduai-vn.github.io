@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>VeduAI – Kiểm tra đầu vào</title>
+<title>Mọt sách – Kiểm tra đầu vào</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -81,15 +81,18 @@
 @media (prefers-reduced-motion:no-preference){.vq.v-mid .vi{display:inline-block;animation:vqb .9s ease-in-out 3}.vq.v-low .vi{display:inline-block;animation:vqs 2s ease-in-out 2;transform-origin:50% 90%}
 .vq.v-top .vi{display:inline-block;animation:vqb .7s ease-in-out 4}@keyframes vqb{50%{transform:translateY(-12px)}}@keyframes vqs{50%{transform:rotate(-8deg)}}}
 </style>
+<link rel="stylesheet" href="mot-sach.css?v=2">
 </head>
-<body>
+<body class="ms">
+<header class="ms-head"><div class="ms-hw"><span class="ms-logo"><img src="assets/logo-mark.png" alt=""><span>Mọt<b>sách</b></span></span></div></header>
+
 <div class="wrap">
-  <div class="hero"><span class="mascot" aria-hidden="true">🦉</span><div class="bubble" id="say">Cô/thầy đang chuẩn bị…</div></div>
+  <div class="hero"><span class="mascot" aria-hidden="true"><svg viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><ellipse cx="100" cy="100" rx="66" ry="62" fill="#A56BE0" stroke="#3B2A55" stroke-width="3"/><ellipse cx="32" cy="132" rx="17" ry="44" fill="#A56BE0" stroke="#3B2A55" stroke-width="3" transform="rotate(10 32 132)"/><ellipse cx="168" cy="132" rx="17" ry="44" fill="#A56BE0" stroke="#3B2A55" stroke-width="3" transform="rotate(-10 168 132)"/><rect x="91" y="156" width="18" height="16" fill="#FFE4D2" stroke="#3B2A55" stroke-width="2.5"/><path d="M56 170 Q100 150 144 170 L154 230 H46 Z" fill="#24305E" stroke="#3B2A55" stroke-width="3" stroke-linejoin="round"/><path d="M78 163 L100 190 L122 163 Q100 154 78 163 Z" fill="#fff" stroke="#3B2A55" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="100" cy="108" rx="58" ry="54" fill="#FFE4D2" stroke="#3B2A55" stroke-width="3"/><g class="eyes"><ellipse cx="76" cy="112" rx="12" ry="15" fill="#2BB5C8"/><ellipse cx="76" cy="115" rx="7" ry="9.5" fill="#1d1a3a"/><circle cx="71" cy="106" r="4.8" fill="#fff"/><circle cx="81" cy="120" r="2.4" fill="#fff"/><ellipse cx="124" cy="112" rx="12" ry="15" fill="#2BB5C8"/><ellipse cx="124" cy="115" rx="7" ry="9.5" fill="#1d1a3a"/><circle cx="119" cy="106" r="4.8" fill="#fff"/><circle cx="129" cy="120" r="2.4" fill="#fff"/></g><path d="M60 103 Q76 91 92 103 M108 103 Q124 91 140 103" stroke="#3B2A55" stroke-width="3.2" fill="none" stroke-linecap="round"/><ellipse cx="57" cy="130" rx="10" ry="5.5" fill="#FF8FAB" opacity=".65"/><ellipse cx="143" cy="130" rx="10" ry="5.5" fill="#FF8FAB" opacity=".65"/><path d="M90 130 Q100 135 110 130 Q108 147 100 147 Q92 147 90 130Z" fill="#E8546E" stroke="#3B2A55" stroke-width="2.2" stroke-linejoin="round"/><path d="M94 141 Q100 138 106 141 Q103 145 100 145 Q97 145 94 141Z" fill="#FF9EB5"/><path d="M38 102 Q38 40 100 36 Q162 40 162 102 Q146 72 124 86 Q112 60 96 84 Q74 64 38 102 Z" fill="#A56BE0" stroke="#3B2A55" stroke-width="3" stroke-linejoin="round"/><path d="M62 54 Q82 44 104 46" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".55" fill="none"/><path d="M24 63 L38 72 L24 81Z M52 63 L38 72 L52 81Z" fill="#FF5C8A" stroke="#3B2A55" stroke-width="2.5" stroke-linejoin="round"/><circle cx="38" cy="72" r="4.5" fill="#FFB3C9" stroke="#3B2A55" stroke-width="2"/><path d="M148 63 L162 72 L148 81Z M176 63 L162 72 L176 81Z" fill="#FF5C8A" stroke="#3B2A55" stroke-width="2.5" stroke-linejoin="round"/><circle cx="162" cy="72" r="4.5" fill="#FFB3C9" stroke="#3B2A55" stroke-width="2"/><circle cx="64" cy="156" r="10" fill="#FFE4D2" stroke="#3B2A55" stroke-width="2.5"/><circle cx="136" cy="156" r="10" fill="#FFE4D2" stroke="#3B2A55" stroke-width="2.5"/><path class="stw" style="animation-delay:0s" d="M22 31 Q22 40 31 40 Q22 40 22 49 Q22 40 13 40 Q22 40 22 31Z" fill="#FFC400"/><path class="stw" style="animation-delay:0.6s" d="M182 27 Q182 34 189 34 Q182 34 182 41 Q182 34 175 34 Q182 34 182 27Z" fill="#FF8FAB"/><path class="stw" style="animation-delay:1.1s" d="M176 94 Q176 100 182 100 Q176 100 176 106 Q176 100 170 100 Q176 100 176 94Z" fill="#14C7D8"/></svg></span><div class="bubble" id="say">Mình đang chuẩn bị…</div></div>
   <div id="app"><div class="card"><div class="state"><div class="big" aria-hidden="true">🐣</div>Đang tải...</div></div></div>
   <footer class="vf"><b>VeduAI</b> – Vietnam Education AI Solutions<br>Hỗ trợ: Admin <a href="tel:0984048177">0984048177</a> (Telegram/Zalo)</footer>
 </div>
 <script>
-/* VeduAI – bộ vẽ hình hình học (SVG) theo đúng schema "ve_hinh" của bot */
+/* Mọt sách – bộ vẽ hình hình học (SVG) theo đúng schema "ve_hinh" của bot */
 function veHinh(spec) {
   const NS = 'http://www.w3.org/2000/svg', W = 360, H = 270, PAD = 38;
   const COL = { blue: '#2F6FDE', red: '#D6336C', green: '#1E9E6A' };
@@ -270,7 +273,7 @@ function speak(g, onEnd) {
 document.addEventListener('visibilitychange', () => { if (document.hidden) stopSpeak(); });
 
 async function load() {
-  if (!b) { say('Ối, link chưa đúng!'); return state('🔍', 'Link chưa đúng', 'Em mở lại link mới nhất trong chat nhé.', 'err'); }
+  if (!b) { say('Ối, link chưa đúng!'); return state('🔍', 'Link chưa đúng', 'Bạn mở lại link mới nhất trong chat nhé.', 'err'); }
   try {
     const j = await api('/kt-lay?b=' + b);
     if (!j.ok) { say('Ối, có chút trục trặc!'); return state('🔍', j.loi || 'Không tìm thấy bài', '', 'err'); }
@@ -289,20 +292,20 @@ function showStart(j) {
   app.innerHTML = ''; const c = el('div', 'card');
   c.append(el('h1', '', 'Kiểm tra đầu vào – ' + (j.mon || '')),
     el('p', 'm', (j.lop ? 'Lớp ' + j.lop + ' · ' : '') + (j.anh ? '20 câu · 4 kỹ năng Nghe – Nói – Đọc – Viết · khoảng ' + (j.phut || 35) + ' phút' : '20 câu · khoảng ' + (j.phut || 25) + ' phút')));
-  if (j.anh) c.appendChild(el('p', 'm', '🎧 Con bật loa hoặc đeo tai nghe  ·  🎤 Cho phép micro khi cô/thầy hỏi  ·  🤫 Tìm chỗ yên tĩnh nhé.'));
-  c.appendChild(el('p', 'q', 'Con đang học đến bài hoặc chương nào? Cô/thầy sẽ ra đề bao quát đến phần đó.'));
+  if (j.anh) c.appendChild(el('p', 'm', '🎧 Bạn bật loa hoặc đeo tai nghe  ·  🎤 Cho phép micro khi mình hỏi  ·  🤫 Tìm chỗ yên tĩnh nhé.'));
+  c.appendChild(el('p', 'q', 'Bạn đang học đến bài hoặc chương nào? Mình sẽ ra đề bao quát đến phần đó.'));
   const inp = el('input', 't'); inp.id = 'bai'; inp.placeholder = 'Ví dụ: Chương 3, bài Hàm số bậc nhất'; inp.maxLength = 200; inp.autocomplete = 'off';
   const er = el('p', 'err'); er.id = 'er';
   const go = el('button', 'b', 'Bắt đầu làm bài 🚀'); go.type = 'button'; go.style.marginTop = '12px';
   go.onclick = async () => {
     const v = inp.value.replace(/\s+/g, ' ').trim();
-    if (v.length < 3) { er.textContent = 'Con nhập giúp cô/thầy bài hoặc chương đang học nhé.'; return; }
-    loading('Cô/thầy đang soạn đề', 'Mất khoảng 1–2 phút, con đừng đóng trang nhé.'); say('Chờ cô/thầy chút xíu…');
+    if (v.length < 3) { er.textContent = 'Bạn nhập giúp mình bài hoặc chương đang học nhé.'; return; }
+    loading('Mình đang soạn đề', 'Mất khoảng 1–2 phút, bạn đừng đóng trang nhé.'); say('Chờ mình chút xíu…');
     try {
       const r = await api('/kt-bat-dau', { b, bai: v });
-      if (!r.ok) { showStart(j); const e2 = document.getElementById('er'); if (e2) e2.textContent = r.loi || 'Chưa soạn được đề, con thử lại nhé.'; return; }
+      if (!r.ok) { showStart(j); const e2 = document.getElementById('er'); if (e2) e2.textContent = r.loi || 'Chưa soạn được đề, bạn thử lại nhé.'; return; }
       route(r);
-    } catch (e) { showStart(j); const e2 = document.getElementById('er'); if (e2) e2.textContent = 'Mạng chập chờn. Con bấm bắt đầu lại nhé (đề đang soạn sẽ không bị mất).'; }
+    } catch (e) { showStart(j); const e2 = document.getElementById('er'); if (e2) e2.textContent = 'Mạng chập chờn. Bạn bấm bắt đầu lại nhé (đề đang soạn sẽ không bị mất).'; }
   };
   c.append(inp, er, go); app.appendChild(c);
 }
@@ -320,10 +323,10 @@ function groupCard(g) {
     speak(g, ok => { playing = false; upd(); if (ok === false && !fb.firstChild) noVoice(); });
   };
   const noVoice = () => {
-    fb.appendChild(el('p', 'err', 'Máy của con chưa phát được tiếng Anh. Con mở bằng trình duyệt khác (Chrome/Safari) hoặc xem nội dung bài nghe bên dưới để làm bài nhé.'));
+    fb.appendChild(el('p', 'err', 'Máy của bạn chưa phát được tiếng Anh. Bạn mở bằng trình duyệt khác (Chrome/Safari) hoặc xem nội dung bài nghe bên dưới để làm bài nhé.'));
     const d = el('details', 'tx'); d.append(el('summary', '', 'Xem nội dung bài nghe'), el('div', 'pas', g.kich_ban)); fb.appendChild(d);
   };
-  c.append(row, el('p', 'm', 'Con được nghe tối đa ' + MAXP + ' lần. Nghe kỹ rồi trả lời các câu bên dưới.'), fb);
+  c.append(row, el('p', 'm', 'Bạn được nghe tối đa ' + MAXP + ' lần. Nghe kỹ rồi trả lời các câu bên dưới.'), fb);
   if (!TTS) noVoice(); upd(); return c;
 }
 
@@ -336,19 +339,19 @@ function micBox(q) {
   const noMic = (why) => {
     err.textContent = why; if (alt.firstChild) return;
     if (TGW && TGW.openLink) { const o = el('button', 'b s', '🌐 Mở bằng trình duyệt để ghi âm'); o.type = 'button'; o.onclick = () => { try { TGW.openLink(location.origin + location.pathname + '?b=' + b); } catch (e) {} }; alt.appendChild(o); }
-    if (q.loai === 'noi_tl') { alt.appendChild(el('p', 'm', 'Không ghi âm được? Em gõ câu trả lời bằng tiếng Anh:')); const t = el('textarea', 't'); t.rows = 2; t.style.minHeight = '70px'; t.value = A[q.id] || ''; t.oninput = () => { A[q.id] = t.value; store('a', A); count(); }; alt.appendChild(t); }
-    else alt.appendChild(el('p', 'm', 'Nếu không ghi âm được, em bỏ qua câu này và làm tiếp các câu khác nhé.'));
+    if (q.loai === 'noi_tl') { alt.appendChild(el('p', 'm', 'Không ghi âm được? Bạn gõ câu trả lời bằng tiếng Anh:')); const t = el('textarea', 't'); t.rows = 2; t.style.minHeight = '70px'; t.value = A[q.id] || ''; t.oninput = () => { A[q.id] = t.value; store('a', A); count(); }; alt.appendChild(t); }
+    else alt.appendChild(el('p', 'm', 'Nếu không ghi âm được, bạn bỏ qua câu này và làm tiếp các câu khác nhé.'));
   };
   const gui = async (blob) => {
     busy = true; btn.disabled = true; btn.classList.remove('rec'); err.textContent = '';
-    if (blob.size < 2000) { err.textContent = 'Bản ghi quá ngắn. Em bấm nói lại, nói đủ câu rồi bấm dừng nhé.'; st.textContent = ''; busy = false; btn.disabled = false; show(); return; }
-    st.textContent = 'Cô/thầy đang nghe em nói…';
+    if (blob.size < 2000) { err.textContent = 'Bản ghi quá ngắn. Bạn bấm nói lại, nói đủ câu rồi bấm dừng nhé.'; st.textContent = ''; busy = false; btn.disabled = false; show(); return; }
+    st.textContent = 'Mình đang nghe bạn nói…';
     try {
       const b64 = await new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(',')[1] || ''); r.onerror = no; r.readAsDataURL(blob); });
       const r = await api('/kt-noi', { b, q: q.id, mime: blob.type || 'audio/webm', audio: b64 });
-      if (!r.ok) { err.textContent = r.loi || 'Chưa nhận dạng được, em thử lại nhé.'; st.textContent = ''; }
-      else { A[q.id] = r.text; store('a', A); count(); st.textContent = r.con_lai > 0 ? 'Em còn ' + r.con_lai + ' lần ghi lại.' : 'Đã dùng hết lượt ghi âm của câu này.'; if (r.con_lai <= 0) btn.style.display = 'none'; }
-    } catch (e) { err.textContent = 'Mạng chập chờn, em bấm ghi âm lại nhé.'; st.textContent = ''; }
+      if (!r.ok) { err.textContent = r.loi || 'Chưa nhận dạng được, bạn thử lại nhé.'; st.textContent = ''; }
+      else { A[q.id] = r.text; store('a', A); count(); st.textContent = r.con_lai > 0 ? 'Bạn còn ' + r.con_lai + ' lần ghi lại.' : 'Đã dùng hết lượt ghi âm của câu này.'; if (r.con_lai <= 0) btn.style.display = 'none'; }
+    } catch (e) { err.textContent = 'Mạng chập chờn, bạn bấm ghi âm lại nhé.'; st.textContent = ''; }
     busy = false; btn.disabled = false; show();
   };
   btn.onclick = async () => {
@@ -356,7 +359,7 @@ function micBox(q) {
     if (rec && rec.state === 'recording') { rec.stop(); return; }
     err.textContent = ''; stopSpeak();
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) return noMic('Thiết bị hoặc ứng dụng này chưa hỗ trợ ghi âm.');
-    try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { return noMic('Em chưa cho phép dùng micro.'); }
+    try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { return noMic('Bạn chưa cho phép dùng micro.'); }
     const mt = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'].find(t => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || '';
     try { rec = new MediaRecorder(stream, mt ? { mimeType: mt } : undefined); } catch (e) { stream.getTracks().forEach(t => t.stop()); return noMic('Thiết bị này chưa ghi âm được.'); }
     chunks = []; rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
@@ -398,7 +401,7 @@ function showTest(j) {
     } else if (q.loai === 'noi_tl') {
       c.appendChild(micBox(q));
     } else {
-      const t = el('input', 't'); t.placeholder = j.anh ? 'Đáp án của con (một câu hoặc từ ngắn)' : 'Đáp án của con (số hoặc từ ngắn)'; t.value = A[q.id] || ''; t.autocomplete = 'off'; if (j.anh) { t.lang = 'en'; t.spellcheck = false; }
+      const t = el('input', 't'); t.placeholder = j.anh ? 'Đáp án của bạn (một câu hoặc từ ngắn)' : 'Đáp án của bạn (số hoặc từ ngắn)'; t.value = A[q.id] || ''; t.autocomplete = 'off'; if (j.anh) { t.lang = 'en'; t.spellcheck = false; }
       t.oninput = () => { A[q.id] = t.value; store('a', A); count(); }; c.appendChild(t);
     }
     app.appendChild(c);
@@ -422,17 +425,17 @@ function tick() {
 async function nop(auto) {
   if (sending) return;
   const thieu = D.cau.length - done();
-  if (!auto && thieu && !confirm('Con còn ' + thieu + ' câu chưa làm. Vẫn nộp bài?')) return;
+  if (!auto && thieu && !confirm('Bạn còn ' + thieu + ' câu chưa làm. Vẫn nộp bài?')) return;
   sending = true; clearInterval(timer); stopSpeak();
   const go = document.getElementById('go'); if (go) { go.disabled = true; go.textContent = 'Đang chấm…'; }
   try {
     const r = await api('/kt-nop', { b, tra_loi: A });
-    if (!r.ok) { sending = false; const er = document.getElementById('er'); if (er) er.textContent = r.loi || 'Chưa nộp được, con thử lại nhé.'; if (go) { go.disabled = false; go.textContent = 'Nộp bài'; } timer = setInterval(tick, 1000); return; }
+    if (!r.ok) { sending = false; const er = document.getElementById('er'); if (er) er.textContent = r.loi || 'Chưa nộp được, bạn thử lại nhé.'; if (go) { go.disabled = false; go.textContent = 'Nộp bài'; } timer = setInterval(tick, 1000); return; }
     document.querySelectorAll('.bar').forEach(x => x.remove());
     try { ['a', 'end', 'l'].forEach(k => sessionStorage.removeItem('kt_' + b + '_' + k)); } catch (e) {}
     D = Object.assign(D, { nhom: r.nhom || D.nhom }); showResult(r); window.scrollTo({ top: 0 });
   } catch (e) {
-    sending = false; const er = document.getElementById('er'); if (er) er.textContent = 'Chưa nộp được. Kiểm tra mạng rồi bấm Nộp lại nhé (bài làm của con vẫn còn).';
+    sending = false; const er = document.getElementById('er'); if (er) er.textContent = 'Chưa nộp được. Kiểm tra mạng rồi bấm Nộp lại nhé (bài làm của bạn vẫn còn).';
     if (go) { go.disabled = false; go.textContent = 'Nộp bài'; } timer = setInterval(tick, 1000);
   }
 }
@@ -491,7 +494,7 @@ function showResult(j) {
   const top = el('div', 'card'); top.style.textAlign = 'center';
   top.append(el('h1', '', 'Kết quả – ' + (j.mon || '')), el('div', 'score', String(k.diem10).replace('.', ',') + '/10'),
     el('p', 'm', k.dung + '/' + k.tong + ' câu đạt · ' + k.xep_loai));
-  const note = el('p', 'q', 'Quay lại chat, cô/thầy sẽ tiếp tục với con nhé. Phần dưới là đáp án và lời giải từng câu.'); note.style.marginTop = '10px'; top.appendChild(note);
+  const note = el('p', 'q', 'Quay lại chat, mình sẽ tiếp tục với bạn nhé. Phần dưới là đáp án và lời giải từng câu.'); note.style.marginTop = '10px'; top.appendChild(note);
   app.appendChild(top);
   { const w = document.createElement('div'); w.innerHTML = veKQ(k.diem10); app.appendChild(w.firstChild); }
   if ((k.ky_nang || []).length) {
@@ -501,7 +504,7 @@ function showResult(j) {
   }
   if ((k.manh || []).length || (k.yeu || []).length) {
     const c = el('div', 'card'); c.appendChild(el('b', '', '📊 Nhận xét kiến thức'));
-    if (k.manh && k.manh.length) { c.appendChild(el('p', 'm', '💪 Con làm tốt:')); const ch = el('div', 'chips'); k.manh.forEach(x => ch.appendChild(el('span', 'chip g', x))); c.appendChild(ch); }
+    if (k.manh && k.manh.length) { c.appendChild(el('p', 'm', '💪 Bạn làm tốt:')); const ch = el('div', 'chips'); k.manh.forEach(x => ch.appendChild(el('span', 'chip g', x))); c.appendChild(ch); }
     if (k.yeu && k.yeu.length) { c.appendChild(el('p', 'm', '⚠️ Cần ôn thêm:')); const ch = el('div', 'chips'); k.yeu.forEach(x => ch.appendChild(el('span', 'chip w', x))); c.appendChild(ch); }
     app.appendChild(c);
   }
@@ -522,7 +525,7 @@ function showResult(j) {
     const f = figure(d.hinh); if (f) c.appendChild(f);
     if (d.loai === 'tn' && d.lc) c.appendChild(el('div', 'm', d.lc.map((x, z) => LET[z] + '. ' + x).join('\n'))).style.whiteSpace = 'pre-wrap';
     const ex = el('div', 'ex');
-    const lab = d.loai === 'tn' ? 'Con chọn' : d.loai === 'viet' ? 'Bài của con' : (d.loai === 'noi_doc' || d.loai === 'noi_tl') ? 'Con nói (máy ghi lại)' : 'Con trả lời';
+    const lab = d.loai === 'tn' ? 'Bạn chọn' : d.loai === 'viet' ? 'Bài của bạn' : (d.loai === 'noi_doc' || d.loai === 'noi_tl') ? 'Bạn nói (máy ghi lại)' : 'Bạn trả lời';
     ex.appendChild(el('div', '', lab + ': ' + (d.hs ? d.hs : '(chưa trả lời)')));
     if (cham) { if (d.nx) ex.appendChild(el('div', 'fb', '💬 ' + d.nx)); if (d.sua) ex.appendChild(el('div', 'fb', '✏️ Gợi ý sửa: ' + d.sua)); if (d.loai !== 'noi_doc' && d.dap_an) ex.appendChild(el('div', 'fb', '📘 Bài mẫu: ' + d.dap_an)); }
     else if (!d.dung) ex.appendChild(el('div', 'err', 'Đáp án đúng: ' + d.dap_an));
