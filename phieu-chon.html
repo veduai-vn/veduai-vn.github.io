@@ -92,6 +92,14 @@ function render(j) {
     card.appendChild(b);
   });
 }
+// v155: neu bot tra ve url trang hoc thi chuyen thang vao bai hoc (khong bat quay lai chat)
+function vaoHoc(j, label) {
+  const u = String((j && j.url) || '');
+  if (!/^https:\/\/veduai-vn\.github\.io\//.test(u)) return false;
+  state('📖', 'Đã ghi nhận: ' + label, 'Đang vào bài học…', 'ok'); say('Giỏi lắm! Mình vào học thôi.');
+  setTimeout(() => { location.href = u; }, 500);
+  return true;
+}
 let sending = false;
 async function submit(i, label) {
   if (sending) return; sending = true;
@@ -99,6 +107,7 @@ async function submit(i, label) {
   try {
     const r = await fetch(API + '/zalo-phieu-nop', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, H), body: JSON.stringify({ t, i }) });
     const j = await r.json();
+    if (j.ok && vaoHoc(j, label)) return;
     if (j.ok) { state('🎉', 'Đã ghi nhận: ' + label, 'Bạn quay lại Zalo để xem phản hồi nhé.', 'ok'); say('Giỏi lắm! Mình nhận được rồi nhé.'); pop(); }
     else showReason(j.reason);
   } catch (e) { sending = false; card.querySelectorAll('button').forEach(b => b.disabled = false); alert('Chưa gửi được, bạn thử lại nhé.'); }

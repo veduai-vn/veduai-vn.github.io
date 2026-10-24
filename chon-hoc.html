@@ -101,11 +101,20 @@ function stepCach(g) {
   const hint = document.createElement('p'); hint.className = 'muted'; hint.style.margin = '0 0 14px'; hint.textContent = '💡 Làm kiểm tra đầu vào trước sẽ cho kết quả học tốt nhất. Bạn vẫn có thể chọn cách học khác.'; card.appendChild(hint);
   g.items.forEach((o, i) => btn(i + 1, o.label, () => submit(o.k, g.label + ' · ' + o.label)));
 }
+// v155: neu bot tra ve url trang hoc thi chuyen thang vao bai hoc (khong bat quay lai chat)
+function vaoHoc(j, label) {
+  const u = String((j && j.url) || '');
+  if (!/^https:\/\/veduai-vn\.github\.io\//.test(u)) return false;
+  state('📖', 'Đã ghi nhận: ' + label, 'Đang vào bài học…', 'ok'); say('Giỏi lắm! Mình vào học thôi.');
+  setTimeout(() => { location.href = u; }, 500);
+  return true;
+}
 async function submit(i, label) {
   if (sending) return; sending = true;
   card.querySelectorAll('button').forEach(b => b.disabled = true);
   try {
     const j = await (await fetch(API + '/zalo-phieu-nop', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, H), body: JSON.stringify({ t, i }) })).json();
+    if (j.ok && vaoHoc(j, label)) return;
     if (j.ok) {
       state('🎉', 'Đã ghi nhận: ' + label, TG ? 'Mình đang chuẩn bị câu hỏi, quay lại chat nhé.' : 'Bạn quay lại ứng dụng chat để làm tiếp nhé.', 'ok');
       say('Giỏi lắm! Mình bắt đầu thôi.');
