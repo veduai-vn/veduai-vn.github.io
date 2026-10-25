@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <title>Đáp án và lời giải – VeduAI</title>
 <style>
 :root{
@@ -108,6 +109,14 @@ var doc=null, show=true, picks={}, revealed={}, onlyLow=false;
 
 function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;}
 function clear(n){while(n.firstChild)n.removeChild(n.firstChild);}
+function startParam(){
+  var m=/(?:^|&)tgWebAppStartParam=([^&]+)/.exec(location.hash.replace(/^#/,'')+'&'+location.search.replace(/^\?/,''));
+  if(m)return decodeURIComponent(m[1]);
+  try{var w=window.Telegram&&Telegram.WebApp;if(w&&w.initDataUnsafe&&w.initDataUnsafe.start_param)return w.initDataUnsafe.start_param;}catch(e){}
+  return '';
+}
+var inTG=false;
+try{var W=window.Telegram&&Telegram.WebApp;if(W&&W.initData){inTG=true;W.ready();W.expand();}}catch(e){}
 function params(){var p={};location.search.replace(/^\?/,'').split('&').forEach(function(kv){var a=kv.split('=');if(a[0])p[decodeURIComponent(a[0])]=decodeURIComponent(a[1]||'');});return p;}
 function base(){
   var p=params(), b=API_BASE;
@@ -120,7 +129,7 @@ function message(icon,title,text,retry){
   app.appendChild(m);bPrint.classList.add('hide');
 }
 function load(){
-  var t=(params().t||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+  var t=(params().t||startParam()||'').toLowerCase().replace(/[^a-z0-9]/g,'');
   if(t.length!==24){message('🔗','Link chưa đúng','Bạn mở lại link mới nhất mà bot đã gửi trong khung chat nhé.');return;}
   if(/DIEN-DIA-CHI/.test(base())){message('⚙️','Trang chưa được cấu hình','Quản trị viên cần điền địa chỉ máy chủ vào dòng API_BASE trong file giai-de.html.');return;}
   clear(app);for(var i=0;i<3;i++)app.appendChild(el('div','sk'));
@@ -140,7 +149,7 @@ function optText(txt){return String(txt).replace(/^\s*[A-Ha-h][\.\)\:]\s*/,'');}
 function isShown(id){return show||revealed[id];}
 
 function render(){
-  clear(app);bPrint.classList.remove('hide');
+  clear(app);if(!inTG)bPrint.classList.remove('hide');
   document.title=doc.tieu_de+' – VeduAI';
   var h=el('section','hero');h.appendChild(el('h1','',doc.tieu_de));
   var ch=el('div','chips');
