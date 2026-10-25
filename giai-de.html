@@ -2,7 +2,6 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
-<meta name="color-scheme" content="light">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <title>Mọt sách – Làm đề & chữa đề</title>
@@ -13,7 +12,9 @@
 <style>
   :root { --bg:#EAF5FF; --card:#fff; --text:#24305E; --muted:#5F6B92; --line:#C9DAF2; --shadow:#B5CBEA; --mark:#FFD84D; --mark-d:#E3AE00; --mark-ink:#4A3700; --ok:#118A62; --okbg:#E3F7EE; --err:#C2255C; --errbg:#FDE8F0; --warn:#B45309; --warnbg:#FFF3D6; --pop:#FF7A90;
     --font:'Nunito',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif; --disp:'Baloo 2','Nunito',system-ui,sans-serif; }
-  /* che do toi tat: mot-sach.css la giao dien sang */
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#151B36; --card:#1F2850; --text:#F1F4FF; --muted:#AAB4DC; --line:#38437A; --shadow:#0E1328; --mark-d:#B88A00; --ok:#5FE0B0; --okbg:#173B3A; --err:#FF9BB5; --errbg:#4A2440; --warn:#FBBF5C; --warnbg:#3B2D10; }
+  }
   * { box-sizing:border-box; }
   html { scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
   html,body { margin:0; background:var(--bg); color:var(--text); font-family:var(--font); font-weight:500; }
@@ -50,6 +51,17 @@
   .k.done b { color:var(--mark-ink); }
   .k.ok { background:var(--okbg); border-color:var(--ok); }
   .k.bad { background:var(--errbg); border-color:var(--err); }
+  .rt { display:grid; grid-template-columns:repeat(auto-fill,minmax(66px,1fr)); gap:8px; margin:8px 0 10px; text-align:center; }
+  .rc { border:2px solid var(--line); border-radius:14px; padding:4px 2px 6px; text-decoration:none; color:var(--text); background:var(--bg); line-height:1.25; }
+  .rc b { display:block; font-size:12px; color:var(--muted); font-weight:800; }
+  .rc .mk { display:block; font:800 17px var(--disp); }
+  .rc .dd { display:block; font-weight:800; font-size:11.5px; color:var(--ok); }
+  .rc.ok { background:var(--okbg); border-color:var(--ok); }
+  .rc.ok .mk { color:var(--ok); }
+  .rc.bad { background:var(--errbg); border-color:var(--err); }
+  .rc.bad .mk { color:var(--err); }
+  .rc s { text-decoration:line-through; text-decoration-thickness:2px; color:var(--err); font-weight:800; }
+  .rt-leg { font-size:13px; color:var(--muted); font-weight:600; margin:0 0 10px; }
   .q { background:var(--card); border:2px solid var(--line); border-radius:24px; box-shadow:0 4px 0 var(--shadow); padding:16px; margin:0 0 14px; scroll-margin-top:12px; }
   .q.low { border-color:var(--warn); }
   .q-h { display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap; }
@@ -109,6 +121,9 @@
   .go:active { transform:translateY(3px); box-shadow:0 1px 0 var(--mark-d); }
   .cf { position:fixed; top:-40px; font-size:26px; pointer-events:none; z-index:30; animation:fall 2.6s ease-in forwards; }
   @keyframes fall { to { transform:translateY(112vh) rotate(380deg); } }
+  .bar-in.tiep { gap:8px; flex-wrap:wrap; justify-content:center; }
+  .bar-in.tiep .btn { flex:1 1 28%; min-height:46px; padding:0 8px; font-size:14px; }
+  body.has-bar .wrap { }
   .hide { display:none!important; }
   .vf { max-width:640px; margin:6px auto 0; padding:10px 8px; text-align:center; font-size:12.5px; line-height:1.6; color:var(--muted); }
   .vf a { color:inherit; font-weight:800; }
@@ -120,7 +135,6 @@
     details.pas > * { display:block; }
   }
 </style>
-<style>:root{color-scheme:light}</style>
 <link rel="stylesheet" href="mot-sach.css?v=2">
 </head>
 <body class="ms">
@@ -141,7 +155,7 @@ var API_BASE = 'https://devotee-outclass-couch.ngrok-free.dev';
 var MON={toan:'Toán',van:'Ngữ văn',anh:'Tiếng Anh',ly:'Vật lý',hoa:'Hóa học',sinh:'Sinh học',su:'Lịch sử',dia:'Địa lý',gdcd:'GDCD',tin:'Tin học',congnghe:'Công nghệ',khac:''};
 var QUOTES=['Có công mài sắt, có ngày nên kim.','Học một biết mười.','Thất bại là mẹ thành công.','Ngã ở đâu, đứng dậy ở đó.','Góp gió thành bão.','Có chí thì nên.','Cái khó ló cái khôn.','Học đi đôi với hành.'];
 var app=document.getElementById('app'), sayEl=document.getElementById('say');
-var doc=null, mode='', picks={}, texts={}, submitted=false, onlyLow=false, printing=false, order=[], cards={}, keys={}, bar=null;
+var doc=null, mode='', picks={}, texts={}, submitted=false, onlyLow=false, printing=false, order=[], cards={}, keys={}, bar=null, SES='', TOK='', reported='', simState='';
 
 function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;}
 function clear(n){while(n.firstChild)n.removeChild(n.firstChild);}
@@ -162,20 +176,21 @@ function base(){
   return b.replace(/\/+$/,'');
 }
 function message(icon,title,text,retry){
-  dropBar();clear(app);setBar(false);
+  clear(app);setBar(false);
   var c=el('div','card'),s=el('div','state');s.appendChild(el('div','big',icon));s.appendChild(el('div','t',title));s.appendChild(el('div','muted',text));
   if(retry){var b=el('button','btn main','Thử lại');b.type='button';b.style.marginTop='14px';b.onclick=load;s.appendChild(b);}
   c.appendChild(s);app.appendChild(c);
 }
 function load(){
-  var t=(params().t||startParam()||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+  var sp=startParam().split('_');SES=(params().s||sp[1]||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,16);
+  var t=(params().t||sp[0]||'').toLowerCase().replace(/[^a-z0-9]/g,'');TOK=t;
   if(t.length!==24){say('Ối, link chưa đúng rồi!');message('🔗','Link chưa đúng','Bạn mở lại link mới nhất mà bot đã gửi trong khung chat nhé.');return;}
   clear(app);for(var i=0;i<3;i++)app.appendChild(el('div','sk'));say('Mình đang mở đề cho bạn…');
   var ctl=('AbortController' in window)?new AbortController():null, to=setTimeout(function(){if(ctl)ctl.abort();},25000);
   fetch(base()+'/webhook/giai-de-lay?t='+t,{headers:{'ngrok-skip-browser-warning':'1'},signal:ctl?ctl.signal:undefined})
    .then(function(r){return r.json();})
    .then(function(j){clearTimeout(to);
-     if(j&&j.ok&&j.doc){doc=j.doc;var pm=(params().m||'').toLowerCase();if(pm==='lam')start('lam');else if(pm==='chua')start('chua');else chooseMode();}
+     if(j&&j.ok&&j.doc){doc=j.doc;var pm=(params().m||'').toLowerCase();var act=(params().act||sp[2]||'').toLowerCase().replace(/[^a-z]/g,'');if(act==='tt'||act==='kt')hanhDong(act);else if(act==='lam'||pm==='lam')start('lam');else if(pm==='chua')start('chua');else chooseMode();}
      else if(j&&j.loi==='het_han'){say('Đề này hết hạn rồi.');message('⌛','Bài giải đã hết hạn','Bài giải được lưu 90 ngày kể từ lần cuối có bạn mở. Bạn gửi lại ảnh đề cho bot để mình soạn lại nhé.');}
      else {say('Mình chưa thấy đề này.');message('🔍','Không tìm thấy bài giải','Link có thể bị sai hoặc bài giải chưa soạn xong. Bạn kiểm tra lại link mới nhất trong chat với bot nhé.');}})
    .catch(function(){clearTimeout(to);say('Mạng đang chập chờn…');message('📡','Chưa kết nối được','Máy chủ học đang bận hoặc mạng yếu. Bạn thử lại sau ít giây nhé.',true);});
@@ -187,7 +202,7 @@ function optText(txt){return String(txt).replace(/^\s*[A-Ha-h][\.\)\:]\s*/,'');}
 function isShown(){return mode==='chua'||submitted||printing;}
 
 function chooseMode(){
-  dropBar();clear(app);setBar(false);mode='';submitted=false;picks={};texts={};
+  clear(app);setBar(false);mode='';submitted=false;picks={};texts={};
   say('Bạn muốn làm gì với đề này nhỉ? 👇');
   var c=el('section','card mode');
   c.appendChild(el('p','msg',doc.tieu_de));
@@ -197,7 +212,7 @@ function chooseMode(){
   c.appendChild(nut('✅','Chữa đề','Xem ngay đáp án đúng và lời giải chi tiết của từng câu.',function(){start('chua');}));
   app.appendChild(c);window.scrollTo(0,0);
 }
-function start(m){mode=m;submitted=false;picks={};texts={};onlyLow=false;render();window.scrollTo(0,0);}
+function start(m){mode=m;submitted=false;reported='';simState='';picks={};texts={};onlyLow=false;render();window.scrollTo(0,0);}
 
 function pop(){
   if(window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches)return;
@@ -205,9 +220,9 @@ function pop(){
   for(var i=0;i<18;i++){var s=document.createElement('span');s.className='cf';s.setAttribute('aria-hidden','true');s.textContent=em[i%em.length];s.style.left=(Math.random()*94)+'vw';s.style.animationDelay=(Math.random()*0.6)+'s';document.body.appendChild(s);(function(x){setTimeout(function(){x.remove();},3600);})(s);}
 }
 
-function dropBar(){if(bar&&bar.parentNode)bar.parentNode.removeChild(bar);bar=null;}
 function render(){
-  dropBar();clear(app);order=[];cards={};keys={};
+  if(bar&&bar.parentNode)bar.parentNode.removeChild(bar);bar=null;
+  clear(app);order=[];cards={};keys={};
   document.title=doc.tieu_de+' – Mọt sách';
   say(mode==='lam'&&!submitted?'Làm bài thôi nào, mình ở đây rồi! 💪':(submitted?'Đây là kết quả và lời giải của bạn nè 👇':'Xem đáp án và lời giải từng câu nhé 👇'));
 
@@ -274,6 +289,8 @@ function render(){
     bar=el('div','bar');var pr=el('div','prog');var pi2=el('i');pi2.id='pg';pr.appendChild(pi2);bar.appendChild(pr);
     var bi=el('div','bar-in');var tt=el('p','');tt.id='tt';bi.appendChild(tt);
     var go=el('button','go','Nộp bài 🚀');go.type='button';go.onclick=nop;bi.appendChild(go);bar.appendChild(bi);document.body.appendChild(bar);setBar(true);
+  } else if(mode==='lam'&&submitted){
+    bar=el('div','bar');var bi2=el('div','bar-in tiep');tiepBtns().forEach(function(x){bi2.appendChild(x);});bar.appendChild(bi2);document.body.appendChild(bar);setBar(true);
   } else {setBar(false);}
   if(bLow)bLow.onclick=function(){onlyLow=!onlyLow;bLow.className='btn'+(onlyLow?' on':'');apply();};
   if(submitted)resSlot.appendChild(buildResult());
@@ -325,19 +342,111 @@ function buildResult(){
   if(other)box.appendChild(el('p','sub','Còn '+other+' câu điền từ / tự luận: bạn tự đối chiếu với đáp án mẫu bên dưới.'));
   if(wrong.length&&n){box.appendChild(el('p','sub','Các câu cần xem lại (bấm để nhảy tới):'));
     var wr=el('div','wr');wrong.forEach(function(o){var a=el('a','','Câu '+o.c.so);a.href='#c'+o.id;wr.appendChild(a);});box.appendChild(wr);}
+  if(order.length){
+    box.appendChild(el('p','sub','Kết quả từng câu (bấm để nhảy tới câu đó):'));
+    var rt=el('div','rt');
+    order.forEach(function(o){
+      var r=cards[o.id],c=o.c,pk=picks[o.id],a=el('a','rc','');a.href='#c'+o.id;
+      a.appendChild(el('b','','Câu '+c.so));
+      if(r.mc){
+        if(pk&&pk===letter(c)){a.className='rc ok';a.appendChild(el('span','mk','✓'));a.appendChild(el('span','',letter(c)));}
+        else{a.className='rc bad';a.appendChild(el('span','mk','✗'));
+          var cs=el('span','','');if(pk)cs.appendChild(el('s','',pk));else cs.textContent='bỏ trống';a.appendChild(cs);
+          a.appendChild(el('span','dd','Đúng: '+letter(c)));}
+      }else{a.appendChild(el('span','mk','✎'));a.appendChild(el('span','','tự đối chiếu'));}
+      rt.appendChild(a);
+    });
+    box.appendChild(rt);
+    box.appendChild(el('p','rt-leg','✓ xanh: làm đúng · ✗ đỏ: làm sai (đáp án bạn chọn bị gạch ngang, kèm đáp án đúng)'));
+  }
   box.appendChild(el('div','qt','💡 '+QUOTES[Math.floor(Math.random()*QUOTES.length)]));
-  var acts=el('div','acts');
-  var b1=el('button','btn main','🔁 Làm lại');b1.type='button';b1.onclick=function(){start('lam');};
-  var b2=el('button','btn','✅ Chỉ xem lời giải');b2.type='button';b2.onclick=function(){start('chua');};
-  acts.appendChild(b1);acts.appendChild(b2);box.appendChild(acts);
+  var nx=el('p','sub','');nx.id='nhanxet';nx.style.fontWeight='700';box.appendChild(nx);
+  if(reported==='ok')nx.textContent='📨 Nhận xét điểm yếu và gợi ý ôn tập đã gửi vào chat với bot.';
+  box.appendChild(el('p','sub','👉 Bạn muốn làm gì tiếp?'));
+  var acts=el('div','acts');tiepBtns().forEach(function(x){acts.appendChild(x);});
+  var b2=el('button','btn','✅ Chỉ xem lời giải');b2.type='button';b2.onclick=function(){start('chua');};acts.appendChild(b2);box.appendChild(acts);
   if(d10!==null&&d10>=6)setTimeout(pop,300);
   return box;
+}
+function postApi(path,body,cb){
+  var ctl=('AbortController' in window)?new AbortController():null, to=setTimeout(function(){if(ctl)ctl.abort();},20000);
+  fetch(base()+'/webhook/'+path,{method:'POST',headers:{'Content-Type':'application/json','ngrok-skip-browser-warning':'1'},body:JSON.stringify(body),signal:ctl?ctl.signal:undefined})
+   .then(function(r){return r.json();}).then(function(j){clearTimeout(to);cb(j&&j.ok?'ok':((j&&j.loi)||'loi'));})
+   .catch(function(){clearTimeout(to);cb('loi');});
+}
+function noteEl(){return document.getElementById('nhanxet');}
+function setNote(t){var n=noteEl();if(n)n.textContent=t;}
+function baoKetQua(){
+  if(!SES||!TOK||mode!=='lam')return;
+  var kq=[],right=0,nmc=0;
+  order.forEach(function(o){var c=o.c,mc=cards[o.id].mc,pk=picks[o.id]||'',tl=(texts[o.id]||'').trim();
+    var d=null;if(mc){nmc++;d=(pk&&pk===letter(c));if(d)right++;}
+    kq.push({so:String(c.so),mc:mc?1:0,chon:pk||tl.slice(0,200),dap:String(c.dap_an||'').slice(0,200),dung:d});});
+  var d10=nmc?Math.round(right/nmc*100)/10:null;
+  reported='wait';setNote('📨 Mình đang soạn nhận xét điểm mạnh / điểm yếu để gửi vào chat với bot…');
+  postApi('giai-de-nop',{t:TOK,s:SES,diem:d10,dung:right,tong_mc:nmc,kq:kq},function(r){
+    if(r==='ok'){reported='ok';setNote('📨 Xong rồi! Nhận xét điểm yếu và gợi ý ôn tập sẽ được gửi vào chat với bot trong ít phút (cho bạn và phụ huynh nếu đã kết nối).');}
+    else{reported='loi';setNote('Mình chưa gửi được nhận xét lần này. Bạn cứ xem kết quả ở trên nhé.');}
+  });
+}
+function lamTuongTu(btn){
+  if(!SES||!TOK){setNote('Link này là bản cũ nên chưa soạn đề tương tự được. Bạn gửi lại ảnh đề cho bot nhé.');return;}
+  if(simState)return;simState='wait';btn.disabled=true;btn.textContent='⏳ Đang gửi yêu cầu…';
+  postApi('giai-de-tuong-tu',{t:TOK,s:SES},function(r){
+    if(r==='ok'){simState='ok';btn.textContent='✅ Đã nhận yêu cầu';setNote('🎯 Mình đang soạn đề tương tự (trúng phần bạn còn yếu). Khoảng 2–3 phút, link sẽ gửi vào chat với bot. Trong lúc chờ bot chưa trả lời việc khác được nhé.');}
+    else if(r==='dang_soan'){simState='';btn.disabled=false;btn.textContent='🎯 Làm đề tương tự';setNote('Bot đang soạn một đề khác cho bạn, bạn chờ xong rồi bấm lại nhé.');}
+    else{simState='';btn.disabled=false;btn.textContent='🎯 Làm đề tương tự';setNote('Chưa gửi được yêu cầu. Bạn thử bấm lại sau ít giây nhé.');}
+  });
+}
+var ktState='';
+function tiepBtns(){
+  var a=el('button','btn main','🔁 Làm lại');a.type='button';a.onclick=function(){start('lam');};
+  var b=el('button','btn main','🎯 Đề tương tự');b.type='button';b.onclick=function(){lamTuongTu(b);};
+  var c=el('button','btn','⏹ Kết thúc');c.type='button';c.onclick=function(){ketThuc(c);};
+  return [a,b,c];
+}
+function daGuiMenu(){
+  if(bar&&bar.parentNode)bar.parentNode.removeChild(bar);bar=null;
+  say('Mình đã gửi menu cho bạn rồi nhé!');
+  message('✅','Mình đã gửi menu dịch vụ vào chat','Bạn quay lại khung chat với bot để chọn việc tiếp theo nhé. Cần xem lại đề thì mở lại link cũ.');
+  if(inTG){setTimeout(function(){try{W.close();}catch(e){}},2500);}
+}
+function ketThuc(btn){
+  if(!SES||!TOK){setNote('Link này là bản cũ nên chưa gửi được menu. Bạn nhắn \"menu\" cho bot nhé.');return;}
+  if(ktState==='wait')return;ktState='wait';if(btn){btn.disabled=true;}
+  postApi('giai-de-ket-thuc',{t:TOK,s:SES},function(r){
+    if(r==='ok'){ktState='ok';daGuiMenu();}
+    else{ktState='';if(btn)btn.disabled=false;setNote('Chưa gửi được menu. Bạn thử bấm lại hoặc nhắn \"menu\" cho bot nhé.');}
+  });
+}
+function hanhDong(act){
+  clear(app);setBar(false);
+  var c=el('section','card'),s=el('div','state');
+  s.appendChild(el('div','big',act==='tt'?'🎯':'⏹'));
+  var t=el('div','t','Đang xử lý…'),m=el('div','muted','');s.appendChild(t);s.appendChild(m);c.appendChild(s);app.appendChild(c);
+  function xemDe(){var b=el('button','btn main','📄 Xem lại đề này');b.type='button';b.style.marginTop='14px';b.onclick=chooseMode;s.appendChild(b);}
+  if(!SES){t.textContent='Link này là bản cũ';m.textContent='Bạn gửi lại ảnh đề cho bot để mình tạo link mới nhé.';xemDe();return;}
+  if(act==='tt'){
+    say('Mình đang gửi yêu cầu soạn đề tương tự…');
+    postApi('giai-de-tuong-tu',{t:TOK,s:SES},function(r){
+      if(r==='ok'){t.textContent='Đã nhận yêu cầu rồi!';m.textContent='Mình đang soạn đề tương tự (trúng phần bạn còn yếu), khoảng 2–3 phút. Link sẽ gửi vào chat với bot, bạn quay lại chat chờ nhé.';}
+      else if(r==='dang_soan'){t.textContent='Bot đang soạn một đề khác';m.textContent='Bạn chờ xong rồi bấm lại nhé.';}
+      else{t.textContent='Chưa gửi được yêu cầu';m.textContent='Bạn thử bấm lại sau ít giây nhé.';}
+      xemDe();});
+  } else {
+    say('Mình đang gửi menu cho bạn…');
+    postApi('giai-de-ket-thuc',{t:TOK,s:SES},function(r){
+      if(r==='ok'){t.textContent='Mình đã gửi menu vào chat';m.textContent='Bạn quay lại khung chat với bot để chọn dịch vụ nhé.';if(inTG){setTimeout(function(){try{W.close();}catch(e){}},2500);}}
+      else{t.textContent='Chưa gửi được menu';m.textContent='Bạn nhắn "menu" cho bot nhé.';}
+      xemDe();});
+  }
 }
 function nop(){
   var tot=order.length,an=answered();
   if(an<tot&&!window.confirm('Bạn còn '+(tot-an)+' câu chưa làm. Vẫn nộp bài?'))return;
   submitted=true;
-  render();window.scrollTo(0,0);
+  if(bar&&bar.parentNode)bar.parentNode.removeChild(bar);bar=null;
+  render();window.scrollTo(0,0);baoKetQua();
   if(inTG){try{W.HapticFeedback&&W.HapticFeedback.notificationOccurred('success');}catch(e){}}
 }
 load();
