@@ -85,6 +85,13 @@ details.pas .txt{padding:0 0 12px;white-space:pre-wrap;font-size:15px}
   .hero{background:#fff;color:#000;border:1px solid #999}.chip{background:#eee;color:#000}
   details.pas{display:block}details.pas>*{display:block}
 }
+.mode{max-width:520px;margin:6vh auto 0;text-align:center;padding:0 4px}
+.mode h2{margin:6px 0 4px;font-size:22px}.mode p{color:var(--mute);margin:0 0 16px}
+.mbtn{display:block;width:100%;text-align:left;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:16px;padding:16px 18px;margin:0 0 12px;cursor:pointer;font:inherit;box-shadow:var(--shadow)}
+.mbtn:hover{border-color:var(--brand)}.mbtn b{display:block;font-size:17px;color:var(--brand);margin-bottom:2px}.mbtn span{color:var(--mute);font-size:14px}
+.res{margin-top:16px;border-radius:16px;padding:16px;background:var(--brand-soft);color:var(--ink);text-align:center;font-weight:700}
+.res big{display:block;font-size:30px;color:var(--brand)}
+@media print{.mode,.res{display:none!important}}
 </style>
 </head>
 <body>
@@ -100,12 +107,12 @@ details.pas .txt{padding:0 0 12px;white-space:pre-wrap;font-size:15px}
 (function(){
 'use strict';
 /* ===== CẤU HÌNH: điền địa chỉ công khai của n8n (giống địa chỉ các trang khác như phieu-chon.html đang dùng) ===== */
-var API_BASE = 'https://DIEN-DIA-CHI-NGROK-CUA-BAN.ngrok-free.app';
+var API_BASE = 'https://devotee-outclass-couch.ngrok-free.dev';
 /* ========================================================================================================== */
 
 var MON={toan:'Toán',van:'Ngữ văn',anh:'Tiếng Anh',ly:'Vật lý',hoa:'Hóa học',sinh:'Sinh học',su:'Lịch sử',dia:'Địa lý',gdcd:'GDCD',tin:'Tin học',congnghe:'Công nghệ',khac:''};
 var app=document.getElementById('app'), bPrint=document.getElementById('bPrint');
-var doc=null, show=true, picks={}, revealed={}, onlyLow=false;
+var doc=null, show=true, picks={}, revealed={}, onlyLow=false, chosen=false;
 
 function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;}
 function clear(n){while(n.firstChild)n.removeChild(n.firstChild);}
@@ -137,7 +144,7 @@ function load(){
   fetch(base()+'/webhook/giai-de-lay?t='+t,{headers:{'ngrok-skip-browser-warning':'true'},signal:ctl?ctl.signal:undefined})
    .then(function(r){return r.json();})
    .then(function(j){clearTimeout(to);
-     if(j&&j.ok&&j.doc){doc=j.doc;render();}
+     if(j&&j.ok&&j.doc){doc=j.doc;var pm=(params().m||'').toLowerCase();if(pm==='lam'){show=false;chosen=true;render();}else if(pm==='chua'){show=true;chosen=true;render();}else{chooseMode();}}
      else if(j&&j.loi==='het_han')message('⌛','Bài giải đã hết hạn','Bài giải được lưu 90 ngày kể từ lần cuối có bạn mở. Bạn gửi lại ảnh đề cho bot để mình soạn lại nhé.');
      else message('🔍','Không tìm thấy bài giải','Link có thể bị sai hoặc bài giải chưa soạn xong. Bạn kiểm tra lại link mới nhất trong chat với bot nhé.');})
    .catch(function(){clearTimeout(to);message('📡','Chưa kết nối được','Máy chủ học đang bận hoặc mạng yếu. Bạn thử lại sau ít giây nhé.',true);});
@@ -148,6 +155,16 @@ function optLetter(txt,i){var m=/^\s*([A-Ha-h])[\.\)\:]/.exec(txt);return m?m[1]
 function optText(txt){return String(txt).replace(/^\s*[A-Ha-h][\.\)\:]\s*/,'');}
 function isShown(id){return show||revealed[id];}
 
+function chooseMode(){
+  clear(app);bPrint.classList.add('hide');
+  var m=el('div','mode');m.appendChild(el('div','ic','📝'));m.appendChild(el('h2','',doc.tieu_de));
+  m.appendChild(el('p','',doc.tong+' câu · Bạn muốn làm gì với đề này?'));
+  var a=el('button','mbtn','');a.type='button';a.appendChild(el('b','','✍️ Làm đề'));a.appendChild(el('span','','Ẩn đáp án, bạn tự chọn từng câu. Nộp bài xong mình chấm điểm và cho xem lời giải.'));
+  a.onclick=function(){show=false;picks={};revealed={};chosen=true;render();window.scrollTo(0,0);};
+  var b=el('button','mbtn','');b.type='button';b.appendChild(el('b','','✅ Chữa đề'));b.appendChild(el('span','','Xem ngay đáp án đúng và lời giải chi tiết của từng câu.'));
+  b.onclick=function(){show=true;revealed={};chosen=true;render();window.scrollTo(0,0);};
+  m.appendChild(a);m.appendChild(b);app.appendChild(m);
+}
 function render(){
   clear(app);if(!inTG)bPrint.classList.remove('hide');
   document.title=doc.tieu_de+' – VeduAI';
@@ -168,6 +185,7 @@ function render(){
   var bShow=el('button','btn','');bShow.type='button';tools.appendChild(bShow);
   var bLow=null;
   if(doc.khong_chac&&doc.khong_chac.length){bLow=el('button','btn','⚠️ Chỉ câu cần đối chiếu ('+doc.khong_chac.length+')');bLow.type='button';tools.appendChild(bLow);}
+  var bMode=el('button','btn','🔁 Đổi chế độ');bMode.type='button';bMode.onclick=function(){chooseMode();};tools.appendChild(bMode);
   var sc=el('span','score','');tools.appendChild(sc);app.appendChild(tools);
 
   var kp=el('section','panel');var kh=el('h2','','Bảng đáp án nhanh');kh.appendChild(el('small','','Bấm vào số câu để nhảy tới lời giải'));kp.appendChild(kh);
@@ -200,7 +218,7 @@ function render(){
   app.appendChild(el('p','foot','Đáp án do AI soạn từ ảnh đề. Nếu thấy chỗ nào chưa hợp lý, bạn hỏi lại bot hoặc thầy cô để chắc chắn nhé.'));
 
   function apply(){
-    bShow.textContent=show?'🙈 Ẩn đáp án để tự làm':'👁 Hiện tất cả đáp án';bShow.className='btn'+(show?'':' on');
+    bShow.textContent=show?'🙈 Ẩn đáp án để tự làm':'👁 Xem hết đáp án (chữa đề)';bShow.className='btn'+(show?'':' on');
     var done=0,right=0;
     order.forEach(function(o){var id=o.id,c=o.c,r=cards[id],sh=isShown(id),pk=picks[id];
       r.an.classList.toggle('hide',!sh);r.rv.classList.toggle('hide',sh);
@@ -212,6 +230,9 @@ function render(){
       r.q.classList.toggle('hide',onlyLow&&c.chac!==false);
     });
     sc.textContent=(!show&&done)?('Đã chọn '+done+' câu · đúng '+right):'';
+    var mcN=order.filter(function(o){return cards[o.id].mc;}).length;
+    var old=document.getElementById('res');if(old)old.remove();
+    if(!show&&mcN&&done>=mcN){var rs=el('div','res','');rs.id='res';rs.appendChild(el('big','',right+'/'+mcN));rs.appendChild(document.createTextNode('Bạn làm đúng '+right+' trên '+mcN+' câu trắc nghiệm. Cuộn lên xem lời giải từng câu nhé.'));app.appendChild(rs);}
   }
   bShow.onclick=function(){show=!show;if(show){revealed={};}else{picks={};revealed={};}apply();};
   if(bLow)bLow.onclick=function(){onlyLow=!onlyLow;bLow.className='btn'+(onlyLow?' on':'');apply();};
