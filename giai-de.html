@@ -138,7 +138,7 @@ function load(){
    .then(function(r){return r.json();})
    .then(function(j){clearTimeout(to);
      if(j&&j.ok&&j.doc){doc=j.doc;render();}
-     else if(j&&j.loi==='het_han')message('⌛','Bài giải đã hết hạn','Bài giải được lưu 30 ngày. Bạn gửi lại ảnh đề cho bot để mình soạn lại nhé.');
+     else if(j&&j.loi==='het_han')message('⌛','Bài giải đã hết hạn','Bài giải được lưu 90 ngày kể từ lần cuối có bạn mở. Bạn gửi lại ảnh đề cho bot để mình soạn lại nhé.');
      else message('🔍','Không tìm thấy bài giải','Link có thể bị sai hoặc bài giải chưa soạn xong. Bạn kiểm tra lại link mới nhất trong chat với bot nhé.');})
    .catch(function(){clearTimeout(to);message('📡','Chưa kết nối được','Máy chủ học đang bận hoặc mạng yếu. Bạn thử lại sau ít giây nhé.',true);});
 }
