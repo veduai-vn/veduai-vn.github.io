@@ -51,7 +51,7 @@ function ve(){const h=D.hs,n=D.nop,done=n.filter(x=>x.toi_da),tb=done.length?Mat
  <div class="c g" style="margin-top:12px"><h2>📝 Làm bài thầy/cô giao</h2><input id="ma" placeholder="Dán link hoặc mã bài thầy/cô gửi"><p class="err" id="er"></p><button class="b" id="go">Mở bài</button></div>
  <div class="c"><h2>📚 Bài bạn đã làm (${n.length})${tb!=null?' · điểm TB '+String(tb).replace('.',','):''}</h2>${n.map(x=>`<div class="r" style="border-top:1px solid var(--line);padding:8px 0"><div><b>${esc(x.tieu_de)}</b><br><span class="m">${esc([x.mon,x.gv&&'GV '+x.gv,x.ngay_nop.split('-').reverse().join('/')].filter(Boolean).join(' · '))}${x.trang_thai==='cho_giao_vien'?' · ⏳ chờ thầy/cô chấm':''}</span></div><span class="sc">${String(x.diem).replace('.',',')}/${x.toi_da}</span></div>`).join('')||'<p class="m">Bạn chưa làm bài nào. Dán link bài thầy/cô gửi vào ô phía trên nhé.</p>'}</div>
  <div id="phbox"></div>
- <div class="c"><h2>🎁 Học cùng Mọt sách – bạn học của bạn</h2><p class="m">Dùng thử miễn phí 5 ngày: học theo sách giáo khoa, hỏi bài bằng chữ, ảnh hoặc giọng nói, có báo cáo điểm mạnh, điểm yếu và kế hoạch khắc phục.</p><a href="${BOT}">Mở Mọt sách trên Telegram →</a></div>`;phTai()}
+ <div class="c"><h2>🎁 Học cùng Mọt sách – bạn học của bạn</h2><p class="m">Dùng thử miễn phí 7 ngày: học theo sách giáo khoa, hỏi bài bằng chữ, ảnh hoặc giọng nói, có báo cáo điểm mạnh, điểm yếu và kế hoạch khắc phục.</p><a href="${BOT}">Mở Mọt sách trên Telegram →</a></div>`;phTai()}
 $.addEventListener('input',e=>{if(e.target.dataset.r)R[e.target.dataset.r]=e.target.value});
 $.addEventListener('change',e=>{if(e.target.dataset.r)R[e.target.dataset.r]=e.target.value});
 $.addEventListener('click',e=>{const id=e.target.id;

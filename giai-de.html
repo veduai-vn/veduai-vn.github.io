@@ -181,10 +181,45 @@ function message(icon,title,text,retry){
   if(retry){var b=el('button','btn main','Thử lại');b.type='button';b.style.marginTop='14px';b.onclick=load;s.appendChild(b);}
   c.appendChild(s);app.appendChild(c);
 }
+var LOP={};
+function hoiTenLop(gl){
+  clear(app);setBar(false);say('Bạn cho mình biết tên nhé 😊');
+  var HD={'Content-Type':'application/json','ngrok-skip-browser-warning':'1'};
+  function hetHan(){say('Đề này đã đóng.');message('⌛','Đã hết hạn nộp bài','Thầy/cô đã đóng bài này rồi. Bạn nhắn thầy/cô nếu cần nộp thêm nhé.');}
+  var c=el('div','card'),s=el('div','state');s.appendChild(el('div','big','🙋'));s.appendChild(el('div','t','Bạn tên là gì?'));
+  var gt=el('div','muted','Thầy/cô giao bài này cho cả lớp. Chọn hoặc nhập họ tên để bài làm và điểm của bạn gửi đến thầy/cô.');s.appendChild(gt);
+  var box=document.createElement('div');box.style.cssText='width:100%;margin-top:14px';
+  var sel=document.createElement('select');sel.style.cssText='width:100%;min-height:48px;padding:8px 14px;font:inherit;border:2px solid var(--line);border-radius:14px;display:none;margin-bottom:10px';
+  var inp=document.createElement('input');inp.type='text';inp.maxLength=40;inp.placeholder='Họ và tên';inp.autocomplete='name';inp.style.cssText='width:100%;min-height:48px;padding:8px 14px;font:inherit;border:2px solid var(--line);border-radius:14px';
+  var er=el('div','muted','');er.style.color='var(--err)';
+  var b=el('button','btn main','Vào làm bài');b.type='button';b.style.marginTop='12px';
+  function layTen(){return (sel.style.display!=='none'&&sel.value!=='__khac')?sel.value:inp.value.trim();}
+  sel.onchange=function(){inp.style.display=(sel.value==='__khac')?'':'none';};
+  b.onclick=function(){var ten=layTen();if(ten.length<2){er.textContent='Bạn chọn hoặc nhập đủ họ tên nhé.';return;}b.disabled=true;er.textContent='';
+    fetch(base()+'/webhook/giao-de-lop',{method:'POST',headers:HD,body:JSON.stringify({g:gl,ten:ten})})
+     .then(function(r){return r.json();}).then(function(j){
+       if(j&&j.ok&&j.ses){LOP[gl]=j.ses;try{localStorage.setItem('gd_lop_'+gl,j.ses);}catch(e){}load();}
+       else if(j&&j.loi==='het_han'){hetHan();}
+       else{b.disabled=false;er.textContent=(j&&j.loi==='link_lop_khong_co')?'Link lớp này không còn nữa. Bạn hỏi thầy/cô gửi lại link nhé.':(j&&j.loi==='nhieu_qua')?'Đang có quá nhiều bạn vào cùng lúc, bạn thử lại sau ít phút nhé.':'Chưa vào được, bạn thử lại nhé.';}})
+     .catch(function(){b.disabled=false;er.textContent='Mạng đang chập chờn, bạn thử lại nhé.';});};
+  box.appendChild(sel);box.appendChild(inp);box.appendChild(er);box.appendChild(b);s.appendChild(box);c.appendChild(s);app.appendChild(c);
+  // hoi server: danh sach lop (neu giao vien co nhap) va han nop
+  fetch(base()+'/webhook/giao-de-lop',{method:'POST',headers:HD,body:JSON.stringify({g:gl,act:'ds'})})
+   .then(function(r){return r.json();}).then(function(j){
+     if(!j||!j.ok)return; if(j.het_han){hetHan();return;}
+     if(Array.isArray(j.ds)&&j.ds.length){
+       var o0=document.createElement('option');o0.value='';o0.textContent='-- Chọn tên của bạn --';sel.appendChild(o0);
+       j.ds.forEach(function(n){var o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});
+       var ok=document.createElement('option');ok.value='__khac';ok.textContent='Tên mình không có trong danh sách';sel.appendChild(ok);
+       sel.style.display='';inp.style.display='none';}
+   }).catch(function(){});
+}
 function load(){
   var sp=startParam().split('_');SES=(params().s||sp[1]||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,16);
   var t=(params().t||sp[0]||'').toLowerCase().replace(/[^a-z0-9]/g,'');TOK=t;
   if(t.length!==24){say('Ối, link chưa đúng rồi!');message('🔗','Link chưa đúng','Bạn mở lại link mới nhất mà bot đã gửi trong khung chat nhé.');return;}
+  var gl=(params().g||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,20);   // link lop cua giao vien: hoc sinh nhap ten de lam bai
+  if(!SES&&gl){var sv=LOP[gl]||'';try{sv=sv||localStorage.getItem('gd_lop_'+gl)||'';}catch(e){}if(sv)SES=sv;else{hoiTenLop(gl);return;}}
   clear(app);for(var i=0;i<3;i++)app.appendChild(el('div','sk'));say('Mình đang mở đề cho bạn…');
   var ctl=('AbortController' in window)?new AbortController():null, to=setTimeout(function(){if(ctl)ctl.abort();},25000);
   fetch(base()+'/webhook/giai-de-lay?t='+t,{headers:{'ngrok-skip-browser-warning':'1'},signal:ctl?ctl.signal:undefined})

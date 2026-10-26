@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="color-scheme" content="light"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<title>Giao đề - Mọt sách VeduAI</title>
+<style>
+:root{--bg:#f5f7fb;--cd:#fff;--tx:#1d2433;--mu:#6b7488;--pr:#2563eb;--ok:#16a34a;--er:#dc2626;--bd:#e3e8f2}
+
+*{box-sizing:border-box}body{margin:0;font:16px/1.5 system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--tx);padding:12px 12px 40px}
+.w{max-width:640px;margin:0 auto}h1{font-size:20px;margin:6px 0 12px}h2{font-size:16px;margin:0 0 8px}
+.c{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+.mu{color:var(--mu);font-size:14px}.r{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button{font:inherit;border:0;border-radius:10px;padding:10px 14px;background:var(--pr);color:#fff;cursor:pointer}
+button.g{background:transparent;color:var(--pr);border:1px solid var(--pr)}button.x{background:var(--er)}button:disabled{opacity:.5}
+select,input[type=time],input[type=date]{font:inherit;padding:9px;border-radius:10px;border:1px solid var(--bd);background:var(--cd);color:var(--tx)}
+.ch{padding:8px 12px;border-radius:999px;border:1px solid var(--bd);cursor:pointer;user-select:none}.ch.on{background:var(--pr);color:#fff;border-color:var(--pr)}
+label.o{display:block;padding:10px;border:1px solid var(--bd);border-radius:10px;margin:6px 0;cursor:pointer}label.o input{margin-right:8px}
+.it{border-top:1px solid var(--bd);padding:10px 0}.it:first-child{border-top:0}.tag{font-size:12px;padding:2px 8px;border-radius:99px;background:var(--bd)}
+.msg{padding:10px;border-radius:10px;margin:8px 0}.msg.ok{background:rgba(22,163,74,.15)}.msg.er{background:rgba(220,38,38,.15)}
+input.l{width:100%;font:inherit;padding:9px;border-radius:10px;border:1px solid var(--bd);background:var(--cd);color:var(--tx)}
+</style></head><body><div class="w">
+<h1 id="tt">Giao đề</h1><div id="app"><div class="c mu">Đang mở…</div></div></div>
+<script>
+// Dia chi webhook n8n (cung domain ngrok voi cac trang khac)
+const BASE = 'https://devotee-outclass-couch.ngrok-free.dev/webhook/';
+const gk = new URLSearchParams(location.search).get('gk') || '';
+const $ = (s) => document.querySelector(s), app = $('#app');
+const E = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const TH = [['T2', 'Thứ 2'], ['T3', 'Thứ 3'], ['T4', 'Thứ 4'], ['T5', 'Thứ 5'], ['T6', 'Thứ 6'], ['T7', 'Thứ 7'], ['CN', 'CN']];
+const LOI = { phien_het_han: 'Liên kết đã hết hạn. Anh/chị gửi lại đề cho bot để nhận liên kết mới nhé.', chua_co_con: 'Chưa thấy hồ sơ của con gắn với tài khoản này.', chua_co_lich: 'Con chưa có lịch học nên không giao theo buổi học được. Anh/chị đặt lịch ở bên dưới trước nhé.', lich_sai_mau: 'Lịch chưa đúng. Chọn ngày học và giờ nhé.', gio_sai: 'Giờ chưa đúng.', gio_da_qua: 'Giờ này đã qua rồi.', qua_xa: 'Chỉ giao được trong 30 ngày tới.', kho_diem_ban: 'Hệ thống bảng điểm đang bận, thầy/cô thử lại sau ít phút nhé.', qua_nhieu_de_cho: 'Đang chờ giao quá nhiều đề, anh/chị huỷ bớt nhé.', nhieu_qua: 'Thao tác nhanh quá, chờ ít phút nhé.', khong_phai_con_cua_ban: 'Hồ sơ này không thuộc tài khoản của anh/chị.' };
+let D = null, cur = 0;
+async function goi(o) { try { const r = await fetch(BASE + 'giao-de-web', { method: 'POST', headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' }, body: JSON.stringify(Object.assign({ gk }, o)) }); return await r.json(); } catch (e) { return { ok: false, loi: 'mang' }; } }
+const hh = (t) => { const d = new Date(t); return d.toLocaleString('vi-VN', { weekday: 'short', hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' }); };
+const tt = { cho: 'Chờ giao', da_gui: 'Đã gửi cho con', xong: 'Con đã làm xong', huy: 'Đã huỷ', loi: 'Lỗi gửi', link: 'Link lớp' };
+const msg = (t, k) => { const m = $('#m'); if (m) m.innerHTML = t ? '<div class="msg ' + (k || 'er') + '">' + E(t) + '</div>' : ''; };
+function dsHtml(ds) {
+  if (!ds || !ds.length) return '<div class="mu">Chưa có đề nào.</div>';
+  return ds.map(d => '<div class="it"><b>' + E(d.tieu_de) + '</b> <span class="tag">' + (tt[d.st] || d.st) + '</span><div class="mu">' + (d.ten ? E(d.ten) + ' · ' : '') + (d.st === 'cho' ? 'giao lúc ' + hh(d.due) + (d.chen ? ' (buổi học thêm)' : '') : '') + (d.st === 'xong' ? (d.diem === null ? 'đề tự luận' : 'Điểm: <b>' + String(d.diem).replace('.', ',') + '/10</b>') : '') + '</div>' +
+    (d.st === 'link' && d.han ? '<div class="mu">Hạn nộp: ' + hh(d.han) + (Date.now() > d.han ? ' (đã hết hạn)' : '') + '</div>' : '') + (d.st === 'link' ? '<div class="mu">Học sinh đã làm: ' + (d.kq.length ? d.kq.map(k => E(k.ten) + ' ' + (k.diem === null ? '(tự luận)' : String(k.diem).replace('.', ',') + 'đ')).join(' · ') : 'chưa có') + '</div>' : '') +
+    (d.st === 'cho' ? '<button class="x" onclick="huy(\'' + d.id + '\')">Huỷ</button>' : '') + '</div>').join('');
+}
+async function huy(id) { const r = await goi({ act: 'huy', id }); if (r.ok) { D.ds = r.ds; ve(); } }
+function ve() {
+  $('#tt').textContent = D.vai === 'gv' ? 'Giao đề cho lớp' : 'Giao đề cho con';
+  const de = '<div class="c"><h2>📄 ' + E(D.de.tieu_de) + '</h2><div class="mu">' + D.de.tong + ' câu</div></div>';
+  if (D.vai === 'gv') {
+    app.innerHTML = de + '<div class="c"><h2>Link giao cho lớp</h2><div class="mu">Thầy/cô gửi link này vào nhóm lớp. Học sinh mở link, nhập tên và làm bài; điểm gửi về Telegram của thầy/cô.</div><div id="lk"></div><div class="mu" style="margin-top:8px">Hạn nộp bài</div><select id="han"><option value="60">1 giờ</option><option value="360">6 giờ</option><option value="1440">1 ngày</option><option value="2880" selected>2 ngày</option><option value="10080">7 ngày</option></select><div class="mu" style="margin-top:8px">Danh sách lớp (không bắt buộc, mỗi em một dòng): bảng điểm sẽ báo em nào chưa nộp, học sinh chọn tên thay vì gõ.</div><textarea id="dsl" rows="4" style="width:100%;font:inherit;padding:9px;border-radius:10px;border:1px solid var(--bd);background:var(--cd);color:var(--tx)" placeholder="Nguyễn Văn An&#10;Trần Thị Bình"></textarea><p class="r"><button onclick="lop()">Tạo link mới</button><button class="g" onclick="kd(\'chot\')">Chốt đề, nhận bảng điểm ngay</button><button class="g" onclick="kd(\'giu\')">Giữ bảng điểm thêm 72 giờ</button></p></div><div class="c"><h2>Các link đã tạo và điểm</h2>' + dsHtml(D.ds) + '</div><div id="m"></div>'; 
+    const l = D.ds.find(x => x.st === 'link'); if (l) $('#lk').innerHTML = '<input class="l" readonly value="' + E(l.link) + '" onclick="this.select()">';
+    return;
+  }
+  const h = D.hs[cur], ds = D.ds;
+  const lich = h.lich || '';
+  const m = lich.match(/^(.*)\s(\d{1,2}):(\d{2})$/), days = m ? m[1].split(',').map(x => x.trim().toUpperCase()) : [], gio = m ? String(m[2]).padStart(2, '0') + ':' + m[3] : '19:30';
+  const sel = D.hs.length > 1 ? '<select onchange="cur=this.value;ve()">' + D.hs.map((x, i) => '<option value="' + i + '"' + (i == cur ? ' selected' : '') + '>' + E(x.ten) + (x.lop ? ' - lớp ' + E(x.lop) : '') + '</option>').join('') + '</select>' : '<b>' + E(h.ten) + '</b>' + (h.lop ? ' · lớp ' + E(h.lop) : '');
+  const tiep = h.tiep ? '<div class="mu">Buổi học tiếp theo: ' + hh(h.tiep) + '</div>' : '';
+  app.innerHTML = de +
+    '<div class="c"><h2>👧 Giao cho</h2>' + sel + '</div>' +
+    '<div class="c"><h2>📅 Lịch học của con</h2><div class="mu" style="margin-bottom:8px">' + (lich ? 'Hiện tại: ' + E(lich) : 'Con chưa có lịch học.') + '</div>' + tiep +
+    '<div class="r" id="ng">' + TH.map(t => '<span class="ch' + (days.includes(t[0]) ? ' on' : '') + '" data-d="' + t[0] + '" onclick="this.classList.toggle(\'on\')">' + t[1] + '</span>').join('') + '</div>' +
+    '<p class="r">Giờ học: <input type="time" id="gl" value="' + gio + '"> <button class="g" onclick="luuLich()">Lưu lịch</button></p></div>' +
+    '<div class="c"><h2>⏰ Giao đề khi nào?</h2>' +
+    '<label class="o"><input type="radio" name="khi" value="ngay" checked>Giao ngay</label>' +
+    '<label class="o"><input type="radio" name="khi" value="sau_lich">Sau buổi học kế tiếp (45 phút sau giờ bắt đầu)</label>' +
+    '<label class="o"><input type="radio" name="khi" value="gio">Chọn ngày giờ: <input type="date" id="gn"> <input type="time" id="gg" value="19:30"></label>' +
+    '<label class="o"><input type="checkbox" id="chen">Xếp thành buổi học thêm (chèn vào lịch của con)</label>' +
+    '<p><button onclick="giao()">Giao đề</button></p></div><div id="m"></div>' +
+    '<div class="c"><h2>📋 Đề đã giao</h2>' + dsHtml(ds) + '</div>';
+}
+async function luuLich() {
+  const h = D.hs[cur], ds = [...document.querySelectorAll('#ng .ch.on')].map(x => x.dataset.d);
+  if (!ds.length) return msg('Chọn ít nhất một ngày học.');
+  const lich = ds.join(',') + ' ' + $('#gl').value;
+  const r = await goi({ act: 'doi_lich', u: h.u, lich });
+  if (r.ok) { h.lich = r.lich; ve(); msg('Đã lưu lịch học: ' + r.lich, 'ok'); } else msg(LOI[r.loi] || 'Chưa lưu được, thử lại nhé.');
+}
+async function giao() {
+  const h = D.hs[cur], khi = document.querySelector('input[name=khi]:checked').value;
+  const o = { act: 'giao', u: h.u, khi, chen: $('#chen').checked };
+  if (khi === 'gio') { o.gio = $('#gg').value; o.ngay = $('#gn').value; }
+  const r = await goi(o);
+  if (r.ok) { D.ds = r.ds; ve(); msg(r.due - Date.now() < 120000 ? 'Đã giao! Con sẽ nhận đề trong ít phút.' : 'Đã hẹn giao lúc ' + hh(r.due), 'ok'); } else msg(LOI[r.loi] || 'Chưa giao được, thử lại nhé.');
+}
+async function lop() {
+  const han_phut = Number(($('#han') || {}).value) || 2880, ds_lop = (($('#dsl') || {}).value || '').split(/\n/).map(x => x.trim()).filter(x => x.length >= 2).slice(0, 80);
+  const r = await goi({ act: 'giao_lop', han_phut, ds_lop });
+  if (r.ok) { D.ds = r.ds; ve(); msg(r.kho === false ? 'Đã tạo link nhưng chưa lưu được vào kho điểm, điểm sẽ nhắn từng em cho thầy/cô.' : 'Đã tạo link. Hạn nộp: ' + hh(r.han), 'ok'); } else msg('Chưa tạo được link.');
+}
+async function kd(act) {
+  const r = await goi({ act });
+  if (r.ok) { D.ds = r.ds; ve(); msg(act === 'chot' ? 'Đã chốt đề. Bảng điểm gửi vào chat với bot trong ít giây.' : 'Đã gia hạn lưu bảng điểm thêm 72 giờ (nếu có bảng điểm đang lưu).', 'ok'); } else msg(LOI[r.loi] || 'Chưa làm được, thử lại nhé.');
+}
+(async () => {
+  if (!gk) { app.innerHTML = '<div class="c">Thiếu mã. Anh/chị mở trang từ nút trong tin nhắn của bot nhé.</div>'; return; }
+  const r = await goi({ act: 'vao' });
+  if (!r.ok) { app.innerHTML = '<div class="c">' + E(LOI[r.loi] || 'Không mở được trang. Thử lại sau ít phút nhé.') + '</div>'; return; }
+  D = r; ve();
+})();
+</script></body></html>
