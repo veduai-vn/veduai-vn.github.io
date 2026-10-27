@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gửi tài liệu cho Mọt sách</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--tx:#1d2433;--mu:#667085;--bd:#dde3ee;--pri:#2563eb;--pri-tx:#fff;--ok:#067647;--ok-bg:#ecfdf3;--er:#b42318;--er-bg:#fef3f2}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1420;--card:#171e2e;--tx:#e8ecf5;--mu:#98a2b8;--bd:#2b3550;--pri:#4f86f7;--pri-tx:#fff;--ok:#6ce9a6;--ok-bg:#0c2a1c;--er:#fda29b;--er-bg:#2c1513}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+.wrap{max-width:640px;margin:0 auto;padding:16px}
+h1{font-size:1.35rem;margin:8px 0 4px}
+p.sub{color:var(--mu);margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:14px}
+.drop{border:2px dashed var(--bd);border-radius:14px;padding:26px 14px;text-align:center;cursor:pointer;color:var(--mu)}
+.drop.on{border-color:var(--pri);background:color-mix(in srgb,var(--pri) 8%,transparent)}
+.drop b{color:var(--tx);display:block;font-size:1.05rem;margin-bottom:4px}
+button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:8px 12px}
+button.pri{background:var(--pri);color:var(--pri-tx);border-color:var(--pri);width:100%;padding:13px;font-weight:600;font-size:1.05rem}
+button:disabled{opacity:.5;cursor:not-allowed}
+ul{list-style:none;margin:0;padding:0}
+li.f{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--bd)}
+li.f:first-child{border-top:0}
+.th{width:56px;height:56px;border-radius:8px;background:var(--bg);border:1px solid var(--bd);object-fit:cover;flex:none;display:flex;align-items:center;justify-content:center;font-size:.72rem;color:var(--mu);font-weight:700}
+.nm{flex:1;min-width:0}
+.nm div:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nm small{color:var(--mu)}
+.ac{display:flex;gap:4px;flex:none}
+.ac button{padding:6px 9px;min-width:36px}
+.stt{font-weight:700;color:var(--pri);width:22px;text-align:center;flex:none}
+textarea{width:100%;font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:10px;resize:vertical;min-height:64px}
+.msg{padding:12px 14px;border-radius:12px;margin-bottom:14px}
+.msg.er{background:var(--er-bg);color:var(--er)}
+.msg.ok{background:var(--ok-bg);color:var(--ok)}
+.bar{height:8px;background:var(--bd);border-radius:6px;overflow:hidden;margin-top:10px}
+.bar i{display:block;height:100%;width:0;background:var(--pri);transition:width .2s}
+.hint{color:var(--mu);font-size:.9rem}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>📎 Gửi tài liệu cho Mọt sách</h1>
+  <p class="sub">Chọn nhiều ảnh hoặc file PDF / Word / PowerPoint của một đề bài, sắp xếp đúng thứ tự trang rồi bấm Gửi. Mình sẽ soạn đáp án và nhắn lại cho bạn ngay trong Zalo / Telegram.</p>
+
+  <div id="loi" class="msg er hide"></div>
+
+  <div id="main">
+    <div class="card">
+      <div id="drop" class="drop" role="button" tabindex="0">
+        <b>Bấm để chọn ảnh hoặc file</b>
+        hoặc kéo thả vào đây<br>
+        <span class="hint">Tối đa 10 tệp · tổng dưới 10MB · ảnh (JPG, PNG), PDF, Word (.docx), PowerPoint (.pptx)</span>
+      </div>
+      <input id="inp" type="file" multiple accept="image/*,.pdf,.docx,.pptx,.txt" class="hide">
+    </div>
+
+    <div id="dsCard" class="card hide">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <strong id="dem">0 tệp</strong>
+        <span class="hint" id="tong"></span>
+      </div>
+      <p class="hint" style="margin:0 0 6px">Dùng mũi tên để đổi thứ tự trang. Trang 1 nằm trên cùng.</p>
+      <ul id="ds"></ul>
+    </div>
+
+    <div id="ghiCard" class="card hide">
+      <label class="hint" for="ghi">Ghi chú thêm (không bắt buộc), ví dụ: Toán 8, đề kiểm tra 15 phút</label>
+      <textarea id="ghi" maxlength="300"></textarea>
+    </div>
+
+    <button id="gui" class="pri" disabled>Gửi cho Mọt sách</button>
+    <div id="bar" class="bar hide"><i id="barI"></i></div>
+    <p id="tt" class="hint" style="text-align:center"></p>
+  </div>
+
+  <div id="xong" class="msg ok hide">
+    <strong>✅ Đã gửi <span id="soTep"></span> tệp!</strong><br>
+    Bạn quay lại Zalo / Telegram nhé. Mình đang soạn câu hỏi, đáp án và lời giải, khoảng 2–5 phút (đề dài có thể lâu hơn). Soạn xong mình nhắn link vào đó ngay. Bạn có thể đóng trang này.
+  </div>
+</div>
+
+<script>
+// ====== CẤU HÌNH: địa chỉ công khai của n8n (lấy từ bàn giao bản 7). Đổi ở đây nếu đổi domain ngrok. Không có dấu / ở cuối. ======
+const API = 'https://devotee-outclass-couch.ngrok-free.dev';
+// ==========================================================================================================
+const MAX_FILES = 10, MAX_TOTAL = 10 * 1024 * 1024, MAX_ONE = 8 * 1024 * 1024, MAX_IMG = 1.9 * 1024 * 1024;
+const q = new URLSearchParams(location.search);
+const P = { c: q.get('c') || '', b: q.get('b') || '', e: q.get('e') || '', t: q.get('t') || '' };
+const $ = (id) => document.getElementById(id);
+let files = [];   // { name, blob, size, isImg, url }
+// ====== Telegram Mini App (nếu mở trong Telegram thì có initData) ======
+const TG = (window.Telegram && Telegram.WebApp && Telegram.WebApp.initData) ? Telegram.WebApp : null;
+function theme() {
+  if (!TG) return;
+  const t = TG.themeParams || {}, r = document.documentElement.style, set = (k, v) => { if (v) r.setProperty(k, v); };
+  set('--bg', t.secondary_bg_color); set('--card', t.bg_color); set('--tx', t.text_color); set('--mu', t.hint_color);
+  set('--pri', t.button_color); set('--pri-tx', t.button_text_color);
+  r.setProperty('--bd', 'color-mix(in srgb, ' + (t.hint_color || '#999999') + ' 30%, transparent)');
+}
+if (TG) { try { TG.ready(); TG.expand(); theme(); TG.onEvent('themeChanged', theme); } catch (e) {} }
+
+const LOI = {
+  link_khong_hop_le: 'Link này không hợp lệ. Bạn nhắn bot "gửi nhiều ảnh" để lấy link mới nhé.',
+  link_het_han: 'Link đã hết hạn (mỗi link dùng được 2 giờ). Bạn nhắn bot "gửi nhiều ảnh" để lấy link mới nhé.',
+  chua_chon_tep: 'Bạn chưa chọn tệp nào.',
+  qua_10_tep: 'Mỗi lần chỉ gửi tối đa 10 tệp.',
+  sai_dinh_dang: 'Có tệp sai định dạng. Chỉ nhận ảnh, PDF, Word (.docx), PowerPoint (.pptx).',
+  tep_loi: 'Có tệp bị lỗi hoặc không đọc được. Bạn thử chọn lại giúp mình.',
+  tep_qua_lon: 'Có tệp lớn hơn 8MB. Bạn chia nhỏ rồi gửi lại nhé.',
+  tong_qua_lon: 'Tổng dung lượng vượt 10MB. Bạn bớt tệp hoặc gửi làm nhiều lần nhé.',
+  nop_nhieu_qua: 'Bạn đã gửi nhiều lần trong 1 giờ. Nghỉ chút rồi gửi tiếp giúp mình nhé.',
+  xac_thuc: 'Không xác thực được tài khoản Telegram. Bạn đóng và mở lại ứng dụng từ bot nhé.',
+  phien_het_han: 'Phiên đã cũ. Bạn đóng và mở lại ứng dụng từ bot nhé.'
+};
+function showErr(m) { const e = $('loi'); e.textContent = m; e.classList.remove('hide'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+function clearErr() { $('loi').classList.add('hide'); }
+const fmt = (n) => n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB';
+
+// kiểm tra link / ngữ cảnh mở
+(function () {
+  if (TG) {
+    const b = q.get('b') || '';
+    if (!/^(hs|ph|gv)$/.test(b)) { showErr('Ứng dụng mở chưa đúng cách. Bạn mở lại từ nút trong bot nhé.'); $('main').classList.add('hide'); return; }
+    P.b = b; $('gui').classList.add('hide');
+    TG.MainButton.setText('Gửi cho Mọt sách'); TG.MainButton.onClick(gui);
+    return;
+  }
+  const e = parseInt(P.e, 10) || 0;
+  if (!P.c || !P.t || !/^(hs|ph|gv)$/.test(P.b) || !e) { showErr(LOI.link_khong_hop_le); $('main').classList.add('hide'); return; }
+  if (e < Date.now() / 1000) { showErr(LOI.link_het_han); $('main').classList.add('hide'); }
+})();
+
+const extOf = (n) => ((String(n).toLowerCase().match(/\.([a-z0-9]+)$/) || [, ''])[1]);
+const OKEXT = ['jpg', 'jpeg', 'png', 'webp', 'pdf', 'docx', 'pptx', 'txt'];
+
+// nén ảnh: tối đa 1800px, JPEG
+function nenAnh(file) {
+  return new Promise((ok, no) => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      let w = img.naturalWidth, h = img.naturalHeight; const m = Math.max(w, h), k = m > 1800 ? 1800 / m : 1;
+      w = Math.round(w * k); h = Math.round(h * k);
+      const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+      const cx = cv.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, w, h); cx.drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      let qlt = 0.85;
+      const thu = () => cv.toBlob((bl) => {
+        if (!bl) return no(new Error('toBlob'));
+        if (bl.size > MAX_IMG && qlt > 0.45) { qlt -= 0.1; return thu(); }
+        ok(bl);
+      }, 'image/jpeg', qlt);
+      thu();
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); no(new Error('doc')); };
+    img.src = url;
+  });
+}
+
+async function them(list) {
+  clearErr();
+  const loiRieng = [];
+  for (const f of Array.from(list)) {
+    if (files.length >= MAX_FILES) { loiRieng.push('Chỉ nhận tối đa ' + MAX_FILES + ' tệp, mình đã bỏ các tệp thừa.'); break; }
+    const ex = extOf(f.name), laAnh = /^image\//.test(f.type) || ['jpg', 'jpeg', 'png', 'webp'].includes(ex);
+    if (!laAnh && !OKEXT.includes(ex)) { loiRieng.push('"' + f.name + '" sai định dạng nên mình bỏ qua.'); continue; }
+    if (laAnh) {
+      try {
+        const bl = await nenAnh(f);
+        const ten = (f.name.replace(/\.[^.]+$/, '') || 'anh') + '.jpg';
+        files.push({ name: ten, blob: bl, size: bl.size, isImg: true, url: URL.createObjectURL(bl) });
+      } catch (e) { loiRieng.push('Không đọc được ảnh "' + f.name + '" (ảnh HEIC thì bạn chụp lại dạng JPG nhé).'); }
+    } else {
+      if (f.size > MAX_ONE) { loiRieng.push('"' + f.name + '" lớn hơn 8MB nên mình bỏ qua.'); continue; }
+      files.push({ name: f.name, blob: f, size: f.size, isImg: false, url: '' });
+    }
+  }
+  ve();
+  if (loiRieng.length) showErr(loiRieng.join(' '));
+}
+
+function ve() {
+  const ul = $('ds'); ul.innerHTML = '';
+  files.forEach((f, i) => {
+    const li = document.createElement('li'); li.className = 'f';
+    const st = document.createElement('div'); st.className = 'stt'; st.textContent = String(i + 1);
+    let th;
+    if (f.isImg) { th = document.createElement('img'); th.src = f.url; th.className = 'th'; th.alt = ''; }
+    else { th = document.createElement('div'); th.className = 'th'; th.textContent = extOf(f.name).toUpperCase(); }
+    const nm = document.createElement('div'); nm.className = 'nm';
+    const a = document.createElement('div'); a.textContent = f.name;
+    const s = document.createElement('small'); s.textContent = fmt(f.size);
+    nm.append(a, s);
+    const ac = document.createElement('div'); ac.className = 'ac';
+    const mk = (t, fn, off, lb) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = t; b.disabled = !!off; b.setAttribute('aria-label', lb); b.onclick = fn; return b; };
+    ac.append(mk('↑', () => doi(i, -1), i === 0, 'Lên'), mk('↓', () => doi(i, 1), i === files.length - 1, 'Xuống'), mk('✕', () => xoa(i), false, 'Xóa'));
+    li.append(st, th, nm, ac); ul.append(li);
+  });
+  const tong = files.reduce((a, f) => a + f.size, 0);
+  $('dem').textContent = files.length + ' tệp';
+  $('tong').textContent = 'Tổng ' + fmt(tong) + ' / 10 MB';
+  $('tong').style.color = tong > MAX_TOTAL ? 'var(--er)' : '';
+  const co = files.length > 0;
+  $('dsCard').classList.toggle('hide', !co); $('ghiCard').classList.toggle('hide', !co);
+  $('gui').disabled = !co || tong > MAX_TOTAL;
+  if (TG) { try {
+    if (co && tong <= MAX_TOTAL) { TG.MainButton.show(); TG.MainButton.enable(); } else TG.MainButton.hide();
+    if (co) TG.enableClosingConfirmation(); else TG.disableClosingConfirmation();
+  } catch (e) {} }
+  if (tong > MAX_TOTAL) showErr(LOI.tong_qua_lon);
+}
+function doi(i, d) { const j = i + d; if (j < 0 || j >= files.length) return; [files[i], files[j]] = [files[j], files[i]]; ve(); }
+function xoa(i) { const f = files.splice(i, 1)[0]; if (f && f.url) URL.revokeObjectURL(f.url); clearErr(); ve(); }
+
+const b64 = (blob) => new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(',')[1] || ''); r.onerror = () => no(new Error('doc')); r.readAsDataURL(blob); });
+
+async function gui() {
+  clearErr();
+  if (!files.length) return;
+  $('gui').disabled = true; $('bar').classList.remove('hide'); $('barI').style.width = '5%'; $('tt').textContent = 'Đang chuẩn bị tệp…';
+  if (TG) { try { TG.MainButton.showProgress(); } catch (e) {} }
+  try {
+    const out = [];
+    for (let i = 0; i < files.length; i++) { out.push({ name: files[i].name, b64: await b64(files[i].blob) }); $('barI').style.width = (5 + 45 * (i + 1) / files.length) + '%'; }
+    $('tt').textContent = 'Đang gửi…'; $('barI').style.width = '70%';
+    const r = await fetch(API + '/webhook/tai-lieu-nop', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' },
+      body: JSON.stringify(TG ? { init: TG.initData, b: P.b, caption: $('ghi').value.trim(), files: out } : { c: P.c, b: P.b, e: P.e, t: P.t, caption: $('ghi').value.trim(), files: out })
+    });
+    const j = await r.json().catch(() => null);
+    if (!j) throw new Error('mang');
+    if (!j.ok) { throw Object.assign(new Error('loi'), { ma: j.loi }); }
+    $('barI').style.width = '100%';
+    $('soTep').textContent = String(j.n || files.length);
+    $('main').classList.add('hide'); $('xong').classList.remove('hide');
+    if (TG) { try { TG.MainButton.hide(); TG.disableClosingConfirmation(); if (TG.HapticFeedback) TG.HapticFeedback.notificationOccurred('success'); } catch (e) {} setTimeout(() => { try { TG.close(); } catch (e) {} }, 2200); }
+  } catch (e) {
+    if (TG) { try { TG.MainButton.hideProgress(); if (TG.HapticFeedback) TG.HapticFeedback.notificationOccurred('error'); } catch (e2) {} }
+    $('bar').classList.add('hide'); $('tt').textContent = '';
+    showErr(LOI[e.ma] || 'Chưa gửi được (mạng yếu hoặc hệ thống đang bận). Bạn thử lại sau ít phút nhé.');
+    ve();
+  }
+}
+
+$('drop').addEventListener('click', () => $('inp').click());
+$('drop').addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('inp').click(); } });
+$('inp').addEventListener('change', (e) => { them(e.target.files); e.target.value = ''; });
+['dragenter', 'dragover'].forEach((ev) => $('drop').addEventListener(ev, (e) => { e.preventDefault(); $('drop').classList.add('on'); }));
+['dragleave', 'drop'].forEach((ev) => $('drop').addEventListener(ev, (e) => { e.preventDefault(); $('drop').classList.remove('on'); }));
+$('drop').addEventListener('drop', (e) => { if (e.dataTransfer && e.dataTransfer.files) them(e.dataTransfer.files); });
+$('gui').addEventListener('click', gui);
+</script>
+</body>
+</html>
