@@ -115,8 +115,8 @@ function monTheoLop(l) {
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const hkMacDinh = () => { const m = new Date().getMonth() + 1; return (m >= 2 && m <= 8) ? '2' : '1'; };
 
-const TONG = 10;   // so muc bat buoc (de tinh thanh tien do)
-const S = { cfg: null, lop: 0, mons: {}, sach: '', sachKhac: '', hk: hkMacDinh(), gt: '', ten: '', nd: '', nt: '', nn: '', truong: '', tenLop: '', ngay: [], gio: '19:30', ph: '', bc: 'tuan', bcGio: '20:00', bcThu: 'CN', bcNgay: '1', nhac: '10', loi: {}, dangGui: false };
+const TONG = 9;   // so muc bat buoc (de tinh thanh tien do)
+const S = { cfg: null, lop: 0, mons: {}, sach: 'Kết nối tri thức', sachKhac: '', hk: hkMacDinh(), gt: '', ten: '', nd: '', nt: '', nn: '', truong: '', tenLop: '', ngay: [], gio: '19:30', ph: '', bc: 'tuan', bcGio: '20:00', bcThu: 'CN', bcNgay: '1', nhac: '10', loi: {}, dangGui: false };
 const ngaySinhISO = () => (S.nd && S.nt && S.nn) ? S.nn + '-' + String(S.nt).padStart(2, '0') + '-' + String(S.nd).padStart(2, '0') : '';
 const ngaySinhHopLe = () => { const v = ngaySinhISO(); if (!v) return false; const d = new Date(v + 'T00:00:00'); return d.getFullYear() === Number(S.nn) && d.getMonth() + 1 === Number(S.nt) && d.getDate() === Number(S.nd); };
 
@@ -162,36 +162,13 @@ function ve() {
 
     <section ${S.lop ? '' : 'hidden'}>
       <h2><i class="em" aria-hidden="true">📚</i>Bạn muốn học môn nào?</h2>
-      <p class="hint">${full ? 'Gói Full: bạn học đủ các môn của lớp ' + S.lop + '.' : 'Gói của bạn được chọn tối đa ' + gioiHan + ' môn (đã chọn ' + nChon + ').'} Mỗi môn chọn cách học: bám sách giáo khoa, theo chủ đề bạn muốn học sâu, hoặc cả hai. Hỏi đáp tự do luôn có cho mọi môn.</p>
+      <p class="hint">${full ? 'Gói Full: bạn học đủ các môn của lớp ' + S.lop + '.' : 'Gói của bạn được chọn tối đa ' + gioiHan + ' môn (đã chọn ' + nChon + ').'} Bộ sách Kết nối tri thức. Hỏi đáp tự do luôn có cho mọi môn.</p>
       <div>
       ${dsMon.map(m => { const x = S.mons[m]; return `
         <div class="mon">
           <label class="mon-head"><input type="checkbox" data-mon="${esc(m)}" ${x ? 'checked' : ''} ${full ? 'disabled' : ''}> ${esc(m)}</label>
-          ${x ? `<div class="mon-body">
-            <div class="seg" role="group" aria-label="Cách học môn ${esc(m)}">
-              ${HT.map(h => `<button type="button" data-ht="${h[0]}" data-m="${esc(m)}" aria-pressed="${x.ht===h[0]}">${h[1]}</button>`).join('')}
-            </div>
-            <div><label class="f">Bạn đang học tới bài/chương nào? (không bắt buộc)</label>
-              <input type="text" maxlength="60" data-td="${esc(m)}" value="${esc(x.td)}" placeholder="Ví dụ: Bài 5"></div>
-            ${x.ht !== 'sgk' ? `<div><label class="f">Chủ đề bạn muốn học</label>
-              <input type="text" maxlength="60" data-cd="${esc(m)}" value="${esc(x.cd)}" placeholder="Ví dụ: Phân số, Hằng đẳng thức">${E('cd:' + m)}</div>` : ''}
-          </div>` : ''}
         </div>`; }).join('')}
       </div>${E('mons')}
-    </section>
-
-    <section ${S.lop ? '' : 'hidden'}>
-      <h2><i class="em" aria-hidden="true">📖</i>Bạn đang dùng bộ sách nào?</h2>
-      <div class="row" role="group" aria-label="Bộ sách">
-        ${SACH.map(s => `<button type="button" class="chip" data-sach="${esc(s)}" aria-pressed="${S.sach===s}">${esc(s)}</button>`).join('')}
-      </div>
-      ${S.sach === 'Khác' ? `<div style="margin-top:10px"><input type="text" maxlength="40" data-sachkhac value="${esc(S.sachKhac)}" placeholder="Tên bộ sách"></div>` : ''}
-      ${E('sach')}
-      <p class="hint" style="margin-top:14px">Bạn đang học học kì mấy? (Học kì 1 = tập 1, học kì 2 = tập 2)</p>
-      <div class="seg" role="group" aria-label="Học kì" style="max-width:240px">
-        <button type="button" data-hk="1" aria-pressed="${S.hk==='1'}">Học kì 1</button>
-        <button type="button" data-hk="2" aria-pressed="${S.hk==='2'}">Học kì 2</button>
-      </div>
     </section>
 
     <section>
@@ -264,7 +241,6 @@ function thieu() {
   const t = [];
   if (!S.lop) t.push('lop');
   if (!Object.keys(S.mons).length) t.push('mons');
-  if (!S.sach || (S.sach === 'Khác' && !S.sachKhac.trim())) t.push('sach');
   if (S.ten.trim().split(/\s+/).filter(Boolean).length < 2) t.push('ten');
   if (!ngaySinhHopLe()) t.push('ns');
   if (!S.gt) t.push('gt');
@@ -280,9 +256,6 @@ function kiemTra() {
   if (!S.lop) L.lop = 'Chọn lớp của bạn.';
   const ms = Object.keys(S.mons);
   if (!ms.length) L.mons = 'Chọn ít nhất một môn.';
-  ms.forEach(m => { const x = S.mons[m]; if (x.ht !== 'sgk' && !x.cd.trim()) L['cd:' + m] = 'Nhập chủ đề, hoặc đổi sang “Bám SGK”.'; });
-  if (!S.sach) L.sach = 'Chọn bộ sách bạn đang dùng.';
-  else if (S.sach === 'Khác' && !S.sachKhac.trim()) L.sach = 'Nhập tên bộ sách.';
   if (S.ten.trim().split(/\s+/).filter(Boolean).length < 2) L.ten = 'Nhập đủ họ và tên của bạn.';
   if (!S.nd || !S.nt || !S.nn) L.ns = 'Chọn đủ ngày, tháng, năm sinh.';
   else if (!ngaySinhHopLe()) L.ns = 'Ngày sinh chưa đúng, bạn kiểm tra lại nhé.';
@@ -302,7 +275,7 @@ async function gui() {
   const body = {
     t: token, lop: S.lop,
     mons: Object.keys(S.mons).map(m => ({ mon: m, ht: S.mons[m].ht, chu_de: S.mons[m].cd.trim(), tien_do: S.mons[m].td.trim() })),
-    bo_sach: S.sach === 'Khác' ? S.sachKhac.trim() : S.sach, hoc_ki: S.hk,
+    bo_sach: 'Kết nối tri thức', hoc_ki: S.hk,   // chi hoc 1 bo sach; hoc ki tu suy theo thang (hoi lai chi tiet khi bat dau hoc)
     ho_ten: S.ten.trim(), ngay_sinh: ngaySinhISO(), nam_sinh: Number(S.nn), gioi_tinh: S.gt, truong: S.truong.trim(), ten_lop: S.tenLop.trim(), ngay: S.ngay, gio: S.gio, phu_huynh: S.ph,
     bao_cao: { tan_suat: S.bc, gio: S.bcGio, thu: S.bcThu, ngay: Number(S.bcNgay), nhac: Number(S.nhac) }
   };
@@ -315,16 +288,20 @@ async function gui() {
   } catch (e) { S.dangGui = false; S.loi = { ph: 'Chưa gửi được phiếu. Kiểm tra mạng rồi bấm Gửi phiếu lại nhé.' }; ve(); }
 }
 
+function tinPH(j) {   // tin học sinh chuyển cho ba/mẹ: có cả cách Telegram và Zalo
+  return 'Chào ba/mẹ, đây là cách nhận báo cáo học tập của con trên Mọt sách:\n• Ba/mẹ dùng Telegram: bấm ' + j.linkPhuHuynh + '\n• ' + (j.huongDanZalo || '');
+}
+
 function xong(j) {
   trang(`<div class="big" aria-hidden="true">🎉</div><h1>Đã gửi phiếu rồi!</h1>
     <p>Mình đã nhận đủ thông tin. ${laZalo() ? 'Con quay lại <b>Zalo</b>, mình đã gửi sẵn menu các dịch vụ để bạn chọn nhé.' : 'Con quay lại khung chat, mình đã gửi sẵn menu các dịch vụ để bạn chọn nhé.'}</p>
     <p class="hint">${j.linkPhuHuynh || laZalo() ? '' : 'Cửa sổ này sẽ tự đóng.'}</p>
-    ${j.linkPhuHuynh ? `<p>Bạn gửi đường dẫn này cho ba/mẹ để nhận báo cáo sau mỗi buổi học:</p><div class="box" id="lk">${esc(j.linkPhuHuynh)}</div>
-      <button type="button" class="chip" id="cp">Sao chép đường dẫn</button>` : ''}`);
+    ${j.linkPhuHuynh ? `<p>Bạn chuyển nguyên tin dưới đây cho ba/mẹ để nhận báo cáo sau mỗi buổi học:</p><div class="box" id="lk" style="white-space:pre-wrap">${esc(tinPH(j))}</div>
+      <button type="button" class="chip" id="cp">Sao chép tin gửi ba/mẹ</button>` : ''}`);
   pop();
   if (TG && !j.linkPhuHuynh) setTimeout(() => { try { TG.close(); } catch (e) {} }, 1600);   // không có link cần sao chép -> tự đóng, quay lại chat
   const cp = document.getElementById('cp');
-  if (cp) cp.onclick = async () => { try { await navigator.clipboard.writeText(j.linkPhuHuynh); cp.textContent = 'Đã sao chép'; } catch (e) { cp.textContent = 'Hãy giữ và sao chép đường dẫn ở trên'; } };
+  if (cp) cp.onclick = async () => { try { await navigator.clipboard.writeText(tinPH(j)); cp.textContent = 'Đã sao chép'; } catch (e) { cp.textContent = 'Hãy giữ và sao chép đường dẫn ở trên'; } };
 }
 
 $app.addEventListener('click', e => {

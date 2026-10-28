@@ -30,7 +30,20 @@
   #gear{float:right;border:0;background:none;font-size:20px}
 </style>
 <style>:root{color-scheme:light}</style>
+<link rel="preconnect" href="https://devotee-outclass-couch.ngrok-free.dev">
 <link rel="stylesheet" href="mot-sach.css?v=2">
+<style>
+  /* v2: mic co dinh o day man hinh, luon hien */
+  body.ms-bi{padding-bottom:170px}
+  #micbar{position:fixed;left:0;right:0;bottom:0;z-index:30;padding:14px 12px calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,#F4F8FC 78%,rgba(244,248,252,0))}
+  #micbar .in{max-width:608px;margin:0 auto}
+  #micbar #mic{display:block;width:100%;min-height:68px;font-size:18px;line-height:1.2;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+  #micbar #mic.wait,#micbar #mic.busy{opacity:.88}
+  #micbar #mic.rec{box-shadow:0 0 0 calc(4px + 14px*var(--lv,0)) rgba(214,64,69,.28),4px 4px 0 var(--ink)}
+  #micbar #stat{min-height:20px;margin:0 0 6px;text-align:center}
+  #micbar label.auto{display:block;margin-top:6px;font-size:13px;text-align:center;color:var(--mute)}
+</style>
+
 </head>
 <body class="ms ms-bi">
 <header class="ms-head"><div class="ms-hw"><span class="ms-logo"><img src="assets/logo-mark.png" alt=""><span>Mọt<b>sách</b></span></span></div></header>
@@ -54,12 +67,13 @@
 </div>
 
 <div id="log"></div>
-<button id="mic">🎤 Bấm để nói</button>
-<div id="stat"></div>
+<div id="micbar"><div class="in"><div id="stat" role="status" aria-live="polite"></div><button id="mic" type="button">🎤 Bấm để nói</button><label class="auto"><input type="checkbox" id="auto"> Nói liên tục (Bi nói xong tự nghe tiếp)</label></div></div>
 
 <footer class="vf"><b>VeduAI</b> – Vietnam Education AI Solutions<br>Hỗ trợ: Admin <a href="tel:0984048177">0984048177</a> (Telegram/Zalo)</footer>
 <script>
 (function(){
+  // v2 (28/10/2026): mic luon hien o day man hinh, noi bat cu luc nao (ngat loi Bi), tu dung khi im lang, khong can nhap khoa bang prompt.
+  var DEFAULT_BASE="https://devotee-outclass-couch.ngrok-free.dev/bivoice", DEFAULT_KEY="f31c73239475649b";
   var SENTENCES=[
     "I like to play football with my friends.",
     "What is the weather like today?",
@@ -70,120 +84,165 @@
     "We are going to visit our grandparents this weekend.",
     "How much does this notebook cost?"
   ];
-  var mode="free", sIdx=0, history=[], rec=null, chunks=[], stream=null, tStop=0, timer=null;
+  var VOICE_PEAK=16, SILENCE_MS=1400, MIN_TALK_MS=900, NO_SPEECH_MS=7000, MAX_REC_MS=15000, REQ_TIMEOUT=30000;
+  var mode="free", sIdx=0, history=[], rec=null, chunks=[], stream=null, tStop=0, inflight=null;
+  var actx=null, analyser=null, vadTimer=null, heard=false, discard=false, curAudios=[], playToken=0, idleTimer=null, maxTimer=null;
 
   function $(id){return document.getElementById(id);}
   function ls(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v);}catch(e){return null;} }
-
-  function config(force){
-    var base=ls("bi_base"), key=ls("bi_key");
-    if(force||!base){ base=prompt("Địa chỉ server của Bi (dạng https://TEN-CUA-BAN.ngrok-free.app/bivoice – nhớ có đuôi /bivoice):", base||""); if(base) ls("bi_base", base.replace(/\/+$/,"")); }
-    if(force||!key){ key=prompt("Khóa BI_KEY (đã đặt trong file .bat):", key||""); if(key) ls("bi_key", key); }
-    return {base:(ls("bi_base")||""), key:(ls("bi_key")||"")};
-  }
-  function hdr(extra){
-    var c=config(false), h={"X-Key":c.key,"ngrok-skip-browser-warning":"1"};
-    for(var k in (extra||{})) h[k]=extra[k];
-    return h;
-  }
-  var unlocked=false;
-  function unlockAudio(){
-    if(unlocked) return; unlocked=true;
-    try{
-      var a=new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=");
-      a.play().catch(function(){});
-    }catch(e){}
-  }
+  function cfg(){ return {base:(ls("bi_base")||DEFAULT_BASE).replace(/\/+$/,""), key:(ls("bi_key")||DEFAULT_KEY)}; }
+  function hdr(extra){ var h={"X-Key":cfg().key,"ngrok-skip-browser-warning":"1"}; for(var k in (extra||{})) h[k]=extra[k]; return h; }
   function stat(t){ $("stat").textContent=t||""; }
-
+  function setMic(s){
+    var m=$("mic"); m.classList.remove("rec","wait","busy"); m.style.removeProperty("--lv");
+    if(s==="rec"){ m.classList.add("rec"); m.textContent="⏹ Đang nghe… nói xong bấm để gửi"; }
+    else if(s==="wait"){ m.classList.add("wait"); m.textContent="🎤 Đang mở micro…"; }
+    else if(s==="busy"){ m.classList.add("busy"); m.textContent="🐻 Bi đang trả lời… (bấm để nói chen)"; }
+    else { m.textContent="🎤 Bấm để nói"; }
+  }
   function addBubble(cls,text){
     var d=document.createElement("div"); d.className="b "+cls; d.textContent=text;
     $("log").appendChild(d); d.scrollIntoView({block:"end"}); return d;
   }
 
-  // ---------- Doc thanh tieng: tai truoc cac cau, phat lien tiep ----------
+  // ---------- Doc thanh tieng (ngat duoc bat cu luc nao) ----------
+  var unlocked=false;
+  function unlockAudio(){
+    if(unlocked) return; unlocked=true;
+    try{ var a=new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="); a.play().catch(function(){}); }catch(e){}
+  }
+  function stopSpeak(){ playToken++; curAudios.forEach(function(a){ try{a.pause();}catch(e){} }); curAudios=[]; }
   function fetchTTS(text,slow){
-    return fetch(ls("bi_base")+"/tts",{method:"POST",headers:hdr({"Content-Type":"application/json"}),
-      body:JSON.stringify({text:text,slow:!!slow})})
+    return fetch(cfg().base+"/tts",{method:"POST",headers:hdr({"Content-Type":"application/json"}),body:JSON.stringify({text:text,slow:!!slow})})
       .then(function(r){ if(!r.ok) throw new Error("tts "+r.status); return r.blob(); })
       .then(function(b){ return URL.createObjectURL(b); });
   }
-  function playUrl(url,onStart){
+  function playUrl(url,onStart,tok){
     return new Promise(function(res){
-      var a=new Audio(url);
+      if(tok!==playToken) return res();
+      var a=new Audio(url); curAudios.push(a);
       a.onplaying=function(){ if(onStart){onStart(); onStart=null;} };
-      a.onended=res; a.onerror=res;
+      a.onended=res; a.onerror=res; a.onpause=res;
       a.play().catch(res);
     });
   }
   function speak(text,slow,onFirst){
+    stopSpeak(); var tok=playToken;
     var parts=(text.match(/[^.!?]+[.!?]*/g)||[]).map(function(x){return x.trim();}).filter(Boolean);
-    if(!parts.length) return Promise.resolve();
-    var pre=parts.map(function(p){ return fetchTTS(p,slow); }); // tai song song
+    if(!parts.length) return Promise.resolve(tok);
+    var pre=parts.map(function(p){ return fetchTTS(p,slow); });   // tai song song, phat noi tiep
     var chain=Promise.resolve();
     pre.forEach(function(pr,i){
-      chain=chain.then(function(){ return pr; }).then(function(u){ return playUrl(u, i===0?onFirst:null); })
-        .catch(function(){});
+      chain=chain.then(function(){ if(tok!==playToken) return; return pr.then(function(u){ return playUrl(u, i===0?onFirst:null, tok); }); }).catch(function(){});
     });
-    return chain;
+    return chain.then(function(){ return tok; });
   }
 
-  // ---------- Ghi am ----------
+  // ---------- Micro: mo 1 lan, giu san sang ----------
   function pickType(){
     var c=["audio/webm;codecs=opus","audio/webm","audio/mp4"];
     for(var i=0;i<c.length;i++){ if(window.MediaRecorder && MediaRecorder.isTypeSupported(c[i])) return c[i]; }
     return "";
   }
+  function getStream(){
+    if(stream && stream.active) return Promise.resolve(stream);
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder) return Promise.reject({name:"NoSupport"});
+    return navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}}).then(function(s){
+      stream=s;
+      try{
+        var AC=window.AudioContext||window.webkitAudioContext; actx=actx||new AC();
+        if(actx.state==="suspended") actx.resume();
+        analyser=actx.createAnalyser(); analyser.fftSize=1024; actx.createMediaStreamSource(s).connect(analyser);
+      }catch(e){ analyser=null; }
+      return s;
+    });
+  }
+  function releaseStream(){
+    if(stream){ stream.getTracks().forEach(function(t){t.stop();}); stream=null; analyser=null; }
+  }
+  function micError(e){
+    setMic("idle");
+    if(e && (e.name==="NotAllowedError"||e.name==="SecurityError")) stat("Bạn chưa cho phép dùng micro. Hãy bấm biểu tượng 🔒 trên thanh địa chỉ, cho phép micro, rồi bấm 🎤 lại.");
+    else if(e && e.name==="NoSupport") stat("Ứng dụng này chưa ghi âm được. Bạn mở trang bằng Chrome hoặc Safari nhé.");
+    else stat("Không mở được micro. Kiểm tra micro rồi bấm 🎤 lại.");
+  }
+
+  function watchVoice(){
+    var buf=analyser?new Uint8Array(analyser.fftSize):null, t0=Date.now(), last=0, talked=false;
+    clearInterval(vadTimer);
+    vadTimer=setInterval(function(){
+      var now=Date.now(), peak=0;
+      if(buf){ analyser.getByteTimeDomainData(buf); for(var i=0;i<buf.length;i++){ var v=Math.abs(buf[i]-128); if(v>peak) peak=v; } }
+      $("mic").style.setProperty("--lv", Math.min(1,peak/50));
+      if(buf && peak>VOICE_PEAK){ talked=true; heard=true; last=now; }
+      if(!buf) return;                                               // khong do duoc: de nguoi dung tu bam dung
+      if(talked && now-last>SILENCE_MS && now-t0>MIN_TALK_MS){ stopRec(false); }
+      else if(!talked && now-t0>NO_SPEECH_MS){ stopRec(true); stat("Mình chưa nghe thấy bạn nói. Bấm 🎤 rồi nói gần micro hơn nhé."); }
+    },100);
+  }
   function startRec(){
-    if(!config(false).base){ return; }
-    navigator.mediaDevices.getUserMedia({audio:true}).then(function(s){
-      stream=s; chunks=[];
+    unlockAudio(); stopSpeak();
+    if(inflight){ try{inflight.abort();}catch(e){} inflight=null; }
+    setMic("wait"); stat("");
+    getStream().then(function(s){
+      chunks=[]; heard=false; discard=false;
       var t=pickType(); rec=t?new MediaRecorder(s,{mimeType:t}):new MediaRecorder(s);
       rec.ondataavailable=function(e){ if(e.data&&e.data.size) chunks.push(e.data); };
       rec.onstop=function(){
-        stream.getTracks().forEach(function(x){x.stop();});
-        tStop=performance.now();
-        send(new Blob(chunks,{type:rec.mimeType||"audio/webm"}));
+        clearInterval(vadTimer); clearTimeout(maxTimer);
+        clearTimeout(idleTimer); idleTimer=setTimeout(releaseStream,5*60*1000);   // giu micro san sang 5 phut
+        var blob=new Blob(chunks,{type:rec.mimeType||"audio/webm"});
+        if(discard || blob.size<1500){ setMic("idle"); if(!discard) stat("Bi chưa nghe rõ, bạn nói lại nhé."); return; }
+        tStop=performance.now(); send(blob);
       };
-      rec.start();
-      $("mic").classList.add("rec"); $("mic").textContent="⏹ Bấm để dừng"; stat("Đang nghe bạn nói…");
-      timer=setTimeout(stopRec,12000);
-    }).catch(function(){ stat("Không mở được micro. Hãy cho phép dùng micro."); });
+      rec.start(250);
+      setMic("rec"); stat("Mời bạn nói, mình đang nghe…");
+      watchVoice();
+      clearTimeout(maxTimer); maxTimer=setTimeout(function(){ if(recording()) stopRec(false); },MAX_REC_MS);
+    }).catch(micError);
   }
-  function stopRec(){
-    clearTimeout(timer);
-    if(rec && rec.state!=="inactive"){ rec.stop(); }
-    $("mic").classList.remove("rec"); $("mic").textContent="🎤 Bấm để nói";
+  function stopRec(drop){
+    discard=!!drop;
+    if(rec && rec.state!=="inactive"){ try{ rec.stop(); }catch(e){} }
   }
-  $("mic").onclick=function(){ unlockAudio(); (rec && rec.state==="recording") ? stopRec() : startRec(); };
+  function recording(){ return rec && rec.state==="recording"; }
+  $("mic").onclick=function(){ if(recording()) stopRec(false); else startRec(); };
+  document.addEventListener("keydown",function(e){
+    if(e.code==="Space" && !/^(INPUT|TEXTAREA|BUTTON)$/.test((e.target||{}).tagName||"")){ e.preventDefault(); $("mic").click(); }
+  });
+  document.addEventListener("visibilitychange",function(){ if(document.hidden){ stopRec(true); stopSpeak(); releaseStream(); setMic("idle"); } });
 
   // ---------- Gui len server ----------
   function send(blob){
-    stat("🐻 Bi đang nghe…");
+    setMic("busy"); stat("🐻 Bi đang nghe…");
     var fd=new FormData();
     var ext=(blob.type.indexOf("mp4")>-1)?"mp4":"webm";
-    fd.append("audio",blob,"nói."+ext);
+    fd.append("audio",blob,"noi."+ext);
     if(mode==="read") fd.append("target",SENTENCES[sIdx]);
     fd.append("history",JSON.stringify(history));
-    fetch(ls("bi_base")+"/bi",{method:"POST",headers:hdr(),body:fd})
+    var ac=("AbortController" in window)?new AbortController():null; inflight=ac;
+    var to=setTimeout(function(){ if(ac) ac.abort(); },REQ_TIMEOUT);
+    fetch(cfg().base+"/bi",{method:"POST",headers:hdr(),body:fd,signal:ac?ac.signal:undefined})
       .then(function(r){ if(r.status===401) throw new Error("Sai khóa. Bấm ⚙️ để nhập lại."); if(!r.ok) throw new Error("Lỗi server "+r.status); return r.json(); })
-      .then(handle)
-      .catch(function(e){ stat("⚠️ "+e.message); });
+      .then(function(d){ clearTimeout(to); if(ac && inflight!==ac) return; inflight=null; handle(d); })
+      .catch(function(e){
+        clearTimeout(to); if(ac && inflight!==ac) return;      // bi huy vi nguoi dung noi tiep: im lang
+        inflight=null; setMic("idle");
+        stat(e && e.name==="AbortError" ? "⚠️ Bi trả lời chậm quá, bạn nói lại nhé." : "⚠️ "+(e.message||"Lỗi mạng"));
+      });
   }
-
   function timing(d,firstMs){
-    var m=d.ms||{};
-    var s="⏱ Nhận giọng "+(m.stt/1000).toFixed(1)+"s";
+    var m=d.ms||{}, s="⏱ Nhận giọng "+((m.stt||0)/1000).toFixed(1)+"s";
     if(m.ai!==undefined) s+=" · AI "+(m.ai/1000).toFixed(1)+"s";
     if(firstMs!==undefined) s+=" · từ lúc bạn nói xong đến khi Bi lên tiếng "+(firstMs/1000).toFixed(1)+"s";
     stat(s);
   }
-
   function handle(d){
-    if(d.empty){ stat("Bi chưa nghe rõ, bạn nói lại nhé."); return; }
+    if(d.empty){ setMic("idle"); stat("Bi chưa nghe rõ, bạn nói lại nhé."); return; }
     if(d.mode==="free"){
       addBubble("me",d.heard);
       if(!d.reply){
+        setMic("idle");
         stat(d.ai_error==="chua dat BI_AI_URL" ? "Bi nghe được rồi, nhưng chưa nối AI (xem BI_AI_URL trong file .bat)." : "⚠️ Bi nghe được rồi nhưng AI chưa trả lời ("+(d.ai_error||"không rõ lý do")+"). Xem log_bi_voice.txt.");
         return;
       }
@@ -191,20 +250,19 @@
       history.push({role:"user",content:d.heard},{role:"assistant",content:d.reply});
       history=history.slice(-6);
       timing(d);
-      speak(d.reply,false,function(){ timing(d, performance.now()-tStop); });
+      setMic("busy");
+      speak(d.reply,false,function(){ timing(d, performance.now()-tStop); }).then(function(tok){
+        if(tok===playToken && !recording()){ setMic("idle"); if($("auto").checked && mode==="free") startRec(); }   // noi lien tuc: tu nghe tiep
+      });
     } else {
-      renderScore(d);
-      timing(d);
+      setMic("idle"); renderScore(d); timing(d);
     }
   }
-
   function renderScore(d){
     var box=document.createElement("div"); box.className="b bi";
     var sc=document.createElement("div"); sc.className="score"; sc.textContent=d.score+"/100"; box.appendChild(sc);
     var line=document.createElement("div");
-    d.words.forEach(function(w){
-      var s=document.createElement("span"); s.className="w "+w.status; s.textContent=w.word; line.appendChild(s);
-    });
+    d.words.forEach(function(w){ var s=document.createElement("span"); s.className="w "+w.status; s.textContent=w.word; line.appendChild(s); });
     box.appendChild(line);
     var fb=document.createElement("div"); fb.className="fb";
     d.feedback.forEach(function(t){ var p=document.createElement("div"); p.textContent=t; fb.appendChild(p); });
@@ -212,7 +270,7 @@
     var r=document.createElement("div"); r.className="row";
     d.words.filter(function(w){return w.status!=="ok";}).forEach(function(w){
       var b=document.createElement("button"); b.className="mini"; b.textContent="🔊 "+w.word;
-      b.onclick=function(){ speak(w.word,true); }; r.appendChild(b);
+      b.onclick=function(){ unlockAudio(); speak(w.word,true); }; r.appendChild(b);
     });
     box.appendChild(r);
     $("log").appendChild(box); box.scrollIntoView({block:"end"});
@@ -230,17 +288,22 @@
   });
   $("hear").onclick=function(){ unlockAudio(); speak(SENTENCES[sIdx],false); };
   $("slow").onclick=function(){ unlockAudio(); speak(SENTENCES[sIdx],true); };
-  $("next").onclick=function(){ sIdx=(sIdx+1)%SENTENCES.length; showTarget(); $("log").innerHTML=""; };
+  $("next").onclick=function(){ stopSpeak(); sIdx=(sIdx+1)%SENTENCES.length; showTarget(); $("log").innerHTML=""; };
+  $("auto").checked=(ls("bi_auto")==="1");
+  $("auto").onchange=function(){ ls("bi_auto",$("auto").checked?"1":"0"); };
   function checkConn(){
-    var c=config(false); if(!c.base){ return; }
     stat("Đang kiểm tra kết nối…");
-    fetch(c.base+"/health",{headers:hdr()})
-      .then(function(r){ if(!r.ok) throw new Error("mã "+r.status); return r.json(); })
-      .then(function(j){ stat(j&&j.ok?("✅ Kết nối tốt (máy "+j.device+", model "+j.model+"). Bấm 🎤 để nói."):"⚠️ Server trả lời lạ."); })
-      .catch(function(e){ stat("⚠️ Chưa nối được server ("+e.message+"). Kiểm tra địa chỉ có đuôi /bivoice và máy chủ đang chạy."); });
+    fetch(cfg().base+"/health",{headers:hdr()})
+      .then(function(r){ if(r.status===401) throw new Error("sai khóa, bấm ⚙️ để nhập lại"); if(!r.ok) throw new Error("mã "+r.status); return r.json(); })
+      .then(function(j){ stat(j&&j.ok?"✅ Sẵn sàng. Bấm 🎤 rồi nói tiếng Anh nhé.":"⚠️ Server trả lời lạ."); })
+      .catch(function(e){ stat("⚠️ Chưa nối được Bi ("+e.message+"). Bạn thử lại sau ít phút hoặc nhắn thầy cô nhé."); });
   }
-  $("gear").onclick=function(){ config(true); checkConn(); };
-  if(!ls("bi_base")) stat("Bấm ⚙️ để nhập địa chỉ server và khóa trước khi nói."); else checkConn();
+  $("gear").onclick=function(){
+    var b=prompt("Địa chỉ server của Bi (có đuôi /bivoice):", cfg().base); if(b) ls("bi_base", b.replace(/\/+$/,""));
+    var k=prompt("Khóa BI_KEY:", cfg().key); if(k) ls("bi_key", k);
+    checkConn();
+  };
+  checkConn();
 })();
 </script>
 </body>

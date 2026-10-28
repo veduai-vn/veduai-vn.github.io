@@ -288,7 +288,7 @@ async function cham(it, tl) {
     card.querySelectorAll('button.opt').forEach(b => { const l = (b.firstChild && b.firstChild.textContent) || ''; if (l === j.dap_an) b.classList.add('ok'); else if (l === String(tl)) b.classList.add('bad'); });
   }
   if (tuLuan) {
-    const f = el('div', 'fb info'); f.textContent = 'Đáp án mẫu:\n' + (j.dap_an_mau || j.dap_an || '') + ((j.tieu_chi_cham || []).length ? '\n\nTiêu chí: ' + j.tieu_chi_cham.join('; ') : '') + (j.giai_thich ? '\n\n' + j.giai_thich : '');
+    const f = el('div', 'fb info'); f.textContent = 'Đáp án mẫu:\n' + (j.dap_an_mau || j.dap_an || '') + ((j.tieu_chi_cham || []).length ? '\n\nTiêu chí: ' + j.tieu_chi_cham.join('; ') : '') + (j.giai_thich ? '\n\n' + j.giai_thich : '') + (j.meo ? '\n\n💡 Mẹo nhỏ: ' + j.meo : '');
     card.append(f, el('p', 'muted', 'Bạn tự so với đáp án mẫu nhé:'));
     card.append(btn('✔', 'Bạn làm đúng', () => { Q.tong++; Q.dung++; if (it.phan === 'kiem_tra_cuoi') { Q.kt_tong++; Q.kt_dung++; } tiep(); }),
                 btn('✖', 'Bạn chưa đúng', () => { Q.tong++; if (it.phan === 'kiem_tra_cuoi') Q.kt_tong++; tiep(); }));
@@ -298,6 +298,7 @@ async function cham(it, tl) {
   let t = j.dung ? '🎉 Chính xác!' : '❌ Chưa đúng. Đáp án: ' + j.dap_an;
   if (!j.dung && j.vi_sao_chon_sai) t += '\n' + j.vi_sao_chon_sai;
   if (j.giai_thich) t += '\n\n' + j.giai_thich;
+  if (j.meo) t += '\n\n💡 Mẹo nhỏ: ' + j.meo;
   f.textContent = t; card.append(f, btn('', Q.i + 1 >= Q.ds.length ? 'Xem kết quả' : 'Câu tiếp theo →', tiep, 'main'));
 }
 function tiep() { Q.i++; SAVE.tiep = { id: Q.id, ten: Q.ten, lop: Q.lop, mon: Q.mon, tap: Q.tap, i: Q.i >= Q.ds.length ? 0 : Q.i }; luu(); hienCau(); }
