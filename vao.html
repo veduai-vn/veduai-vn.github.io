@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mọt sách - Vào học</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#EAF5FF;--card:#fff;--ink:#24305E;--muted:#5F6B92;--line:#C9DAF2;--shadow:#B5CBEA;--mark:#FFD84D;--mark-d:#E3AE00;--pop:#FF7A90;--ok:#118A62;
+--font:'Nunito',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;--disp:'Baloo 2','Nunito',system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--paper:#151B36;--card:#1F2850;--ink:#F1F4FF;--muted:#AAB4DC;--line:#38437A;--shadow:#0E1328}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%}
+body{background:var(--paper);background-image:radial-gradient(var(--line) 1.5px,transparent 1.5px);background-size:26px 26px;color:var(--ink);font:700 18px/1.4 var(--font);overflow-x:hidden}
+#app{max-width:640px;margin:0 auto;padding:14px 14px calc(30px + env(safe-area-inset-bottom,0px));min-height:100vh}
+.top{display:flex;align-items:center;gap:10px;min-height:56px}
+.back{appearance:none;border:3px solid var(--line);background:var(--card);border-radius:18px;width:56px;height:56px;font-size:28px;cursor:pointer;box-shadow:0 4px 0 var(--shadow);flex:none}
+.back[hidden]{visibility:hidden;display:block}
+.dots{flex:1;display:flex;gap:8px;justify-content:center}
+.dots i{width:14px;height:14px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--mark-d);transform:scale(1.25)}
+.snd{appearance:none;border:3px solid var(--line);background:var(--card);border-radius:18px;width:56px;height:56px;font-size:26px;cursor:pointer;box-shadow:0 4px 0 var(--shadow);flex:none}
+.snd.off{opacity:.55}
+.hero{display:flex;gap:10px;align-items:flex-end;margin:14px 0 18px}
+.bi{font-size:72px;line-height:1;flex:none;animation:lac 2.6s ease-in-out infinite;transform-origin:50% 90%}
+@keyframes lac{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(5deg) translateY(-4px)}}
+.bubble{background:var(--card);border:3px solid var(--line);border-radius:26px 26px 26px 6px;padding:12px 18px;box-shadow:0 5px 0 var(--shadow);font:800 24px/1.25 var(--disp)}
+.bubble small{display:block;font:700 15px var(--font);color:var(--muted);margin-top:4px}
+.grid{display:grid;gap:12px;position:relative}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+.btn{appearance:none;border:3px solid var(--line);background:var(--card);color:var(--ink);font:800 20px var(--disp);border-radius:24px;box-shadow:0 6px 0 var(--shadow);cursor:pointer;min-height:84px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center;transition:transform .08s,box-shadow .08s}
+.btn:active{transform:translateY(5px);box-shadow:0 1px 0 var(--shadow)}
+.btn .ic{font-size:38px;line-height:1.1}
+.btn.lop{font-size:34px;min-height:92px}
+.btn.lop small{font:700 13px var(--font);color:var(--muted)}
+.btn.big{min-height:150px;font-size:24px;padding:14px}
+.btn.big .ic{font-size:64px}
+.btn.big small{font:700 15px var(--font);color:var(--muted);font-weight:700}
+.btn.sel{background:var(--mark);border-color:var(--mark-d)}
+.tay{position:absolute;font-size:46px;pointer-events:none;animation:chi 1s ease-in-out infinite;filter:drop-shadow(0 3px 0 rgba(0,0,0,.15));z-index:3}
+@keyframes chi{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.nhan{margin:16px 0 8px;text-align:center;color:var(--muted);font-size:16px}
+.chip{appearance:none;border:3px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;font:800 17px var(--font);padding:10px 20px;cursor:pointer;box-shadow:0 4px 0 var(--shadow)}
+.chipbar{display:flex;justify-content:center;gap:10px;margin-top:20px;flex-wrap:wrap}
+.xong{text-align:center;margin-top:10px}
+@media (max-width:380px){.btn{font-size:17px}.btn .ic{font-size:32px}.bubble{font-size:21px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+.pop{animation:nay .35s ease-out}
+@keyframes nay{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ===== Vào học: 1 trang duy nhất, toàn nút bấm (lớp 1-12). Không bắt quay về Zalo. ===== */
+const API = 'https://devotee-outclass-couch.ngrok-free.dev/webhook';
+const KEY = 'ms_vao_v1';
+const q = new URLSearchParams(location.search);
+const token = q.get('t') || '';
+const $app = document.getElementById('app');
+
+let S = { lop: 0, vai: '', ph: '', mon: '', tieng: true };
+try { Object.assign(S, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
+const luu = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+
+const MON_ICON = { 'Toán': '➗', 'Tiếng Việt': '📖', 'Ngữ văn': '📖', 'Tiếng Anh': '🔤', 'Đạo đức': '💛', 'Tự nhiên và Xã hội': '🌳', 'Khoa học': '🔬',
+  'Khoa học tự nhiên': '🔬', 'Lịch sử và Địa lý': '🗺️', 'Lịch sử': '🏛️', 'Địa lý': '🌏', 'Giáo dục công dân': '🤝', 'Giáo dục kinh tế và pháp luật': '⚖️',
+  'Tin học và Công nghệ': '💻', 'Tin học': '💻', 'Công nghệ': '🛠️', 'Vật lý': '⚡', 'Hóa học': '🧪', 'Sinh học': '🌱' };
+function monTheoLop(l) {
+  if (l <= 2) return ['Toán', 'Tiếng Việt', 'Tiếng Anh', 'Đạo đức', 'Tự nhiên và Xã hội'];
+  if (l === 3) return ['Toán', 'Tiếng Việt', 'Tiếng Anh', 'Đạo đức', 'Tự nhiên và Xã hội', 'Tin học và Công nghệ'];
+  if (l <= 5) return ['Toán', 'Tiếng Việt', 'Tiếng Anh', 'Khoa học', 'Lịch sử và Địa lý', 'Đạo đức', 'Tin học và Công nghệ'];
+  if (l <= 9) return ['Toán', 'Ngữ văn', 'Tiếng Anh', 'Khoa học tự nhiên', 'Lịch sử và Địa lý', 'Giáo dục công dân', 'Tin học', 'Công nghệ'];
+  return ['Toán', 'Ngữ văn', 'Tiếng Anh', 'Vật lý', 'Hóa học', 'Sinh học', 'Lịch sử', 'Địa lý', 'Giáo dục kinh tế và pháp luật', 'Tin học', 'Công nghệ'];
+}
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+/* ---- Bi đọc to cho bé chưa biết đọc ---- */
+let giong = null;
+function noi(t) {
+  if (!S.tieng || !('speechSynthesis' in window)) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(t); u.lang = 'vi-VN'; u.rate = 0.92; u.pitch = 1.15;
+    if (!giong) giong = (speechSynthesis.getVoices() || []).find(v => /vi/i.test(v.lang)) || null;
+    if (giong) u.voice = giong;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+}
+if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => { giong = (speechSynthesis.getVoices() || []).find(v => /vi/i.test(v.lang)) || null; };
+
+/* ---- gửi nền lên máy chủ (nếu có token); lỗi thì bỏ qua, bé không bị chặn ---- */
+function baoMayChu() {
+  if (!token) return;
+  try { fetch(API + '/vao-nop', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' },
+    body: JSON.stringify({ t: token, lop: S.lop, vai: S.vai, phu_huynh: S.ph, mon: S.mon }) }).catch(() => {}); } catch (e) {}
+}
+
+/* ---- khung màn ---- */
+const BUOC = ['lop', 'ai', 'ph', 'mon', 'menu'];
+let man = 'lop';
+function khung(tenMan, loi, phu, noiDung, coQuayLai) {
+  const i = Math.max(0, BUOC.indexOf(tenMan));
+  $app.innerHTML = `<div class="top">
+      <button class="back" id="lui" aria-label="Quay lại" ${coQuayLai ? '' : 'hidden'}>⬅</button>
+      <div class="dots" aria-hidden="true">${[0, 1, 2, 3, 4].map(k => `<i class="${k <= i ? 'on' : ''}"></i>`).join('')}</div>
+      <button class="snd ${S.tieng ? '' : 'off'}" id="am" aria-label="Bật tắt tiếng Bi">${S.tieng ? '🔊' : '🔇'}</button>
+    </div>
+    <div class="hero pop"><div class="bi" id="bi" aria-hidden="true">🐻</div><div class="bubble">${loi}${phu ? `<small>${phu}</small>` : ''}</div></div>
+    <div class="pop" id="nd">${noiDung}</div>`;
+  document.getElementById('am').onclick = () => { S.tieng = !S.tieng; luu(); if (S.tieng) noi(loi.replace(/<[^>]+>/g, '')); else speechSynthesis && speechSynthesis.cancel(); ve(); };
+  document.getElementById('bi').onclick = () => noi(loi.replace(/<[^>]+>/g, ''));
+  const l = document.getElementById('lui'); if (l) l.onclick = lui;
+  noi(loi.replace(/<[^>]+>/g, '') + (phu ? '. ' + phu : ''));
+}
+function datTay(selector, kieu) {   // ngón tay chỉ vào nút cần bấm
+  const g = document.querySelector(selector); if (!g) return;
+  const t = document.createElement('span'); t.className = 'tay'; t.setAttribute('aria-hidden', 'true'); t.textContent = kieu === 'xuong' ? '👇' : '👆';
+  if (kieu === 'xuong') { g.style.marginTop = '58px'; t.style.left = '50%'; t.style.top = '-54px'; t.style.marginLeft = '-23px'; }
+  else { g.style.marginBottom = '56px'; t.style.left = '50%'; t.style.bottom = '-52px'; t.style.marginLeft = '-23px'; }
+  g.appendChild(t);
+}
+
+function ve() {
+  if (man === 'lop') {
+    khung('lop', 'Bạn học lớp mấy?', 'Chạm vào số lớp của bạn nhé', `<div class="grid g4" id="gl">${[...Array(12).keys()].map(i => {
+      const l = i + 1, e = l <= 5 ? '🐣' : l <= 9 ? '🎒' : '🎓';
+      return `<button class="btn lop ${S.lop === l ? 'sel' : ''}" data-l="${l}"><span class="ic">${e}</span>${l}<small>Lớp</small></button>`; }).join('')}</div>`, false);
+    datTay('#gl', 'xuong');
+    document.querySelectorAll('[data-l]').forEach(b => b.onclick = () => { S.lop = +b.dataset.l; luu(); S.mon = ''; di(S.vai ? 'mon' : 'ai'); });
+  } else if (man === 'ai') {
+    khung('ai', 'Ai đang dùng nè?', 'Chạm vào hình bạn nhé', `<div class="grid g2" id="ga">
+      <button class="btn big" data-v="hs"><span class="ic">🧒</span>Mình là bạn học sinh</button>
+      <button class="btn big" data-v="ph"><span class="ic">👨‍👩‍👧</span>Mình là ba mẹ<small>xem con học</small></button></div>`, true);
+    datTay('#ga', 'len');
+    document.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { S.vai = b.dataset.v; luu(); di(S.vai === 'ph' ? 'ph' : 'mon'); });
+  } else if (man === 'ph') {
+    khung('ph', 'Ba mẹ dùng thế nào ạ?', 'Chọn một cách thôi', `<div class="grid g2" id="gp">
+      <button class="btn big ${S.ph === 'chung' ? 'sel' : ''}" data-p="chung"><span class="ic">👨‍👩‍👧‍👦</span>Dùng chung<small>1 tài khoản cho các con</small></button>
+      <button class="btn big ${S.ph === 'rieng' ? 'sel' : ''}" data-p="rieng"><span class="ic">🧒</span>Riêng từng con<small>mỗi con một tài khoản</small></button></div>`, true);
+    datTay('#gp', 'len');
+    document.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { S.ph = b.dataset.p; luu(); baoMayChu(); di('mon'); });
+  } else if (man === 'mon') {
+    khung('mon', 'Hôm nay học môn gì?', 'Chạm vào môn bạn muốn', `<div class="grid g3" id="gm">${monTheoLop(S.lop).map(m =>
+      `<button class="btn ${S.mon === m ? 'sel' : ''}" data-m="${esc(m)}"><span class="ic">${MON_ICON[m] || '📘'}</span>${esc(m)}</button>`).join('')}</div>
+      <div class="chipbar"><button class="chip" id="dl">✏️ Đổi lớp (đang lớp ${S.lop})</button></div>`, true);
+    datTay('#gm', 'xuong');
+    document.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { S.mon = b.dataset.m; luu(); baoMayChu(); di('menu'); });
+    document.getElementById('dl').onclick = () => di('lop');
+  } else if (man === 'menu') {
+    const dl = 'lop=' + S.lop + '&mon=' + encodeURIComponent(S.mon) + (token ? '&t=' + encodeURIComponent(token) : '');
+    const ten = esc(S.mon);
+    khung('menu', 'Mình học ' + S.mon + ' nhé! Bạn muốn làm gì?', 'Chạm vào hình bạn thích', `<div class="grid g2" id="gk">
+      <a class="btn big" style="text-decoration:none" href="hoc-ngay.html?${dl}"><span class="ic">📘</span>Học bài<small>${ten} lớp ${S.lop}</small></a>
+      <a class="btn big" style="text-decoration:none" href="${token ? 'tai-lieu.html?b=' + (S.vai === 'ph' ? 'ph' : 'hs') + '&t=' + encodeURIComponent(token) : 'hoc-ngay.html?' + dl}"><span class="ic">📷</span>Chụp đề cho Bi<small>Bi giúp giải</small></a>
+      <a class="btn big" style="text-decoration:none" href="bi-noi-nhanh.html"><span class="ic">🗣️</span>Nói chuyện với Bi<small>luyện nói</small></a>
+      <button class="btn big" id="dm"><span class="ic">🔄</span>Đổi môn khác</button></div>`, true);
+    datTay('#gk', 'len');
+    document.getElementById('dm').onclick = () => { S.mon = ''; luu(); di('mon'); };
+  }
+}
+function di(m) { man = m; ve(); window.scrollTo(0, 0); }
+function lui() {
+  const truoc = { ai: 'lop', ph: 'ai', mon: S.vai === 'ph' ? 'ph' : (S.vai ? 'ai' : 'lop'), menu: 'mon' };
+  di(truoc[man] || 'lop');
+}
+
+/* ---- vào thẳng nếu đã chọn trước đây (không hỏi lại) ---- */
+man = !S.lop ? 'lop' : !S.vai ? 'ai' : (S.vai === 'ph' && !S.ph) ? 'ph' : !S.mon ? 'mon' : 'menu';
+ve();
+</script>
+</body>
+</html>
