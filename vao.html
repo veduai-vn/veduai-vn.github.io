@@ -454,16 +454,18 @@ function manHome() {
   const m = (id, ic, tt) => `<button class="btn" data-h="${id}"><span class="ic">${ic}</span>${tt}</button>`;
   const b = (id, ic, tt, sub, cls) => `<button class="btn ${cls || ''}" data-h="${id}"><span class="ic">${ic}</span>${tt}${sub ? `<small>${sub}</small>` : ''}</button>`;
   khung('home', 'Trang chủ của bạn nè! Hôm nay mình học gì nhỉ?', 'Chạm vào hình bạn thích', `
-    <div class="sec">📚 Học bài</div>
+    <div class="sec">📚 Các môn học</div>
     <div class="grid g3" id="gh">${m('toan', '➗', 'Toán')}${m('anh', '🔤', 'Tiếng Anh')}${m('khac', '📖', 'Môn khác')}</div>
+    <div class="sec">🎯 Học chuyên đề</div>
+    <div class="grid g2">${b('chuyende', '🎯', 'Học chuyên đề', 'ôn cả mạch kiến thức lớp 1 đến lớp 12', 'rong')}</div>
     <div class="sec">🗣️ Tiếng Anh giao tiếp</div>
     <div class="grid g2">${b('chude', '🗣️', 'Nói theo chủ đề', 'Bi nói trước hoặc bạn nói trước')}${b('nhanh', '🎤', 'Nói nhanh với Bi', 'Bi nghe và trả lời bằng giọng')}</div>
     <div class="sec">📝 Ôn thi</div>
     <div class="grid g2">${b('hk', '📝', 'Ôn thi học kỳ', '')}${b('dh', '🏛️', 'Ôn thi đại học', '')}${b('c3', '🏫', 'Ôn thi vào lớp 10 (cấp 3)', '', 'rong')}</div>
     <div class="sec">🎓 Chứng chỉ tiếng Anh <em>sắp có</em></div>
     <div class="grid g3">${b('sap', '🚧', 'TOEIC', 'đang làm', 'khoa')}${b('sap', '🚧', 'TOEFL', 'đang làm', 'khoa')}${b('sap', '🚧', 'IELTS', 'đang làm', 'khoa')}</div>
-    <div class="sec">⭐ Thêm</div>
-    <div class="grid g3">${m('hoi', '💬', 'Hỏi nhanh Bi')}${m('tiendo', '📈', 'Tiến độ')}${m('chuyende', '🎯', 'Chuyên đề')}</div>
+    <div class="sec">❓ Hỏi khác</div>
+    <div class="grid g2">${b('hoi', '💬', 'Hỏi nhanh Bi', 'gõ, nói hoặc chụp ảnh')}${b('tiendo', '📈', 'Tiến độ của mình', 'đã học tới đâu')}</div>
     <div class="sec">🎮 Chơi cùng Bi</div>
     <div class="grid g2">${b('game', '🎮', 'Game nuôi Bi', 'nuôi gấu Bi lớn lên, chơi mà học', 'rong')}</div>`, false);
   const lopTxt = ' lớp ' + S.lop;

@@ -142,7 +142,7 @@ button:disabled{opacity:.55;cursor:default}
 #en .eend{text-align:center}#en .eend .ebig{font-size:64px}
 #en .epromo{background:linear-gradient(135deg,#FFD84D,#FFB84D);color:#4A3700;border-radius:20px;padding:12px 14px;margin:0 0 14px;font-weight:700;font-size:14.5px;line-height:1.5}#en .epromo b{font:800 17px var(--disp)}#en .epromo a{color:#4A3700;font-weight:800}
 #en #en-cbox{margin:0 0 10px}#en #en-cbox input{width:100%;min-height:48px;border:2px solid var(--line);border-radius:999px;background:var(--card);color:var(--text);font:inherit;padding:0 16px}
-</style></head><body><div class="w">
+</style><script>if(new URLSearchParams(location.search).get("mo")==="en")document.documentElement.classList.add("mo-en")</script><style>html.mo-en .w,html.mo-en #pick{display:none!important}</style></head><body><div class="w">
 <h1>Bạn đồng hành của Bi</h1>
 <p class="m">Bạn nhỏ lớn lên theo số sao và số ngày học của bạn.</p>
 <div class="tabs" id="views" role="group" aria-label="Chọn màn hình">
@@ -953,5 +953,5 @@ $('rs').onclick=()=>{S.care={no:90,sach:90,ngu:90,vui:90};S.ct=Date.now();S.spen
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!busy)rtick()});
 setInterval(()=>{if(!busy)rtick()},30000);
 requestAnimationFrame(frame);
-(async()=>{await pull();rtick();ui();if(S.ch)load();else openPick(false);if(Q.get('mo')==='en')setTimeout(()=>{try{window.enOpen()}catch(e){}},600)})();   /* ?mo=en: mở thẳng màn Nói tiếng Anh theo chủ đề (từ trang Vào học) */
+(async()=>{const MO=Q.get('mo')==='en';if(MO){try{document.getElementById('en-x').textContent='← Về Trang chủ';window.enOpen()}catch(e){}}await pull();rtick();ui();if(S.ch)load();else if(!MO)openPick(false)})();   /* ?mo=en: mở thẳng màn Nói tiếng Anh theo chủ đề (từ trang Vào học) */
 </script></body></html>
