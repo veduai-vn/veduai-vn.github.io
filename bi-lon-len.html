@@ -944,7 +944,7 @@ function enClose(){ stopAudio(); try { if (rec) rec.stop(); } catch(e){} try { i
   ROOT.hidden = true; document.body.style.overflow = ''; cancelAnimationFrame(cpT);
   if (typeof SND !== 'undefined' && SND.m && typeof musicOn === 'function') musicOn(); }
 window.enClose = enClose; window.enIsOpen = () => !ROOT.hidden;
-$('x').onclick = enClose;
+$('x').onclick = () => { enClose(); if (Q.get('mo') === 'en') location.href = 'vao.html'; };   /* vào từ Trang chủ thì đóng là quay về Trang chủ */
 })();
 /* chế độ thử */
 $('t6').onclick=()=>{S.ct-=6*3.6e6;rtick()};$('t48').onclick=()=>{S.ct-=48*3.6e6;rtick()};
@@ -953,5 +953,5 @@ $('rs').onclick=()=>{S.care={no:90,sach:90,ngu:90,vui:90};S.ct=Date.now();S.spen
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!busy)rtick()});
 setInterval(()=>{if(!busy)rtick()},30000);
 requestAnimationFrame(frame);
-(async()=>{await pull();rtick();ui();if(S.ch)load();else openPick(false)})();
+(async()=>{await pull();rtick();ui();if(S.ch)load();else openPick(false);if(Q.get('mo')==='en')setTimeout(()=>{try{window.enOpen()}catch(e){}},600)})();   /* ?mo=en: mở thẳng màn Nói tiếng Anh theo chủ đề (từ trang Vào học) */
 </script></body></html>

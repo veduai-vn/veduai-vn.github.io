@@ -100,7 +100,8 @@ body{background:var(--paper);background-image:radial-gradient(var(--line) 1.5px,
 .nhap>div{max-width:640px;margin:0 auto;display:flex;gap:8px}
 .nhap input{flex:1;min-width:0;border:3px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:10px 16px;font:700 18px var(--font);outline:none}
 .nhap input:focus{border-color:var(--mark-d)}
-.nhap .ib{width:48px;height:48px;border-radius:50%}
+.nhap .ib{width:44px;height:44px;border-radius:50%;font-size:21px}
+.nhap .ib span{line-height:1}
 .nhap .gui{background:var(--mark);border-color:var(--mark-d)}
 .goiy{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
 /* hiệu ứng bấm */
@@ -243,7 +244,12 @@ function phao(x, y) {
 const CAU_BI = ['Hihi, nhột quá! 🤭', 'Bi đây, Bi đây! 🐻', 'Cùng học nào! 📚', 'Bạn giỏi lắm! 🌟', 'Bi yêu bạn! 💖', 'Hôm nay học gì nhỉ? 🤔', 'Cố lên nha! 💪'];
 let kCau = 0;
 let BI_TOK = (DD && DD.bi) || '';
-function moGame() { dungNoi(); setTimeout(() => { location.href = 'bi-lon-len.html' + (BI_TOK ? '?t=' + encodeURIComponent(BI_TOK) : ''); }, 800); }
+function vaoBi(them, cho) {   // vào app "Bi lớn lên" (game nuôi Bi / nói tiếng Anh theo chủ đề); cần mã riêng của bé
+  dungNoi();
+  const di = () => { location.href = 'bi-lon-len.html' + (BI_TOK ? '?t=' + encodeURIComponent(BI_TOK) + (them ? '&' + them : '') : (them ? '?' + them : '')); };
+  setTimeout(() => { if (BI_TOK) di(); else layHoSo().catch(() => {}).then(di); }, cho || 0);
+}
+function moGame() { vaoBi('', 800); }
 function gauChuyen(bi, cau, khongMo) {   // chạm vào gấu: nhảy hoặc xoay, nổ tim sao, nói một câu dễ thương
   bi.classList.remove('nhay', 'xoay'); void bi.offsetWidth; bi.classList.add(kCau % 2 ? 'xoay' : 'nhay');
   const r = bi.getBoundingClientRect(), c = cau || CAU_BI[kCau++ % CAU_BI.length];
@@ -332,7 +338,8 @@ function moNgan() {
     if (S.lop) mucs.push(['🏠', 'Trang chủ', 'chọn môn', veNha]);
     if (S.lop) mucs.push(['✏️', 'Đổi lớp', 'đang lớp ' + S.lop, () => { S.mon = ''; luu(); LS = []; di('lop'); }]);
   }
-  mucs.push(['🗣️', 'Tiếng Anh giao tiếp', 'luyện nói với Bi', () => { location.href = 'bi-noi-nhanh.html'; }]);
+  if (DA_DK) mucs.push(['🗣️', 'Nói tiếng Anh theo chủ đề', 'Bi nói trước hoặc bạn nói trước', () => vaoBi('mo=en')]);
+  mucs.push(['🎤', 'Nói nhanh với Bi', 'Bi nghe và trả lời bằng giọng', () => { location.href = 'bi-noi-nhanh.html'; }]);
   if (DA_DK) mucs.push(['🎮', 'Game nuôi Bi', 'nuôi gấu Bi lớn lên', moGame]);
   mucs.push([S.tieng ? '🔇' : '🔊', S.tieng ? 'Tắt tiếng Bi' : 'Bật tiếng Bi', 'Bi đọc to cho bạn nghe', () => { S.tieng = !S.tieng; luu(); if (!S.tieng) dungNoi(); ve(); }]);
   $tam.innerHTML = '<h3>Menu <span aria-hidden="true">🐻</span></h3>' + mucs.map((m, k) => `<button class="mn" data-k="${k}"><span class="ic">${m[0]}</span><span>${m[1]}<small>${m[2]}</small></span></button>`).join('') +
@@ -358,7 +365,7 @@ try { CH = JSON.parse(localStorage.getItem(KCHAT + '_' + uZalo) || '[]').slice(-
 const luuChat = () => { try { localStorage.setItem(KCHAT + '_' + uZalo, JSON.stringify(CH.slice(-20))); } catch (e) {} };
 let dangHoi = false;
 function veTin(m, k) {
-  return `<div class="tin ${m.r === 'u' ? 'me' : 'bi'}">${esc(dep(m.t)).replace(/\n/g, '<br>')}${m.r === 'b' ? `<br><button class="nghe" data-n="${k}">🔊 Nghe</button>` : ''}</div>`;
+  return `<div class="tin ${m.r === 'u' ? 'me' : 'bi'}">${m.a ? '📷 ' : ''}${esc(dep(m.t)).replace(/\n/g, '<br>')}${m.r === 'b' ? `<br><button class="nghe" data-n="${k}">🔊 Nghe</button>` : ''}</div>`;
 }
 function ghiChat() {
   const kh = document.getElementById('kh'); if (!kh) return;
@@ -366,12 +373,37 @@ function ghiChat() {
   kh.querySelectorAll('[data-n]').forEach(b => b.onclick = () => noiDai(CH[+b.dataset.n].t));
   window.scrollTo(0, document.body.scrollHeight);
 }
-async function hoi(text) {
-  text = String(text || '').trim().slice(0, 600); if (!text || dangHoi) return;
-  dungNoi(); CH.push({ r: 'u', t: text }); dangHoi = true; ghiChat();
+function nenAnh(file) {   // thu nhỏ ảnh về tối đa 1280px, nén JPEG để gửi nhanh
+  return new Promise((ok, loi) => {
+    const r = new FileReader();
+    r.onload = () => { const im = new Image(); im.onload = () => {
+      const k = Math.min(1, 1280 / Math.max(im.width, im.height)), w = Math.round(im.width * k), h = Math.round(im.height * k);
+      const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(im, 0, 0, w, h);
+      ok(c.toDataURL('image/jpeg', 0.82).split(',')[1]); }; im.onerror = () => loi(new Error('anh')); im.src = r.result; };
+    r.onerror = () => loi(new Error('doc')); r.readAsDataURL(file);
+  });
+}
+async function guiAnh(file, text) {
+  if (dangHoi) return;
+  try { const b64 = await nenAnh(file); hoi(text, b64); }
+  catch (e) { CH.push({ r: 'b', t: 'Bi chưa mở được ảnh này, bạn chụp lại nhé 📷' }); ghiChat(); }
+}
+async function moTep() {   // đề nhiều trang / PDF / Word: sang trang gửi tài liệu (dùng chung với Zalo)
+  dungNoi();
+  try {
+    const r = await fetch(API + '/vao-tailieu', { method: 'POST', headers: H, body: JSON.stringify({ u: uZalo, t: tHex }) });
+    const j = await r.json();
+    if (j && j.ok && j.url) { location.href = j.url; return; }
+    CH.push({ r: 'b', t: (j && j.loi) || 'Chưa mở được trang gửi tệp, bạn thử lại nhé.' });
+  } catch (e) { CH.push({ r: 'b', t: 'Mạng đang chập chờn, bạn thử lại nhé 📡' }); }
+  ghiChat();
+}
+async function hoi(text, img) {
+  text = String(text || '').trim().slice(0, 600); if ((!text && !img) || dangHoi) return;
+  dungNoi(); CH.push({ r: 'u', t: text || 'Bi ơi, giúp mình bài trong ảnh này nhé.', a: img ? 1 : 0 }); dangHoi = true; ghiChat();
   try {
     const hist = CH.slice(0, -1).slice(-6);
-    const r = await fetch(API + '/vao-hoi', { method: 'POST', headers: H, body: JSON.stringify({ u: uZalo, t: tHex, lop: S.lop, mon: S.mon, text, hist }) });
+    const r = await fetch(API + '/vao-hoi', { method: 'POST', headers: H, body: JSON.stringify({ u: uZalo, t: tHex, lop: S.lop, mon: S.mon, text, hist, img: img || '' }) });
     const j = await r.json();
     CH.push({ r: 'b', t: j.ok ? j.reply : (j.loi || 'Bi đang bận chút, bạn hỏi lại nhé.') });
     dangHoi = false; luuChat(); ghiChat();
@@ -379,16 +411,20 @@ async function hoi(text) {
   } catch (e) { dangHoi = false; CH.push({ r: 'b', t: 'Mạng đang chập chờn, bạn thử lại nhé 📡' }); ghiChat(); }
 }
 function manChat(batDauVoi) {
-  khung('chat', 'Hỏi Bi nhanh nè!', 'Gõ hoặc bấm 🎤 để nói', `<div class="goiy" id="gy">
+  khung('chat', 'Hỏi Bi nhanh nè!', 'Gõ, nói 🎤 hoặc chụp ảnh 📷', `<div class="goiy" id="gy">
       <button class="chip" data-g="Giải thích giúp mình bài đang học">📘 Giải thích bài</button>
       <button class="chip" data-g="Cho mình một mẹo để nhớ bài${S.mon ? ' môn ' + esc(S.mon) : ''}">💡 Mẹo nhớ</button>
       <button class="chip" data-g="Cho mình 3 câu bài tập${S.mon ? ' môn ' + esc(S.mon) : ''} để luyện, hỏi từng câu một">✏️ Cho bài tập</button></div>
     <div class="khung" id="kh"></div>
-    <div class="nhap"><div><button class="ib" id="mic" aria-label="Nói" hidden>🎤</button><input id="o" type="text" maxlength="600" placeholder="Bạn muốn hỏi gì?" autocomplete="off" enterkeyhint="send"><button class="ib gui" id="g" aria-label="Gửi">➤</button></div></div>`, true, true);
+    <div class="nhap"><div><button class="ib" id="cam" aria-label="Chụp hoặc chọn ảnh"><span>📷</span></button><button class="ib" id="tep" aria-label="Gửi tệp hoặc đề nhiều trang"><span>📎</span></button><input type="file" id="fa" accept="image/*" hidden><button class="ib" id="mic" aria-label="Nói" hidden>🎤</button><input id="o" type="text" maxlength="600" placeholder="Hỏi Bi nhé…" autocomplete="off" enterkeyhint="send"><button class="ib gui" id="g" aria-label="Gửi">➤</button></div></div>`, true, true);
   document.getElementById('fab').hidden = true;
   if (!CH.length) CH.push({ r: 'b', t: 'Chào bạn! Mình là Bi 🐻. Bạn cứ hỏi bài, mình giúp ngay nhé!' });
   ghiChat();
   const o = document.getElementById('o'), gui = () => { const v = o.value; o.value = ''; hoi(v); };
+  const fa = document.getElementById('fa');
+  document.getElementById('cam').onclick = () => fa.click();
+  fa.onchange = () => { const f = fa.files && fa.files[0]; fa.value = ''; if (f) { const v = o.value; o.value = ''; guiAnh(f, v); } };
+  document.getElementById('tep').onclick = moTep;
   document.getElementById('g').onclick = gui; o.onkeydown = e => { if (e.key === 'Enter') gui(); };
   document.querySelectorAll('[data-g]').forEach(b => b.onclick = () => hoi(b.dataset.g));
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition, mic = document.getElementById('mic');
@@ -421,23 +457,26 @@ function manHome() {
     <div class="sec">📚 Học bài</div>
     <div class="grid g3" id="gh">${m('toan', '➗', 'Toán')}${m('anh', '🔤', 'Tiếng Anh')}${m('khac', '📖', 'Môn khác')}</div>
     <div class="sec">🗣️ Tiếng Anh giao tiếp</div>
-    <div class="grid g2">${b('giaotiep', '🐻', 'Nói tiếng Anh với Bi', 'luyện nói, Bi sửa lỗi')}${b('hoi', '💬', 'Hỏi nhanh Bi', 'gõ hoặc nói')}${b('game', '🎮', 'Game nuôi Bi', 'nuôi gấu Bi lớn lên, chơi mà học', 'rong')}</div>
+    <div class="grid g2">${b('chude', '🗣️', 'Nói theo chủ đề', 'Bi nói trước hoặc bạn nói trước')}${b('nhanh', '🎤', 'Nói nhanh với Bi', 'Bi nghe và trả lời bằng giọng')}</div>
     <div class="sec">📝 Ôn thi</div>
     <div class="grid g2">${b('hk', '📝', 'Ôn thi học kỳ', '')}${b('dh', '🏛️', 'Ôn thi đại học', '')}${b('c3', '🏫', 'Ôn thi vào lớp 10 (cấp 3)', '', 'rong')}</div>
     <div class="sec">🎓 Chứng chỉ tiếng Anh <em>sắp có</em></div>
     <div class="grid g3">${b('sap', '🚧', 'TOEIC', 'đang làm', 'khoa')}${b('sap', '🚧', 'TOEFL', 'đang làm', 'khoa')}${b('sap', '🚧', 'IELTS', 'đang làm', 'khoa')}</div>
     <div class="sec">⭐ Thêm</div>
-    <div class="grid g2">${b('tiendo', '📈', 'Tiến độ', 'đã học tới đâu')}${b('chuyende', '🎯', 'Học chuyên đề', 'ôn cả mạch kiến thức')}</div>`, false);
+    <div class="grid g3">${m('hoi', '💬', 'Hỏi nhanh Bi')}${m('tiendo', '📈', 'Tiến độ')}${m('chuyende', '🎯', 'Chuyên đề')}</div>
+    <div class="sec">🎮 Chơi cùng Bi</div>
+    <div class="grid g2">${b('game', '🎮', 'Game nuôi Bi', 'nuôi gấu Bi lớn lên, chơi mà học', 'rong')}</div>`, false);
   const lopTxt = ' lớp ' + S.lop;
   const hanh = {
     toan: () => { S.mon = 'Toán'; luu(); di('menu'); },
     anh: () => { S.mon = 'Tiếng Anh'; luu(); di('menu'); },
     khac: () => di('mon'),
-    giaotiep: () => { location.href = 'bi-noi-nhanh.html'; },
+    chude: () => vaoBi('mo=en'),
+    nhanh: () => { location.href = 'bi-noi-nhanh.html'; },
     hoi: () => di('chat'),
     hk: () => { LS.push('home'); man = 'chat'; ve('Mình muốn ôn thi học kì' + lopTxt + '. Hỏi mình xem muốn ôn môn nào, rồi cho từng câu một, chờ mình trả lời rồi chấm và giải thích.'); },
     dh: () => { LS.push('home'); man = 'chat'; ve('Mình muốn ôn thi đại học (tốt nghiệp THPT). Hỏi mình xem muốn ôn môn nào, rồi cho từng câu một, chờ mình trả lời rồi chấm và giải thích.'); },
-    game: () => { const bi = document.getElementById('bi'); gauChuyen(bi, 'Vào chơi với Bi nhé! 🎮', true); moGame(); },
+    game: () => { const bi = document.getElementById('bi'); if (bi) gauChuyen(bi, 'Vào chơi với Bi nhé! 🎮', true); moGame(); },
     c3: () => { LS.push('home'); man = 'chat'; ve('Mình muốn ôn thi vào lớp 10 (cấp 3). Hỏi mình xem muốn ôn môn nào, rồi cho từng câu một, chờ mình trả lời rồi chấm và giải thích.'); },
     sap: nhacSapCo,
     tiendo: () => { location.href = 'hoc-ngay.html?lop=' + S.lop + '&u=' + encodeURIComponent(uZalo) + '&t=' + tHex; },
