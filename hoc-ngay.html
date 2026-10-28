@@ -151,9 +151,9 @@ const loiMang = fn => { say('Mạng đang chập chờn…'); trangThai('📡', 
 /* v136: khoi 'Cau hoi khac' - luon co loi ra, khong de hoc sinh phai doan */
 function chanTrang() {
   const w = el('div'); w.style.marginTop = '14px';
-  w.append(el('div', 'chap', '❓ Câu hỏi khác'));
+  w.append(el('div', 'chap', '🐻 Làm gì tiếp?'));
   if (TG) w.append(btn('💬', 'Về chat để chọn mục khác', () => { try { TG.close(); } catch (e) {} }));
-  else w.append(el('p', 'muted', 'Quay lại Zalo, gõ “menu” hoặc chọn “Câu hỏi khác” để xem tất cả dịch vụ.'));
+  else w.append(btn('🏠', 'Về trang chính (Bi)', () => { location.href = 'vao.html' + (SAVE.u && SAVE.t ? '?u=' + encodeURIComponent(SAVE.u) + '&t=' + SAVE.t : ''); }));
   const a = btn('📞', 'Gặp Admin', () => { location.href = 'tel:0984048177'; }); w.append(a);
   return w;
 }
@@ -331,5 +331,6 @@ function tongKet() {
   manLop();
 })();
 </script>
+<script src="bi-bar.js"></script>
 </body>
 </html>
