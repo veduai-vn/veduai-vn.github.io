@@ -10,13 +10,13 @@
   } catch (e) {}
   var home = 'vao.html' + (me && me.u && me.t ? '?u=' + encodeURIComponent(me.u) + '&t=' + me.t : '');
 
-  var tm = document.createElement('link'); tm.rel = 'stylesheet'; tm.href = 'bi-theme.css?v=1'; document.head.appendChild(tm);   // giao diện xanh chấm bi chung (sau mot-sach.css)
+  var tm = document.createElement('link'); tm.rel = 'stylesheet'; tm.href = 'bi-theme.css?v=2'; document.head.appendChild(tm);   // giao diện xanh chấm bi chung (sau mot-sach.css)
   var css = document.createElement('style');
   css.textContent =
-    '#bibar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:9999;display:flex;gap:10px;padding:8px 12px;background:rgba(255,255,255,.96);border:3px solid #C9DAF2;border-radius:26px;box-shadow:0 5px 0 #B5CBEA,0 10px 24px rgba(0,0,0,.18);font-family:"Nunito",system-ui,sans-serif}' +
-    '#bibar button,#bibar a{appearance:none;border:0;background:transparent;color:#24305E;text-decoration:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:62px;height:54px;border-radius:16px;font:800 11px/1 "Nunito",system-ui,sans-serif;transition:transform .12s,background .15s}' +
+    '#bibar{position:fixed;right:8px;top:calc(6px + env(safe-area-inset-top,0px));z-index:9999;display:flex;gap:2px;padding:3px 5px;background:rgba(255,255,255,.96);border:3px solid #C9DAF2;border-radius:20px;box-shadow:0 4px 0 #B5CBEA,0 6px 14px rgba(0,0,0,.15);font-family:"Nunito",system-ui,sans-serif}' +
+    '#bibar button,#bibar a{appearance:none;border:0;background:transparent;color:#24305E;text-decoration:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:50px;height:46px;border-radius:14px;font:800 10px/1 "Nunito",system-ui,sans-serif;transition:transform .12s,background .15s}' +
     '#bibar button:active,#bibar a:active{transform:translateY(3px) scale(.94);background:rgba(255,216,77,.45)}' +
-    '#bibar span{font-size:26px;line-height:1}' +
+    '#bibar span{font-size:22px;line-height:1}' +
     '#bibar .bi{animation:bibarlac 2.6s ease-in-out infinite}' +
     '@keyframes bibarlac{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg) translateY(-3px)}}' +
     '.bibar-pt{position:fixed;z-index:10000;pointer-events:none;font-size:22px;animation:bibarbay .85s ease-out forwards}' +
@@ -30,7 +30,7 @@
     '<a id="bb-nha" href="' + home + '" aria-label="Về trang chính"><span class="bi">🏠</span>Trang chủ</a>' +
     '<button id="bb-tien" aria-label="Đi tới"><span>➡️</span>Tới</button>';
   document.body.appendChild(bar);
-  document.body.style.paddingBottom = 'calc(86px + env(safe-area-inset-bottom,0px))';
+  if (!document.querySelector('.ms-head')) document.body.style.paddingTop = 'calc(58px + env(safe-area-inset-top,0px))';   // trang không có đầu trang riêng: chừa chỗ cho thanh điều hướng
   document.getElementById('bb-lui').onclick = function () { history.length > 1 ? history.back() : (location.href = home); };
   document.getElementById('bb-tien').onclick = function () { history.forward(); };
   bar.addEventListener('pointerdown', function (e) {
