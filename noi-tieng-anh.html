@@ -4,13 +4,13 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head><body style="font-family:system-ui,sans-serif;text-align:center;padding:40px 16px">
 <p>Đang chuyển sang <b>Bi lớn lên</b>…</p>
-<p><a id="a" href="index.html">Bấm vào đây nếu trang không tự chuyển</a></p>
+<p><a id="a" href="bi-lon-len.html">Bấm vào đây nếu trang không tự chuyển</a></p>
 <script>
-/* Trang cũ "Nói tiếng Anh" đã gộp vào index.html. Giữ file này để link cũ vẫn chạy: chuyển sang index.html và giữ nguyên mã ?t=, ?s=, ?thu= (và mã start_param của Telegram). */
+/* Trang cũ "Nói tiếng Anh" đã gộp vào bi-lon-len.html. Giữ file này để link cũ vẫn chạy: chuyển sang bi-lon-len.html và giữ nguyên mã ?t=, ?s=, ?thu= (và mã start_param của Telegram). */
 (function(){
  var q=new URLSearchParams(location.search), TG=window.Telegram&&Telegram.WebApp;
  try{ if(!q.get('t')){ var sp=TG&&TG.initDataUnsafe&&TG.initDataUnsafe.start_param; if(sp) q.set('t',String(sp).replace(/[^A-Za-z0-9]/g,'')); } }catch(e){}
- var qs=q.toString(), url='index.html'+(qs?'?'+qs:'')+location.hash;
+ var qs=q.toString(), url='bi-lon-len.html'+(qs?'?'+qs:'')+location.hash;
  document.getElementById('a').href=url;
  location.replace(url);
 })();
