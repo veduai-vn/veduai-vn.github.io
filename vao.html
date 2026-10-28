@@ -60,12 +60,22 @@ body{background:var(--paper);background-image:radial-gradient(var(--line) 1.5px,
 const API = 'https://devotee-outclass-couch.ngrok-free.dev/webhook';
 const KEY = 'ms_vao_v1';
 const q = new URLSearchParams(location.search);
-const token = q.get('t') || '';
+const uZalo = (q.get('u') || '').slice(0, 80);
+const tHex = (q.get('t') || '').replace(/[^a-f0-9]/g, '');
+const DA_DK = !!uZalo && tHex.length >= 16;      // bé đã đăng ký: link do bot gửi (u + mã ký), bỏ qua phần làm quen
+const token = DA_DK ? '' : (q.get('t') || '');
 const $app = document.getElementById('app');
 
 let S = { lop: 0, vai: '', ph: '', mon: '', tieng: true };
 try { Object.assign(S, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
 const luu = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+if (DA_DK) {   // bé đã đăng ký: lớp lấy từ link, vai trò = học sinh, hỏi môn ngay
+  const l = parseInt(q.get('lop'), 10);
+  if (l >= 1 && l <= 12) S.lop = l;
+  S.vai = 'hs'; S.ph = S.ph || 'chung';
+  if (q.get('mon')) S.mon = q.get('mon'); else if (q.get('m') !== 'menu') S.mon = '';
+}
+const MON_DK = (q.get('mons') || '').split(',').map(x => x.trim()).filter(Boolean);
 
 const MON_ICON = { 'Toán': '➗', 'Tiếng Việt': '📖', 'Ngữ văn': '📖', 'Tiếng Anh': '🔤', 'Đạo đức': '💛', 'Tự nhiên và Xã hội': '🌳', 'Khoa học': '🔬',
   'Khoa học tự nhiên': '🔬', 'Lịch sử và Địa lý': '🗺️', 'Lịch sử': '🏛️', 'Địa lý': '🌏', 'Giáo dục công dân': '🤝', 'Giáo dục kinh tế và pháp luật': '⚖️',
@@ -145,18 +155,18 @@ function ve() {
     datTay('#gp', 'len');
     document.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { S.ph = b.dataset.p; luu(); baoMayChu(); di('mon'); });
   } else if (man === 'mon') {
-    khung('mon', 'Hôm nay học môn gì?', 'Chạm vào môn bạn muốn', `<div class="grid g3" id="gm">${monTheoLop(S.lop).map(m =>
+    khung('mon', 'Hôm nay học môn gì?', 'Chạm vào môn bạn muốn', `<div class="grid g3" id="gm">${(DA_DK && MON_DK.length ? monTheoLop(S.lop).filter(m => MON_DK.includes(m)) : monTheoLop(S.lop)).map(m =>
       `<button class="btn ${S.mon === m ? 'sel' : ''}" data-m="${esc(m)}"><span class="ic">${MON_ICON[m] || '📘'}</span>${esc(m)}</button>`).join('')}</div>
-      <div class="chipbar"><button class="chip" id="dl">✏️ Đổi lớp (đang lớp ${S.lop})</button></div>`, true);
+      ${DA_DK ? '' : `<div class="chipbar"><button class="chip" id="dl">✏️ Đổi lớp (đang lớp ${S.lop})</button></div>`}`, !DA_DK);
     datTay('#gm', 'xuong');
     document.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { S.mon = b.dataset.m; luu(); baoMayChu(); di('menu'); });
-    document.getElementById('dl').onclick = () => di('lop');
+    { const dlb = document.getElementById('dl'); if (dlb) dlb.onclick = () => di('lop'); }
   } else if (man === 'menu') {
-    const dl = 'lop=' + S.lop + '&mon=' + encodeURIComponent(S.mon) + (token ? '&t=' + encodeURIComponent(token) : '');
+    const dl = 'lop=' + S.lop + '&mon=' + encodeURIComponent(S.mon) + (DA_DK ? '&u=' + encodeURIComponent(uZalo) + '&t=' + tHex : (token ? '&t=' + encodeURIComponent(token) : ''));
     const ten = esc(S.mon);
     khung('menu', 'Mình học ' + S.mon + ' nhé! Bạn muốn làm gì?', 'Chạm vào hình bạn thích', `<div class="grid g2" id="gk">
       <a class="btn big" style="text-decoration:none" href="hoc-ngay.html?${dl}"><span class="ic">📘</span>Học bài<small>${ten} lớp ${S.lop}</small></a>
-      <a class="btn big" style="text-decoration:none" href="${token ? 'tai-lieu.html?b=' + (S.vai === 'ph' ? 'ph' : 'hs') + '&t=' + encodeURIComponent(token) : 'hoc-ngay.html?' + dl}"><span class="ic">📷</span>Chụp đề cho Bi<small>Bi giúp giải</small></a>
+      <a class="btn big" style="text-decoration:none" href="${DA_DK ? 'chuyen-de.html?lop=' + S.lop : token ? 'tai-lieu.html?b=' + (S.vai === 'ph' ? 'ph' : 'hs') + '&t=' + encodeURIComponent(token) : 'hoc-ngay.html?' + dl}">${DA_DK ? '<span class="ic">🎯</span>Học chuyên đề<small>ôn cả mạch kiến thức</small>' : '<span class="ic">📷</span>Chụp đề cho Bi<small>Bi giúp giải</small>'}</a>
       <a class="btn big" style="text-decoration:none" href="bi-noi-nhanh.html"><span class="ic">🗣️</span>Nói chuyện với Bi<small>luyện nói</small></a>
       <button class="btn big" id="dm"><span class="ic">🔄</span>Đổi môn khác</button></div>`, true);
     datTay('#gk', 'len');
@@ -170,7 +180,7 @@ function lui() {
 }
 
 /* ---- vào thẳng nếu đã chọn trước đây (không hỏi lại) ---- */
-man = !S.lop ? 'lop' : !S.vai ? 'ai' : (S.vai === 'ph' && !S.ph) ? 'ph' : !S.mon ? 'mon' : 'menu';
+man = DA_DK && S.lop ? (S.mon ? 'menu' : 'mon') : !S.lop ? 'lop' : !S.vai ? 'ai' : (S.vai === 'ph' && !S.ph) ? 'ph' : !S.mon ? 'mon' : 'menu';
 ve();
 </script>
 </body>
