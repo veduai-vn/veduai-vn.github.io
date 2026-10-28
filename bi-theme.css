@@ -1,0 +1,29 @@
+/* bi-theme.css - giao diện chung "Bi" cho mọi trang của bé: nền xanh chấm bi, thẻ bo tròn, gấu Bi.
+   Nạp tự động bởi bi-bar.js (sau mot-sach.css) nên mọi trang đổi theo cùng lúc. Giống vao.html: sáng/tối theo máy. */
+:root{
+  --bg:#EAF5FF;--paper:#EAF5FF;--card:#fff;--text:#24305E;--ink:#24305E;--muted:#5F6B92;--mut:#5F6B92;--line:#C9DAF2;--shadow:#B5CBEA;--sh:#B5CBEA;
+  --mark:#FFD84D;--mark-d:#E3AE00;--mark-ink:#4A3700;--okbg:#E3F7EE;--errbg:#FDE8F0;--ok:#118A62;--err:#C2255C;--bad:#C2255C;--red:#FF7A90;--blue:#2F6FD6;--stage:#EAF5FF;
+  --font:'Nunito',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;--disp:'Baloo 2','Nunito',system-ui,sans-serif;color-scheme:light dark;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#151B36;--paper:#151B36;--card:#1F2850;--text:#F1F4FF;--ink:#F1F4FF;--muted:#AAB4DC;--mut:#AAB4DC;--line:#38437A;--shadow:#0E1328;--sh:#0E1328;
+  --mark-ink:#24305E;--okbg:#103B31;--errbg:#4A1F33;--ok:#4BD3A1;--err:#FF8FB0;--bad:#FF8FB0;--blue:#8DB4FF;--stage:#151B36;color-scheme:dark}}
+html,body.ms,body{background-color:var(--paper)!important;color:var(--text)}
+body.ms{background-image:radial-gradient(var(--line) 1.5px,transparent 1.5px)!important;background-size:26px 26px!important}
+body.ms::before{display:none!important}
+.ms-head{background:transparent!important;border-bottom:0!important}
+.ms-logo,.ms-logo span{color:var(--text)!important}
+.ms-logo b{color:#24305E!important}
+body.ms .bubble,body.ms .card{background:var(--card)!important;color:var(--text);border:3px solid var(--line)!important;box-shadow:0 5px 0 var(--shadow)!important}
+body.ms .bubble{border-radius:26px 26px 26px 6px!important;font-family:var(--disp)}
+body.ms .card{border-radius:26px!important}
+body.ms button.opt,body.ms .tab,body.ms .tu{background:var(--card);color:var(--text);border-color:var(--line)}
+body.ms button.opt{box-shadow:0 5px 0 var(--shadow)}
+body.ms button.opt .n{background:var(--mark);color:var(--mark-ink)}
+body.ms textarea,body.ms input[type=text],body.ms input[type=number],body.ms select{background:var(--card);color:var(--text);border-color:var(--line)}
+body.ms .vf,body.ms .muted{color:var(--muted)}
+body.ms a{color:var(--blue)}
+body.ms .btn,body.ms button{-webkit-tap-highlight-color:transparent}
+/* nhấn nút có phản hồi */
+body.ms button.opt:active,body.ms .tab:active,body.ms .chip:active{transform:translateY(4px) scale(.97)}
+body.ms button.opt{transition:transform .12s,box-shadow .12s,background .15s}

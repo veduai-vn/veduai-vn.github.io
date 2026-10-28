@@ -10,10 +10,10 @@
   } catch (e) {}
   var home = 'vao.html' + (me && me.u && me.t ? '?u=' + encodeURIComponent(me.u) + '&t=' + me.t : '');
 
+  var tm = document.createElement('link'); tm.rel = 'stylesheet'; tm.href = 'bi-theme.css?v=1'; document.head.appendChild(tm);   // giao diện xanh chấm bi chung (sau mot-sach.css)
   var css = document.createElement('style');
   css.textContent =
     '#bibar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:9999;display:flex;gap:10px;padding:8px 12px;background:rgba(255,255,255,.96);border:3px solid #C9DAF2;border-radius:26px;box-shadow:0 5px 0 #B5CBEA,0 10px 24px rgba(0,0,0,.18);font-family:"Nunito",system-ui,sans-serif}' +
-    '@media (prefers-color-scheme:dark){#bibar{background:rgba(31,40,80,.96);border-color:#38437A;box-shadow:0 5px 0 #0E1328,0 10px 24px rgba(0,0,0,.4)}#bibar button,#bibar a{color:#F1F4FF}}' +
     '#bibar button,#bibar a{appearance:none;border:0;background:transparent;color:#24305E;text-decoration:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:62px;height:54px;border-radius:16px;font:800 11px/1 "Nunito",system-ui,sans-serif;transition:transform .12s,background .15s}' +
     '#bibar button:active,#bibar a:active{transform:translateY(3px) scale(.94);background:rgba(255,216,77,.45)}' +
     '#bibar span{font-size:26px;line-height:1}' +
@@ -21,12 +21,13 @@
     '@keyframes bibarlac{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg) translateY(-3px)}}' +
     '.bibar-pt{position:fixed;z-index:10000;pointer-events:none;font-size:22px;animation:bibarbay .85s ease-out forwards}' +
     '@keyframes bibarbay{from{opacity:1;transform:translate(0,0) scale(.6)}to{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.4)}}' +
+    '@media (prefers-color-scheme:dark){#bibar{background:rgba(31,40,80,.96);border-color:#38437A;box-shadow:0 5px 0 #0E1328,0 10px 24px rgba(0,0,0,.4)}#bibar button,#bibar a{color:#F1F4FF}}' +
     '.mascot.bibear{font-size:76px!important;line-height:1.15!important;display:block!important;width:92px!important;height:auto!important;text-align:center;animation:bibarlac 2.6s ease-in-out infinite}';
   document.head.appendChild(css);
 
   var bar = document.createElement('div'); bar.id = 'bibar'; bar.setAttribute('role', 'navigation'); bar.setAttribute('aria-label', 'Điều hướng');
   bar.innerHTML = '<button id="bb-lui" aria-label="Quay lại"><span>⬅️</span>Lùi</button>' +
-    '<a id="bb-nha" href="' + home + '" aria-label="Về trang chính"><span class="bi">🏠</span>Về nhà</a>' +
+    '<a id="bb-nha" href="' + home + '" aria-label="Về trang chính"><span class="bi">🏠</span>Trang chủ</a>' +
     '<button id="bb-tien" aria-label="Đi tới"><span>➡️</span>Tới</button>';
   document.body.appendChild(bar);
   document.body.style.paddingBottom = 'calc(86px + env(safe-area-inset-bottom,0px))';
@@ -42,5 +43,25 @@
   });
 
   /* mọi trang dùng chung một linh vật: gấu Bi (thay cô bé tím cũ) */
-  document.querySelectorAll('.mascot').forEach(function (m) { m.innerHTML = '🐻'; m.classList.add('bibear'); m.setAttribute('aria-hidden', 'true'); });
+  var CAU = ['Hihi, nhột quá! 🤭', 'Bi đây, Bi đây! 🐻', 'Cùng học nào! 📚', 'Bạn giỏi lắm! 🌟', 'Bi yêu bạn! 💖', 'Cố lên nha! 💪'], kc = 0, au = null;
+  function pop(x, y, n) {
+    for (var i = 0; i < n; i++) {
+      var s = document.createElement('span'); s.className = 'bibar-pt'; s.textContent = ['⭐', '✨', '💛', '🌟', '🎈', '💖'][i % 6];
+      s.style.left = x + 'px'; s.style.top = y + 'px';
+      s.style.setProperty('--dx', ((Math.random() - .5) * 140) + 'px'); s.style.setProperty('--dy', (-20 - Math.random() * 100) + 'px');
+      document.body.appendChild(s); setTimeout(function (z) { z.remove(); }.bind(null, s), 900);
+    }
+  }
+  document.querySelectorAll('.mascot').forEach(function (m) {
+    m.innerHTML = '🐻'; m.classList.add('bibear'); m.setAttribute('aria-hidden', 'true'); m.style.cursor = 'pointer';
+    m.addEventListener('pointerdown', function () {
+      var c = CAU[kc++ % CAU.length], r = m.getBoundingClientRect();
+      if (m.animate) m.animate([{ transform: 'translateY(0) rotate(0)' }, { transform: 'translateY(-22px) rotate(-12deg) scale(1.15)' }, { transform: 'translateY(0) rotate(0)' }], { duration: 550, easing: 'ease-out' });
+      pop(r.left + r.width / 2, r.top + r.height / 3, 10);
+      var n = document.createElement('div'); n.textContent = c;
+      n.style.cssText = 'position:fixed;z-index:10001;pointer-events:none;background:#fff;color:#24305E;border:3px solid #E3AE00;border-radius:20px 20px 20px 4px;padding:6px 12px;font:800 17px Nunito,system-ui,sans-serif;box-shadow:0 4px 0 #B5CBEA;transition:opacity .4s;white-space:nowrap;left:' + Math.max(8, Math.min(innerWidth - 230, r.left)) + 'px;top:' + Math.max(8, r.top - 44) + 'px';
+      document.body.appendChild(n); setTimeout(function () { n.style.opacity = 0; }, 1300); setTimeout(function () { n.remove(); }, 1750);
+      try { if (au) au.pause(); au = new Audio('https://devotee-outclass-couch.ngrok-free.dev/webhook/vao-doc?text=' + encodeURIComponent(c.replace(/[\u{1F000}-\u{1FFFF}\u2600-\u27BF\uFE0F]/gu, '').trim())); au.play().catch(function () {}); } catch (x) {}
+    });
+  });
 })();
