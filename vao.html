@@ -75,7 +75,7 @@ if (DA_DK) {   // bé đã đăng ký: lớp lấy từ link, vai trò = học s
   S.vai = 'hs'; S.ph = S.ph || 'chung';
   if (q.get('mon')) S.mon = q.get('mon'); else if (q.get('m') !== 'menu') S.mon = '';
 }
-const MON_DK = (q.get('mons') || '').split(',').map(x => x.trim()).filter(Boolean);
+let MON_DK = (q.get('mons') || '').split(',').map(x => x.trim()).filter(Boolean);
 
 const MON_ICON = { 'Toán': '➗', 'Tiếng Việt': '📖', 'Ngữ văn': '📖', 'Tiếng Anh': '🔤', 'Đạo đức': '💛', 'Tự nhiên và Xã hội': '🌳', 'Khoa học': '🔬',
   'Khoa học tự nhiên': '🔬', 'Lịch sử và Địa lý': '🗺️', 'Lịch sử': '🏛️', 'Địa lý': '🌏', 'Giáo dục công dân': '🤝', 'Giáo dục kinh tế và pháp luật': '⚖️',
@@ -90,18 +90,34 @@ function monTheoLop(l) {
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 /* ---- Bi đọc to cho bé chưa biết đọc ---- */
-let giong = null;
-function noi(t) {
-  if (!S.tieng || !('speechSynthesis' in window)) return;
+let giong = null, amNow = null, noiSeq = 0;
+const ACACHE = {};
+function dungNoi() { noiSeq++; try { if (amNow) { amNow.pause(); amNow = null; } if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) {} }
+function noiMayTinh(t) {   // dự phòng: chỉ đọc khi máy có giọng tiếng Việt, tuyệt đối không đọc bằng giọng tiếng Anh
+  if (!('speechSynthesis' in window)) return;
   try {
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(t); u.lang = 'vi-VN'; u.rate = 0.92; u.pitch = 1.15;
-    if (!giong) giong = (speechSynthesis.getVoices() || []).find(v => /vi/i.test(v.lang)) || null;
-    if (giong) u.voice = giong;
+    if (!giong) giong = (speechSynthesis.getVoices() || []).find(v => /^vi/i.test(v.lang)) || null;
+    if (!giong) return;
+    const u = new SpeechSynthesisUtterance(t); u.lang = 'vi-VN'; u.voice = giong; u.rate = 0.92; u.pitch = 1.1;
     speechSynthesis.speak(u);
   } catch (e) {}
 }
-if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => { giong = (speechSynthesis.getVoices() || []).find(v => /vi/i.test(v.lang)) || null; };
+async function noi(t) {   // giọng tiếng Việt từ máy chủ Mọt sách (cùng giọng bot Zalo)
+  if (!S.tieng) return;
+  dungNoi(); const seq = noiSeq; t = String(t).replace(/\s+/g, ' ').trim().slice(0, 300); if (!t) return;
+  try {
+    let url = ACACHE[t];
+    if (!url) {
+      const r = await fetch(API + '/vao-doc?text=' + encodeURIComponent(t), { headers: { 'ngrok-skip-browser-warning': '1' } });
+      if (!r.ok) throw new Error('tts');
+      const b = await r.blob(); if (b.size < 800) throw new Error('tts');
+      url = ACACHE[t] = URL.createObjectURL(b.type ? b : new Blob([b], { type: 'audio/mpeg' }));
+    }
+    if (seq !== noiSeq) return;
+    amNow = new Audio(url); await amNow.play();
+  } catch (e) { if (seq === noiSeq) noiMayTinh(t); }
+}
+if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => { giong = (speechSynthesis.getVoices() || []).find(v => /^vi/i.test(v.lang)) || null; };
 
 /* ---- gửi nền lên máy chủ (nếu có token); lỗi thì bỏ qua, bé không bị chặn ---- */
 function baoMayChu() {
@@ -122,7 +138,7 @@ function khung(tenMan, loi, phu, noiDung, coQuayLai) {
     </div>
     <div class="hero pop"><div class="bi" id="bi" aria-hidden="true">🐻</div><div class="bubble">${loi}${phu ? `<small>${phu}</small>` : ''}</div></div>
     <div class="pop" id="nd">${noiDung}</div>`;
-  document.getElementById('am').onclick = () => { S.tieng = !S.tieng; luu(); if (S.tieng) noi(loi.replace(/<[^>]+>/g, '')); else speechSynthesis && speechSynthesis.cancel(); ve(); };
+  document.getElementById('am').onclick = () => { S.tieng = !S.tieng; luu(); if (S.tieng) noi(loi.replace(/<[^>]+>/g, '')); else dungNoi(); ve(); };
   document.getElementById('bi').onclick = () => noi(loi.replace(/<[^>]+>/g, ''));
   const l = document.getElementById('lui'); if (l) l.onclick = lui;
   noi(loi.replace(/<[^>]+>/g, '') + (phu ? '. ' + phu : ''));
@@ -180,8 +196,16 @@ function lui() {
 }
 
 /* ---- vào thẳng nếu đã chọn trước đây (không hỏi lại) ---- */
-man = DA_DK && S.lop ? (S.mon ? 'menu' : 'mon') : !S.lop ? 'lop' : !S.vai ? 'ai' : (S.vai === 'ph' && !S.ph) ? 'ph' : !S.mon ? 'mon' : 'menu';
-ve();
+function batDau() {
+  man = DA_DK && S.lop ? (S.mon ? 'menu' : 'mon') : !S.lop ? 'lop' : !S.vai ? 'ai' : (S.vai === 'ph' && !S.ph) ? 'ph' : !S.mon ? 'mon' : 'menu';
+  ve();
+}
+if (DA_DK && !q.get('lop')) {   // link ngắn cố định (chỉ u + t): hỏi máy chủ xem bé học lớp mấy, môn nào
+  $app.innerHTML = '<div class="hero pop"><div class="bi" aria-hidden="true">🐻</div><div class="bubble">Bi đang mở bài cho bạn…</div></div>';
+  fetch(API + '/vao-ho-so?u=' + encodeURIComponent(uZalo) + '&t=' + tHex, { headers: { 'ngrok-skip-browser-warning': '1' } })
+    .then(r => r.json()).then(j => { if (j && j.ok && j.lop) { S.lop = j.lop; MON_DK = j.mons || []; S.mon = q.get('mon') || ''; luu(); } batDau(); })
+    .catch(batDau);
+} else batDau();
 </script>
 </body>
 </html>
