@@ -5,6 +5,7 @@
    Gắn:  <script src="bi-chung.js"></script>  (bi-bar.js tự nạp).  Trang có thể đặt window.BI_GUIDE = 'lời hướng dẫn'. */
 (function () {
   if (window.BiSao) return;
+  try { if (!window.BiLoa) { var _l = document.createElement('script'); _l.src = (document.currentScript && document.currentScript.src ? document.currentScript.src.replace(/bi-chung\.js.*$/, '') : '') + 'bi-loa.js'; document.head.appendChild(_l); } } catch (e) {}
   var API = 'https://devotee-outclass-couch.ngrok-free.dev/webhook';
   var page = (location.pathname.split('/').pop() || 'index.html').replace(/\s+/g, '');
   var qs = '';
@@ -117,8 +118,8 @@
     'chat-hoc.html': 'Bạn có thể hỏi bài bằng chữ, ảnh hoặc giọng nói. Hãy nhắn câu hỏi, bạn học AI sẽ trả lời ngay.',
     'index.html': 'Chào anh chị! Một sách là bạn học AI cho học sinh. Anh chị có trợ lý riêng để biết con học thế nào. Bấm Học thử miễn phí để bắt đầu.'
   };
-  var gUtter = null, gAudio = null, gBtn;
-  function stopGuide() { try { speechSynthesis.cancel(); } catch (e) {} if (gAudio) { try { gAudio.pause(); } catch (e) {} gAudio = null; } if (gBtn) { gBtn.classList.remove('on'); gBtn.lastChild.textContent = 'Nghe hướng dẫn'; } }
+  var gUtter = null, gAudio = null, gBtn, gSeq = 0;
+  function stopGuide() { gSeq++; try { speechSynthesis.cancel(); } catch (e) {} if (gAudio) { try { gAudio.pause(); } catch (e) {} gAudio = null; } if (gBtn) { gBtn.classList.remove('on'); gBtn.lastChild.textContent = 'Nghe hướng dẫn'; } }
   function speak(text) {
     stopGuide(); gBtn.classList.add('on'); gBtn.lastChild.textContent = 'Dừng đọc';
     var done = function () { if (gBtn) { gBtn.classList.remove('on'); gBtn.lastChild.textContent = 'Nghe hướng dẫn'; } };
@@ -126,7 +127,7 @@
     try { voice = (speechSynthesis.getVoices() || []).filter(function (v) { return /^vi/i.test(v.lang); })[0]; } catch (e) {}
     if (voice) { var u = new SpeechSynthesisUtterance(text); u.voice = voice; u.lang = 'vi-VN'; u.rate = .95; u.onend = u.onerror = done; gUtter = u; speechSynthesis.speak(u); return; }
     try {   // dự phòng: giọng đọc của máy chủ Bi
-      gAudio = new Audio(API + '/vao-doc?text=' + encodeURIComponent(text.slice(0, 280))); gAudio.onended = done; gAudio.onerror = done; gAudio.play().catch(done);
+      var mySeq = ++gSeq; fetch(API + '/vao-doc?text=' + encodeURIComponent(text.slice(0, 280)), { headers: { 'ngrok-skip-browser-warning': '1' } }).then(function (r) { if (!r.ok) throw 0; return r.blob(); }).then(function (b) { if (mySeq !== gSeq) return; gAudio = new Audio(URL.createObjectURL(b)); gAudio.onended = done; gAudio.onerror = done; if (window.BiLoa) BiLoa(gAudio); gAudio.play().catch(done); }).catch(done);
     } catch (e) { done(); }
   }
 
@@ -201,7 +202,7 @@
   function ttSet(o) { try { o ? localStorage.setItem(TK, JSON.stringify(o)) : localStorage.removeItem(TK); } catch (e) {} }
   function say(t) {
     try { var u = new SpeechSynthesisUtterance(t); u.lang = 'vi-VN'; var v = (speechSynthesis.getVoices() || []).filter(function (x) { return /^vi/i.test(x.lang); })[0]; if (v) u.voice = v; speechSynthesis.speak(u); return; } catch (e) {}
-    try { new Audio(API + '/vao-doc?text=' + encodeURIComponent(t)).play().catch(function () {}); } catch (e) {}
+    try { if (window.BiLoaDoc) BiLoaDoc(API + '/vao-doc?text=' + encodeURIComponent(t)).catch(function () {}); else new Audio(API + '/vao-doc?text=' + encodeURIComponent(t)).play().catch(function () {}); } catch (e) {}
   }
   function beep() { try { var c = new (window.AudioContext || window.webkitAudioContext)(), o = c.createOscillator(), g = c.createGain(); o.connect(g); g.connect(c.destination); o.frequency.value = 880; g.gain.value = .12; o.start(); setTimeout(function () { o.frequency.value = 1175; }, 140); setTimeout(function () { o.stop(); c.close(); }, 320); } catch (e) {} }
   function ttPaint() {

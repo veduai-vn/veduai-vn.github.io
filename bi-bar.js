@@ -62,7 +62,7 @@
       var n = document.createElement('div'); n.textContent = c;
       n.style.cssText = 'position:fixed;z-index:10001;pointer-events:none;background:#fff;color:#24305E;border:3px solid #E3AE00;border-radius:20px 20px 20px 4px;padding:6px 12px;font:800 17px Nunito,system-ui,sans-serif;box-shadow:0 4px 0 #B5CBEA;transition:opacity .4s;white-space:nowrap;left:' + Math.max(8, Math.min(innerWidth - 230, r.left)) + 'px;top:' + Math.max(8, r.top - 44) + 'px';
       document.body.appendChild(n); setTimeout(function () { n.style.opacity = 0; }, 1300); setTimeout(function () { n.remove(); }, 1750);
-      try { if (au) au.pause(); au = new Audio('https://devotee-outclass-couch.ngrok-free.dev/webhook/vao-doc?text=' + encodeURIComponent(c.replace(/[\u{1F000}-\u{1FFFF}\u2600-\u27BF\uFE0F]/gu, '').trim())); au.play().catch(function () {}); } catch (x) {}
+      try { if (au) au.pause(); var tx = c.replace(/[\u{1F000}-\u{1FFFF}\u2600-\u27BF\uFE0F]/gu, '').trim(), uu = 'https://devotee-outclass-couch.ngrok-free.dev/webhook/vao-doc?text=' + encodeURIComponent(tx); if (window.BiLoaDoc) BiLoaDoc(uu).then(function (x) { au = x; }).catch(function () {}); else { au = new Audio(uu); au.play().catch(function () {}); } } catch (x) {}
     });
   });
 })();

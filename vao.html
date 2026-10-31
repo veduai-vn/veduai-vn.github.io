@@ -190,7 +190,7 @@ async function layAm(t) {
 }
 function phatAm(url) {
   return new Promise((ok, loi) => {
-    const a = new Audio(url); amNow = a; dangNoi = true; capNhatDung();
+    const a = new Audio(url); amNow = a; dangNoi = true; capNhatDung(); if (window.BiLoa) BiLoa(a);
     a.onended = () => ok(); a.onerror = () => loi(new Error('play'));
     a.play().catch(loi);
   });

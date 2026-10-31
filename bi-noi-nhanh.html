@@ -128,7 +128,7 @@
       var a=getAud(); curRes=res;
       a.onplaying=function(){ if(onStart){onStart(); onStart=null;} };
       a.onended=function(){ curRes=null; res(); }; a.onerror=function(){ curRes=null; res(); };
-      a.src=url;
+      a.src=url; if(window.BiLoa) BiLoa(a);
       var p=a.play(); if(p&&p.catch) p.catch(function(){ curRes=null; res(); });
     });
   }
@@ -312,6 +312,6 @@
   checkConn();
 })();
 </script>
-<script src="bi-bar.js?v=5"></script>
+<script src="bi-loa.js"></script><script src="bi-bar.js?v=5"></script>
 </body>
 </html>

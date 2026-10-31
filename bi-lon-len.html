@@ -764,7 +764,7 @@ function speakLocal(t, done){
   speechSynthesis.speak(u);
 }
 function playData(t, d, done){
-  const sc = $('scene'), a = new Audio('data:' + d.mime + ';base64,' + d.audio); curAudio = a; let fin = false;
+  const sc = $('scene'), a = new Audio('data:' + d.mime + ';base64,' + d.audio); curAudio = a; if (window.BiLoa) BiLoa(a); let fin = false;
   const end = bad => { if (fin) return; fin = true; sc.classList.remove('etalk'); if (curAudio === a) curAudio = null; bad ? speakLocal(t, done) : (done && done()); };
   a.onplay = () => sc.classList.add('etalk'); a.onended = () => end(false); a.onerror = () => end(true);
   a.play().catch(() => end(true));

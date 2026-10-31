@@ -105,7 +105,7 @@ const API = 'https://devotee-outclass-couch.ngrok-free.dev/webhook';   // vẫn 
 /* ================================================================================================ */
 
 const $app = document.getElementById('app');
-const TG = (window.Telegram && Telegram.WebApp) || null;
+const TG = (window.Telegram && Telegram.WebApp && Telegram.WebApp.initData) ? Telegram.WebApp : null;   // chỉ là Telegram khi mở thật trong Telegram (Zalo/trình duyệt thì không)
 if (TG) { try { TG.ready(); TG.expand(); } catch (e) {} }
 // Mini App: token nằm trong link t.me/<bot>/phieu?startapp=TOKEN  (dự phòng: ?t=TOKEN khi mở bằng trình duyệt)
 const token = (TG && TG.initDataUnsafe && TG.initDataUnsafe.start_param) || new URLSearchParams(location.search).get('t') || '';
@@ -278,8 +278,8 @@ async function gui() {
   } catch (e) { S.dangGui = false; S.loi = { ph: 'Chưa gửi được phiếu. Kiểm tra mạng rồi bấm Gửi phiếu lại nhé.' }; ve(); }
 }
 
-function tinPH(j) {   // tin học sinh chuyển cho ba/mẹ: có cả cách Telegram và Zalo
-  return 'Chào ba/mẹ, đây là cách nhận báo cáo học tập của con trên Mọt sách:\n• Ba/mẹ dùng Telegram: bấm ' + j.linkPhuHuynh + '\n• ' + (j.huongDanZalo || '');
+function tinPH(j) {   // tin học sinh chuyển cho ba/mẹ: 1 link bấm được (Zalo hoặc Telegram)
+  return 'Chào ba/mẹ, ba/mẹ bấm vào link này để nhận báo cáo học tập của con trên Mọt sách (dùng Zalo hoặc Telegram đều được):\n' + (j.linkKet || j.linkPhuHuynh);
 }
 
 function vaoHoc(j, web) {
@@ -306,6 +306,8 @@ function xong(j) {
     <p>Bạn bấm <b>Copy</b> rồi gửi tin dưới đây cho ba/mẹ. Ba/mẹ bấm vào là xác nhận xong, bạn sẽ được học chính thức.</p>
     <div class="box" id="lk" style="white-space:pre-wrap">${esc(tinPH(j))}</div>
     <button type="button" class="go" id="cp">📋 Copy gửi ba/mẹ</button>
+    <p class="hint" style="margin:16px 0 6px">Ba/mẹ đang cầm máy này? Bấm nút dưới để mở bot Phụ huynh ngay:</p>
+    <p><a class="chip" href="${esc(j.linkKet || j.linkPhuHuynh)}">👨‍👩‍👧 Mở bot Phụ huynh (Zalo / Telegram)</a></p>
     <p class="hint" id="cho" style="margin-top:18px">⏳ Đang chờ ba/mẹ bấm link… (trang này tự cập nhật)</p>
     ${web ? `<p><a class="chip" href="${esc(hocThu)}">📚 Học thử trong lúc chờ</a></p>` : ''}`);
   pop();
