@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mọt sách – Chào phụ huynh</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#24305E;--muted:#5F6B92;--line:#C9DAF2;--mark:#FFD84D;--mark-ink:#4A3700;--green:#4CBF5B;--green-d:#2F9A3E;--font:'Nunito',system-ui,sans-serif;--disp:'Baloo 2','Nunito',sans-serif}
+*{box-sizing:border-box;margin:0}
+body{font-family:var(--font);color:var(--ink);min-height:100vh;background:linear-gradient(180deg,#A9DBFF 0,#DCF0FF 320px,#F4FAFF 100%) fixed;padding:calc(56px + env(safe-area-inset-top,0px)) 14px 120px}
+.wrap{max-width:640px;margin:0 auto}h1{font:800 clamp(1.5rem,4vw,2rem) var(--disp)}.sub{color:var(--muted);font-weight:700;margin:4px 0 14px}
+.glass{background:rgba(255,255,255,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:2px solid #fff;border-radius:26px;box-shadow:0 10px 30px rgba(19,84,124,.14);padding:18px;margin-bottom:14px}
+h2{font:800 1.15rem var(--disp);margin-bottom:6px}p{font-weight:700;line-height:1.5}
+.steps{margin:10px 0 0;padding-left:0;list-style:none}.steps li{display:flex;gap:10px;align-items:flex-start;margin:8px 0;font-weight:700}
+.steps li>b{flex:none;display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--mark);color:var(--mark-ink);font:800 16px var(--disp)}
+.btn{appearance:none;display:block;text-align:center;text-decoration:none;width:100%;font:800 1.05rem var(--font);cursor:pointer;padding:14px;border-radius:999px;border:2px solid var(--green-d);background:linear-gradient(180deg,#6FD67A,var(--green));color:#fff;box-shadow:0 5px 0 var(--green-d);margin-top:12px}
+.btn.alt{background:#fff;color:var(--ink);border-color:var(--line);box-shadow:0 5px 0 var(--line)}
+.note{color:var(--muted);font-size:.85rem;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>👨‍👩‍👧 Chào anh/chị phụ huynh</h1>
+  <p class="sub">Mọt sách gửi báo cáo học tập của con thẳng về điện thoại của anh/chị.</p>
+  <div class="glass">
+    <h2>Cách đơn giản nhất</h2>
+    <ul class="steps">
+      <li><b>1</b><span>Nhờ con đăng ký dùng thử và điền phiếu làm quen, đến mục ba/mẹ thì bấm “Gửi link cho ba/mẹ”.</span></li>
+      <li><b>2</b><span>Anh/chị bấm link con gửi (Telegram hoặc Zalo). Bấm xong là gói dùng thử 7 ngày của con bắt đầu và báo cáo về máy anh/chị.</span></li>
+    </ul>
+    <p class="note">Nếu anh/chị dùng chung điện thoại với con, chọn “Dùng chung” trong phiếu.</p>
+  </div>
+  <div class="glass">
+    <h2>Mở bot Phụ huynh</h2>
+    <a class="btn" href="https://zalo.me/4575554065668007909">Mở bot Phụ huynh trên Zalo</a>
+    <a class="btn alt" href="https://t.me/MotSachVedu_Bot">Mở bot Phụ huynh trên Telegram</a>
+    <a class="btn alt" href="https://veduai-vn.web.app">🌐 Xem gói học và bảng giá</a>
+    <p class="note">Cần hỗ trợ: Admin 0984048177 (Telegram/Zalo).</p>
+  </div>
+</div>
+<script>window.BI_GUIDE = 'Chào anh chị phụ huynh. Anh chị nhờ con điền phiếu làm quen rồi gửi link cho ba mẹ. Anh chị bấm link đó là gói dùng thử bắt đầu và báo cáo học tập sẽ gửi về điện thoại của anh chị.';</script>
+<script src="bi-nguoi-que.js"></script><script src="bi-chung.js"></script>
+</body>
+</html>

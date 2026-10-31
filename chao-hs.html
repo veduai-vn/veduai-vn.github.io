@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mọt sách – Chào học sinh mới</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#24305E;--muted:#5F6B92;--line:#C9DAF2;--mark:#FFD84D;--mark-d:#E3AE00;--mark-ink:#4A3700;--bad:#D94B4B;--green:#4CBF5B;--green-d:#2F9A3E;--font:'Nunito',system-ui,sans-serif;--disp:'Baloo 2','Nunito',sans-serif}
+*{box-sizing:border-box;margin:0}
+body{font-family:var(--font);color:var(--ink);min-height:100vh;background:linear-gradient(180deg,#A9DBFF 0,#DCF0FF 320px,#F4FAFF 100%) fixed;padding:calc(56px + env(safe-area-inset-top,0px)) 14px 120px}
+.wrap{max-width:640px;margin:0 auto}h1{font:800 clamp(1.5rem,4vw,2rem) var(--disp)}.sub{color:var(--muted);font-weight:700;margin:4px 0 14px}
+.glass{background:rgba(255,255,255,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:2px solid #fff;border-radius:26px;box-shadow:0 10px 30px rgba(19,84,124,.14);padding:18px;margin-bottom:14px}
+.gift{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;font-weight:700}.gift b{font-family:var(--disp)}
+.steps{margin:10px 0 0;padding-left:0;list-style:none}.steps li{display:flex;gap:10px;align-items:flex-start;margin:8px 0;font-weight:700}
+.steps li>b{flex:none;display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--mark);color:var(--mark-ink);font:800 16px var(--disp)}
+.btn{appearance:none;display:block;text-align:center;text-decoration:none;width:100%;font:800 1.1rem var(--font);cursor:pointer;padding:14px;border-radius:999px;border:2px solid var(--green-d);background:linear-gradient(180deg,#6FD67A,var(--green));color:#fff;box-shadow:0 5px 0 var(--green-d);margin-top:14px}.btn:disabled{opacity:.6}
+.btn.alt{background:#fff;color:var(--ink);border-color:var(--line);box-shadow:0 5px 0 var(--line)}
+.err{color:var(--bad);font-weight:800;font-size:.95rem;margin-top:10px;min-height:1.2em}.note{color:var(--muted);font-size:.85rem;margin-top:8px}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎓 Chào bạn! Mọt sách tặng bạn quà</h1>
+  <p class="sub">Mọi bước làm ngay trên trang này, không cần quay lại chat.</p>
+  <div class="glass" id="form">
+    <div class="gift"><span>🎁</span><span><b>7 ngày học miễn phí</b>, đầy đủ chức năng, tất cả các môn của lớp</span></div>
+    <div class="gift"><span>🎁</span><span>Hết 7 ngày, <b>tặng thêm 21 ngày gói Tiết kiệm</b></span></div>
+    <ul class="steps">
+      <li><b>1</b><span>Bấm nhận quà và điền phiếu làm quen (lớp, môn, lịch học), khoảng 1 phút.</span></li>
+      <li><b>2</b><span>Ba/mẹ bấm link kết nối bot Phụ huynh để nhận báo cáo học tập của bạn. Ba/mẹ bấm xong là 7 ngày bắt đầu.</span></li>
+    </ul>
+    <div class="err" id="err" role="alert"></div>
+    <button class="btn" id="go">🎁 Nhận quà 7 ngày miễn phí</button>
+    <a class="btn alt" id="thu" href="hoc-ngay.html">📚 Học thử ngay (không cần đăng ký)</a>
+    <a class="btn alt" id="goi" href="vao.html">🛒 Xem các gói học</a>
+    <p class="note">Mỗi tài khoản chỉ nhận quà dùng thử một lần.</p>
+  </div>
+  <div class="glass hide" id="bad"><b>Link chưa đúng hoặc đã hết hiệu lực.</b><p class="note">Bạn mở lại từ bot Mọt sách (bấm 🎓 Học sinh) nhé.</p></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const Q = new URLSearchParams(location.search);
+const API = Q.get('api') || 'https://devotee-outclass-couch.ngrok-free.dev/webhook';
+let UT = {}; try { UT = JSON.parse(localStorage.getItem('ms_vao_id') || '{}') || {}; } catch (e) {}
+const U = Q.get('u') || UT.u || '', T = Q.get('t') || UT.t || '';
+if (!U || !T) { $('form').classList.add('hide'); $('bad').classList.remove('hide'); }
+else { const k = '?u=' + encodeURIComponent(U) + '&t=' + T; $('goi').href = 'vao.html' + k; $('thu').href = 'hoc-ngay.html' + k; try { localStorage.setItem('ms_vao_id', JSON.stringify({ u: U, t: T })); } catch (e) {} }
+let busy = false;
+async function nhan() {
+  if (busy) return; busy = true;
+  const e = $('err'), b = $('go'); e.textContent = ''; b.disabled = true; b.textContent = 'Đang tạo phiếu…';
+  try {
+    const r = await (await fetch(API + '/web-nhan-qua', { method: 'POST', headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' }, body: JSON.stringify({ u: U, t: T }) })).json();
+    if (!r || !r.ok || !/^https:\/\/veduai-vn\.github\.io\//.test(String(r.url || ''))) throw new Error((r && r.loi) || 'loi');
+    b.textContent = r.state === 'da_co' ? 'Bạn đã có tài khoản, đang vào học…' : 'Xong! Đang mở phiếu làm quen…';
+    setTimeout(() => { location.href = r.url; }, 500);
+  } catch (x) { e.textContent = 'Chưa nhận được (' + x.message + '). Bạn thử lại sau ít phút nhé.'; b.disabled = false; b.textContent = '🎁 Nhận quà 7 ngày miễn phí'; busy = false; }
+}
+$('go').onclick = nhan;
+if (Q.get('go') === '1' && U && T) nhan();
+window.BI_GUIDE = 'Chào bạn! Mọt sách tặng bạn bảy ngày học miễn phí. Bấm nhận quà, điền phiếu làm quen một phút, rồi nhờ ba mẹ bấm link kết nối là bắt đầu. Bạn cũng có thể bấm học thử ngay mà không cần đăng ký.';
+</script>
+<script src="bi-nguoi-que.js"></script><script src="bi-chung.js"></script>
+</body>
+</html>

@@ -66,9 +66,9 @@ function state(icon, title, sub, cls) {
   card.appendChild(s);
 }
 const LY_DO = {
-  khong_co: ['🔍', 'Không tìm thấy phiếu', 'Link không đúng hoặc đã bị xoá. Bạn quay lại Zalo và mở link mới nhất nhé.'],
-  da_dung: ['✅', 'Phiếu này chọn xong rồi nè', 'Bạn quay lại Zalo để xem phản hồi nhé.'],
-  het_han: ['⏰', 'Phiếu đã hết hạn', 'Bạn quay lại Zalo và mở link mới nhất nhé.'],
+  khong_co: ['🔍', 'Không tìm thấy phiếu', 'Link không đúng hoặc đã bị xoá. Bạn nhắn “menu” cho bot để nhận link mới nhé.'],
+  da_dung: ['✅', 'Phiếu này chọn xong rồi nè', 'Bạn nhắn “menu” cho bot nếu muốn chọn lại nhé.'],
+  het_han: ['⏰', 'Phiếu đã hết hạn', 'Bạn nhắn “menu” cho bot để nhận link mới nhé.'],
   sai_lua_chon: ['⚠️', 'Lựa chọn không hợp lệ', 'Hãy tải lại trang và thử lại.']
 };
 function showReason(r) { say('Ối, có chút trục trặc rồi!'); const x = LY_DO[r] || ['⚠️', 'Có lỗi xảy ra', 'Vui lòng thử lại sau.']; state(x[0], x[1], x[2], 'err'); }
@@ -108,7 +108,7 @@ async function submit(i, label) {
     const r = await fetch(API + '/zalo-phieu-nop', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, H), body: JSON.stringify({ t, i }) });
     const j = await r.json();
     if (j.ok && vaoHoc(j, label)) return;
-    if (j.ok) { state('🎉', 'Đã ghi nhận: ' + label, 'Bạn quay lại Zalo để xem phản hồi nhé.', 'ok'); say('Giỏi lắm! Mình nhận được rồi nhé.'); pop(); }
+    if (j.ok) { state('🎉', 'Đã ghi nhận: ' + label, 'Mình đã nhận lựa chọn của bạn.', 'ok'); try { const d = JSON.parse(localStorage.getItem('ms_vao_id') || 'null'); if (d && d.u && d.t) { const a = document.createElement('a'); a.className = 'opt'; a.style.cssText = 'text-decoration:none;justify-content:center;margin-top:12px'; a.href = 'vao.html?u=' + encodeURIComponent(d.u) + '&t=' + d.t; a.textContent = '📚 Mở trang học'; card.appendChild(a); } } catch (e) {}; say('Giỏi lắm! Mình nhận được rồi nhé.'); pop(); }
     else showReason(j.reason);
   } catch (e) { sending = false; card.querySelectorAll('button').forEach(b => b.disabled = false); alert('Chưa gửi được, bạn thử lại nhé.'); }
 }

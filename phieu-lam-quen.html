@@ -295,13 +295,16 @@ function tinPH(j) {   // tin học sinh chuyển cho ba/mẹ: có cả cách Tel
 }
 
 function xong(j) {
+  const web = !!j.vaoUrl && !TG;   // trên Zalo/web: chuyển thẳng sang trang học, không bắt quay lại chat
+  const coLink = !!j.linkPhuHuynh;
   trang(`<div class="big" aria-hidden="true">🎉</div><h1>Đã gửi phiếu rồi!</h1>
-    <p>Mình đã nhận đủ thông tin. ${laZalo() ? 'Con quay lại <b>Zalo</b>, mình đã gửi sẵn menu các dịch vụ để bạn chọn nhé.' : 'Con quay lại khung chat, mình đã gửi sẵn menu các dịch vụ để bạn chọn nhé.'}</p>
-    <p class="hint">${j.linkPhuHuynh || laZalo() ? '' : 'Cửa sổ này sẽ tự đóng.'}</p>
-    ${j.linkPhuHuynh ? `<p><b>Gói học sẽ bắt đầu ngay khi ba/mẹ bấm link.</b> Bạn chuyển nguyên tin dưới đây cho ba/mẹ:</p><div class="box" id="lk" style="white-space:pre-wrap">${esc(tinPH(j))}</div>
-      <button type="button" class="chip" id="cp">Sao chép tin gửi ba/mẹ</button>` : ''}`);
+    <p>Mình đã nhận đủ thông tin.${web ? (coLink ? '' : ' Đang mở trang học cho bạn…') : ' Con quay lại khung chat, mình đã gửi sẵn menu các dịch vụ để bạn chọn nhé.'}</p>
+    ${coLink ? `<p><b>Gói học sẽ bắt đầu ngay khi ba/mẹ bấm link.</b> Bạn chuyển nguyên tin dưới đây cho ba/mẹ:</p><div class="box" id="lk" style="white-space:pre-wrap">${esc(tinPH(j))}</div>
+      <button type="button" class="chip" id="cp">Sao chép tin gửi ba/mẹ</button>` : ''}
+    ${web ? `<p style="margin-top:14px"><a class="chip" id="vao" href="${esc(j.vaoUrl)}">📚 Vào trang học ngay</a></p>` : ''}`);
   pop();
-  if (TG && !j.linkPhuHuynh) setTimeout(() => { try { TG.close(); } catch (e) {} }, 1600);   // không có link cần sao chép -> tự đóng, quay lại chat
+  if (TG && !coLink) setTimeout(() => { try { TG.close(); } catch (e) {} }, 1600);   // Telegram: không có link cần sao chép -> tự đóng, quay lại chat
+  if (web && !coLink) setTimeout(() => { location.href = j.vaoUrl; }, 1800);
   const cp = document.getElementById('cp');
   if (cp) cp.onclick = async () => { try { await navigator.clipboard.writeText(tinPH(j)); cp.textContent = 'Đã sao chép'; } catch (e) { cp.textContent = 'Hãy giữ và sao chép đường dẫn ở trên'; } };
 }
