@@ -1,0 +1,706 @@
+[
+{
+"k": "TOEIC",
+"b": "A",
+"w": "invoice",
+"p": "n",
+"vi": "hóa đơn",
+"ex": "Please send the invoice by Friday."
+},
+{
+"k": "TOEIC",
+"b": "A",
+"w": "schedule",
+"p": "n/v",
+"vi": "lịch trình; lên lịch",
+"ex": "The meeting is scheduled for 9 a.m."
+},
+{
+"k": "TOEIC",
+"b": "A",
+"w": "appointment",
+"p": "n",
+"vi": "cuộc hẹn",
+"ex": "I have a dentist appointment at noon."
+},
+{
+"k": "TOEIC",
+"b": "A",
+"w": "deadline",
+"p": "n",
+"vi": "hạn chót",
+"ex": "The deadline for the report is Monday."
+},
+{
+"k": "TOEIC",
+"b": "A",
+"w": "customer",
+"p": "n",
+"vi": "khách hàng",
+"ex": "The customer asked for a refund."
+},
+{
+"k": "TOEIC",
+"b": "A",
+"w": "receipt",
+"p": "n",
+"vi": "biên lai",
+"ex": "Keep your receipt for returns."
+},
+{
+"k": "TOEIC",
+"b": "A",
+"w": "employee",
+"p": "n",
+"vi": "nhân viên",
+"ex": "Every employee must wear a badge."
+},
+{
+"k": "TOEIC",
+"b": "A",
+"w": "payment",
+"p": "n",
+"vi": "khoản thanh toán",
+"ex": "Payment is due within 30 days."
+},
+{
+"k": "TOEIC",
+"b": "A",
+"w": "delivery",
+"p": "n",
+"vi": "việc giao hàng",
+"ex": "The delivery arrived this morning."
+},
+{
+"k": "TOEIC",
+"b": "A",
+"w": "reserve",
+"p": "v",
+"vi": "đặt chỗ trước",
+"ex": "I would like to reserve a table for two."
+},
+{
+"k": "TOEIC",
+"b": "B",
+"w": "colleague",
+"p": "n",
+"vi": "đồng nghiệp",
+"ex": "My colleague will cover my shift."
+},
+{
+"k": "TOEIC",
+"b": "B",
+"w": "submit",
+"p": "v",
+"vi": "nộp",
+"ex": "Please submit your application online."
+},
+{
+"k": "TOEIC",
+"b": "B",
+"w": "require",
+"p": "v",
+"vi": "yêu cầu, đòi hỏi",
+"ex": "This position requires two years of experience."
+},
+{
+"k": "TOEIC",
+"b": "B",
+"w": "refund",
+"p": "n",
+"vi": "tiền hoàn lại",
+"ex": "You can get a full refund within a week."
+},
+{
+"k": "TOEIC",
+"b": "B",
+"w": "shipment",
+"p": "n",
+"vi": "lô hàng",
+"ex": "The shipment will arrive on Tuesday."
+},
+{
+"k": "TOEIC",
+"b": "B",
+"w": "applicant",
+"p": "n",
+"vi": "ứng viên",
+"ex": "Ten applicants were interviewed."
+},
+{
+"k": "TOEIC",
+"b": "B",
+"w": "attach",
+"p": "v",
+"vi": "đính kèm",
+"ex": "I attached the file to this email."
+},
+{
+"k": "TOEIC",
+"b": "B",
+"w": "budget",
+"p": "n",
+"vi": "ngân sách",
+"ex": "We must stay within the budget."
+},
+{
+"k": "TOEIC",
+"b": "B",
+"w": "renew",
+"p": "v",
+"vi": "gia hạn",
+"ex": "You need to renew your membership."
+},
+{
+"k": "TOEIC",
+"b": "B",
+"w": "promote",
+"p": "v",
+"vi": "thăng chức; quảng bá",
+"ex": "She was promoted to sales manager."
+},
+{
+"k": "TOEIC",
+"b": "B",
+"w": "reschedule",
+"p": "v",
+"vi": "dời lịch",
+"ex": "Can we reschedule the meeting to Thursday?"
+},
+{
+"k": "TOEIC",
+"b": "B",
+"w": "complimentary",
+"p": "adj",
+"vi": "miễn phí (tặng kèm)",
+"ex": "Complimentary coffee is available in the lobby."
+},
+{
+"k": "TOEIC",
+"b": "C",
+"w": "negotiate",
+"p": "v",
+"vi": "đàm phán",
+"ex": "They negotiated a better price."
+},
+{
+"k": "TOEIC",
+"b": "C",
+"w": "implement",
+"p": "v",
+"vi": "triển khai, thực hiện",
+"ex": "The company will implement the new policy in May."
+},
+{
+"k": "TOEIC",
+"b": "C",
+"w": "revenue",
+"p": "n",
+"vi": "doanh thu",
+"ex": "Annual revenue increased by ten percent."
+},
+{
+"k": "TOEIC",
+"b": "C",
+"w": "inventory",
+"p": "n",
+"vi": "hàng tồn kho",
+"ex": "We check our inventory every month."
+},
+{
+"k": "TOEIC",
+"b": "C",
+"w": "comply",
+"p": "v",
+"vi": "tuân thủ",
+"ex": "All staff must comply with safety rules."
+},
+{
+"k": "TOEIC",
+"b": "C",
+"w": "mandatory",
+"p": "adj",
+"vi": "bắt buộc",
+"ex": "Attendance at the training is mandatory."
+},
+{
+"k": "TOEIC",
+"b": "C",
+"w": "substantial",
+"p": "adj",
+"vi": "đáng kể",
+"ex": "The firm made a substantial profit."
+},
+{
+"k": "TOEIC",
+"b": "C",
+"w": "reimburse",
+"p": "v",
+"vi": "hoàn lại chi phí",
+"ex": "The company will reimburse your travel expenses."
+},
+{
+"k": "TOEIC",
+"b": "C",
+"w": "expire",
+"p": "v",
+"vi": "hết hạn",
+"ex": "Your passport will expire next year."
+},
+{
+"k": "TOEIC",
+"b": "C",
+"w": "subsidiary",
+"p": "n",
+"vi": "công ty con",
+"ex": "The subsidiary opened an office in Hanoi."
+},
+{
+"k": "TOEIC",
+"b": "D",
+"w": "allocate",
+"p": "v",
+"vi": "phân bổ",
+"ex": "We need to allocate more funds to marketing."
+},
+{
+"k": "TOEIC",
+"b": "D",
+"w": "liability",
+"p": "n",
+"vi": "trách nhiệm pháp lý; khoản nợ",
+"ex": "The company accepts no liability for lost items."
+},
+{
+"k": "TOEIC",
+"b": "D",
+"w": "fluctuate",
+"p": "v",
+"vi": "dao động, biến động",
+"ex": "Oil prices fluctuate throughout the year."
+},
+{
+"k": "TOEIC",
+"b": "D",
+"w": "undertake",
+"p": "v",
+"vi": "đảm nhận",
+"ex": "The firm undertook a major renovation."
+},
+{
+"k": "TOEIC",
+"b": "D",
+"w": "stipulate",
+"p": "v",
+"vi": "quy định rõ (trong hợp đồng)",
+"ex": "The contract stipulates a 30-day notice."
+},
+{
+"k": "TOEIC",
+"b": "D",
+"w": "prospective",
+"p": "adj",
+"vi": "tiềm năng, sắp tới",
+"ex": "Prospective clients toured the factory."
+},
+{
+"k": "TOEIC",
+"b": "D",
+"w": "depreciation",
+"p": "n",
+"vi": "sự khấu hao",
+"ex": "Depreciation reduces the value of equipment."
+},
+{
+"k": "TOEIC",
+"b": "D",
+"w": "contingency",
+"p": "n",
+"vi": "tình huống bất ngờ; dự phòng",
+"ex": "We have a contingency plan for delays."
+},
+{
+"k": "IELTS",
+"b": "A",
+"w": "increase",
+"p": "v/n",
+"vi": "tăng",
+"ex": "The number of visitors increased last year."
+},
+{
+"k": "IELTS",
+"b": "A",
+"w": "decrease",
+"p": "v/n",
+"vi": "giảm",
+"ex": "Sales decreased in the summer."
+},
+{
+"k": "IELTS",
+"b": "A",
+"w": "society",
+"p": "n",
+"vi": "xã hội",
+"ex": "Technology has changed society."
+},
+{
+"k": "IELTS",
+"b": "A",
+"w": "government",
+"p": "n",
+"vi": "chính phủ",
+"ex": "The government should invest in schools."
+},
+{
+"k": "IELTS",
+"b": "A",
+"w": "benefit",
+"p": "n/v",
+"vi": "lợi ích; có lợi",
+"ex": "Exercise has many health benefits."
+},
+{
+"k": "IELTS",
+"b": "A",
+"w": "pollution",
+"p": "n",
+"vi": "ô nhiễm",
+"ex": "Air pollution is a serious problem in big cities."
+},
+{
+"k": "IELTS",
+"b": "B",
+"w": "advantage",
+"p": "n",
+"vi": "ưu điểm",
+"ex": "One advantage of online study is flexibility."
+},
+{
+"k": "IELTS",
+"b": "B",
+"w": "disadvantage",
+"p": "n",
+"vi": "nhược điểm",
+"ex": "A major disadvantage is the high cost."
+},
+{
+"k": "IELTS",
+"b": "B",
+"w": "improve",
+"p": "v",
+"vi": "cải thiện",
+"ex": "Regular practice improves your speaking."
+},
+{
+"k": "IELTS",
+"b": "B",
+"w": "reduce",
+"p": "v",
+"vi": "giảm bớt",
+"ex": "We should reduce plastic waste."
+},
+{
+"k": "IELTS",
+"b": "B",
+"w": "solution",
+"p": "n",
+"vi": "giải pháp",
+"ex": "Public transport is one solution to traffic."
+},
+{
+"k": "IELTS",
+"b": "B",
+"w": "influence",
+"p": "n/v",
+"vi": "ảnh hưởng",
+"ex": "Social media influences young people."
+},
+{
+"k": "IELTS",
+"b": "B",
+"w": "opportunity",
+"p": "n",
+"vi": "cơ hội",
+"ex": "Travelling gives people the opportunity to learn."
+},
+{
+"k": "IELTS",
+"b": "C",
+"w": "significant",
+"p": "adj",
+"vi": "đáng kể, quan trọng",
+"ex": "There was a significant rise in prices."
+},
+{
+"k": "IELTS",
+"b": "C",
+"w": "contribute",
+"p": "v",
+"vi": "đóng góp; góp phần",
+"ex": "Cars contribute to air pollution."
+},
+{
+"k": "IELTS",
+"b": "C",
+"w": "sustainable",
+"p": "adj",
+"vi": "bền vững",
+"ex": "Sustainable energy protects the planet."
+},
+{
+"k": "IELTS",
+"b": "C",
+"w": "enhance",
+"p": "v",
+"vi": "nâng cao",
+"ex": "Good lighting enhances learning."
+},
+{
+"k": "IELTS",
+"b": "C",
+"w": "widespread",
+"p": "adj",
+"vi": "phổ biến rộng rãi",
+"ex": "Smartphone use is widespread among teenagers."
+},
+{
+"k": "IELTS",
+"b": "C",
+"w": "consume",
+"p": "v",
+"vi": "tiêu thụ",
+"ex": "Developed countries consume more energy."
+},
+{
+"k": "IELTS",
+"b": "C",
+"w": "urbanisation",
+"p": "n",
+"vi": "đô thị hoá",
+"ex": "Rapid urbanisation puts pressure on housing."
+},
+{
+"k": "IELTS",
+"b": "D",
+"w": "mitigate",
+"p": "v",
+"vi": "làm giảm nhẹ",
+"ex": "Trees can mitigate the effects of heat."
+},
+{
+"k": "IELTS",
+"b": "D",
+"w": "detrimental",
+"p": "adj",
+"vi": "có hại",
+"ex": "Stress is detrimental to health."
+},
+{
+"k": "IELTS",
+"b": "D",
+"w": "alleviate",
+"p": "v",
+"vi": "làm dịu, giảm bớt",
+"ex": "New roads may alleviate congestion."
+},
+{
+"k": "IELTS",
+"b": "D",
+"w": "unprecedented",
+"p": "adj",
+"vi": "chưa từng có",
+"ex": "The city faces an unprecedented water shortage."
+},
+{
+"k": "IELTS",
+"b": "D",
+"w": "ubiquitous",
+"p": "adj",
+"vi": "có mặt khắp nơi",
+"ex": "Smartphones have become ubiquitous."
+},
+{
+"k": "IELTS",
+"b": "D",
+"w": "implication",
+"p": "n",
+"vi": "hệ quả, ngụ ý",
+"ex": "The study has implications for policy."
+},
+{
+"k": "IELTS",
+"b": "D",
+"w": "proliferation",
+"p": "n",
+"vi": "sự gia tăng nhanh",
+"ex": "The proliferation of fast food worries doctors."
+},
+{
+"k": "TOEFL",
+"b": "A",
+"w": "research",
+"p": "n/v",
+"vi": "nghiên cứu",
+"ex": "Scientists do research on climate."
+},
+{
+"k": "TOEFL",
+"b": "A",
+"w": "evidence",
+"p": "n",
+"vi": "bằng chứng",
+"ex": "There is evidence that sleep helps memory."
+},
+{
+"k": "TOEFL",
+"b": "A",
+"w": "theory",
+"p": "n",
+"vi": "lý thuyết",
+"ex": "The theory explains why the continents move."
+},
+{
+"k": "TOEFL",
+"b": "A",
+"w": "species",
+"p": "n",
+"vi": "loài",
+"ex": "Many species live in the rainforest."
+},
+{
+"k": "TOEFL",
+"b": "B",
+"w": "analyze",
+"p": "v",
+"vi": "phân tích",
+"ex": "Students analyzed the data in the lab."
+},
+{
+"k": "TOEFL",
+"b": "B",
+"w": "hypothesis",
+"p": "n",
+"vi": "giả thuyết",
+"ex": "The experiment tested her hypothesis."
+},
+{
+"k": "TOEFL",
+"b": "B",
+"w": "emerge",
+"p": "v",
+"vi": "xuất hiện, nổi lên",
+"ex": "New cities emerged along the river."
+},
+{
+"k": "TOEFL",
+"b": "B",
+"w": "consist of",
+"p": "v",
+"vi": "bao gồm",
+"ex": "The atmosphere consists of several gases."
+},
+{
+"k": "TOEFL",
+"b": "B",
+"w": "adapt",
+"p": "v",
+"vi": "thích nghi",
+"ex": "Animals adapt to cold weather."
+},
+{
+"k": "TOEFL",
+"b": "C",
+"w": "phenomenon",
+"p": "n",
+"vi": "hiện tượng",
+"ex": "Lightning is a natural phenomenon."
+},
+{
+"k": "TOEFL",
+"b": "C",
+"w": "ecosystem",
+"p": "n",
+"vi": "hệ sinh thái",
+"ex": "Coral reefs are fragile ecosystems."
+},
+{
+"k": "TOEFL",
+"b": "C",
+"w": "fossil",
+"p": "n",
+"vi": "hoá thạch",
+"ex": "The fossil was about 60 million years old."
+},
+{
+"k": "TOEFL",
+"b": "C",
+"w": "fundamental",
+"p": "adj",
+"vi": "cơ bản, nền tảng",
+"ex": "Water is fundamental to life."
+},
+{
+"k": "TOEFL",
+"b": "C",
+"w": "correlation",
+"p": "n",
+"vi": "mối tương quan",
+"ex": "Researchers found a correlation between diet and mood."
+},
+{
+"k": "TOEFL",
+"b": "C",
+"w": "deplete",
+"p": "v",
+"vi": "làm cạn kiệt",
+"ex": "Overfishing depletes ocean resources."
+},
+{
+"k": "TOEFL",
+"b": "D",
+"w": "ubiquitous",
+"p": "adj",
+"vi": "có mặt khắp nơi",
+"ex": "Bacteria are ubiquitous in soil."
+},
+{
+"k": "TOEFL",
+"b": "D",
+"w": "ambiguous",
+"p": "adj",
+"vi": "mơ hồ, nhiều nghĩa",
+"ex": "The results were ambiguous."
+},
+{
+"k": "TOEFL",
+"b": "D",
+"w": "inherent",
+"p": "adj",
+"vi": "vốn có",
+"ex": "Some risk is inherent in any experiment."
+},
+{
+"k": "TOEFL",
+"b": "D",
+"w": "coincide",
+"p": "v",
+"vi": "trùng khớp",
+"ex": "The rainy season coincides with the harvest."
+},
+{
+"k": "TOEFL",
+"b": "D",
+"w": "reinforce",
+"p": "v",
+"vi": "củng cố",
+"ex": "The new data reinforce the theory."
+},
+{
+"k": "TOEFL",
+"b": "D",
+"w": "scarcity",
+"p": "n",
+"vi": "sự khan hiếm",
+"ex": "Water scarcity affects farming."
+}
+]

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mọt sách – Ôn từ mới TOEIC · IELTS · TOEFL</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#24305E;--muted:#5F6B92;--line:#C9DAF2;--mark:#FFD84D;--mark-d:#E3AE00;--mark-ink:#4A3700;--ok:#2E9E5B;--okbg:#E4F7EC;--bad:#D94B4B;--badbg:#FDECEC;--green:#4CBF5B;--green-d:#2F9A3E;--font:'Nunito',system-ui,sans-serif;--disp:'Baloo 2','Nunito',system-ui,sans-serif}
+*{box-sizing:border-box;margin:0}
+body{font-family:var(--font);color:var(--ink);min-height:100vh;background:linear-gradient(180deg,#A9DBFF 0,#DCF0FF 320px,#F4FAFF 100%) fixed;padding:calc(56px + env(safe-area-inset-top,0px)) 14px 120px}
+.wrap{max-width:720px;margin:0 auto}
+h1{font:800 clamp(1.5rem,4vw,2.1rem) var(--disp)}.sub{color:var(--muted);font-weight:700;margin:4px 0 14px}
+.glass{background:rgba(255,255,255,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:2px solid #fff;border-radius:26px;box-shadow:0 10px 30px rgba(19,84,124,.14);padding:18px;margin-bottom:14px}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px}
+.chip{appearance:none;font:inherit;font-weight:800;cursor:pointer;color:var(--ink);padding:8px 14px;border-radius:999px;border:2px solid var(--line);background:#fff}.chip.on{background:var(--mark);border-color:var(--mark-d);color:var(--mark-ink)}
+.btn{appearance:none;font:800 1.05rem var(--font);cursor:pointer;padding:12px 22px;border-radius:999px;border:2px solid var(--green-d);background:linear-gradient(180deg,#6FD67A,var(--green));color:#fff;box-shadow:0 5px 0 var(--green-d);text-shadow:0 1px 0 rgba(0,0,0,.15)}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--green-d)}.btn.alt{background:#fff;border-color:var(--line);color:var(--ink);box-shadow:0 5px 0 #B5CBEA;text-shadow:none}.btn.bad{background:linear-gradient(180deg,#FF8A8A,var(--bad));border-color:#B03030;box-shadow:0 5px 0 #B03030}
+.full{width:100%}.hide{display:none!important}.note{color:var(--muted);font-size:.85rem}
+.card{min-height:250px;display:grid;place-items:center;text-align:center;cursor:pointer;user-select:none;padding:22px}
+.card .w{font:800 2.4rem var(--disp)}.card .p{color:var(--muted);font-weight:800;margin-top:2px}.card .vi{font:800 1.6rem var(--disp);color:var(--blue,#2F6FD6)}.card .ex{margin-top:10px;font-style:italic;color:#445}
+.spk{appearance:none;border:2px solid var(--line);background:#fff;border-radius:999px;padding:4px 12px;font-weight:800;cursor:pointer;margin-top:8px}
+.bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0 10px}.bar i{display:block;height:100%;background:var(--green);width:0;transition:width .3s}
+.opt{display:block;width:100%;text-align:left;padding:12px 14px;margin:8px 0;border-radius:16px;border:2px solid var(--line);background:#fff;font:700 1rem var(--font);cursor:pointer}
+.opt.ok{border-color:var(--ok);background:var(--okbg)}.opt.bad{border-color:var(--bad);background:var(--badbg)}
+.q{font:800 1.8rem var(--disp);text-align:center;margin:6px 0 10px}.fb{margin-top:10px;padding:10px 14px;border-radius:14px;font-size:.93rem;line-height:1.5}.fb.ok{background:var(--okbg)}.fb.bad{background:var(--badbg)}
+.meta{display:flex;justify-content:space-between;font-weight:800;color:var(--muted);font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="vHome">
+    <h1>📚 Ôn từ mới thi chứng chỉ</h1>
+    <p class="sub">Thẻ ghi nhớ và kiểm tra nhanh. Từ em quên sẽ quay lại sớm, từ em nhớ sẽ cách xa dần.</p>
+    <div class="glass">
+      <b>Kì thi</b><div class="row" id="rEx"></div>
+      <b>Lộ trình (trình độ hiện tại)</b><div class="row" id="rLv"></div>
+      <p class="note" id="info"></p>
+      <div class="row" style="margin-top:14px"><button class="btn full" id="bCard">🃏 Học thẻ ghi nhớ</button><button class="btn alt full" id="bQuiz">🧩 Kiểm tra 10 từ</button></div>
+      <p class="note">Bộ từ khởi đầu gồm 88 từ chọn lọc, sẽ được bổ sung thêm.</p>
+    </div>
+    <a class="btn alt full" href="luyen-thi.html" style="display:block;text-align:center;text-decoration:none">← Về trang luyện thi</a>
+  </div>
+
+  <div id="vCard" class="hide">
+    <div class="meta"><span id="cNo"></span><span id="cBox"></span></div><div class="bar"><i id="cPb"></i></div>
+    <div class="glass card" id="card"></div>
+    <div class="row" style="justify-content:center"><button class="btn bad" id="no">😅 Chưa nhớ</button><button class="btn" id="yes">😄 Đã nhớ</button></div>
+    <p class="note" style="text-align:center">Bấm vào thẻ để lật. Bấm 🔊 để nghe phát âm.</p>
+  </div>
+
+  <div id="vQuiz" class="hide">
+    <div class="meta"><span id="qNo"></span><span id="qSc"></span></div><div class="bar"><i id="qPb"></i></div>
+    <div class="glass"><div class="q" id="qW"></div><div style="text-align:center"><button class="spk" id="qSp">🔊 Nghe</button></div><div id="qO"></div><div id="qF"></div><div style="height:10px"></div><button class="btn full hide" id="qNext">Câu tiếp</button></div>
+  </div>
+
+  <div id="vEnd" class="hide"><div class="glass" style="text-align:center"><div style="width:110px;margin:0 auto" id="eFig"></div><div style="font:800 2.2rem var(--disp)" id="eSc"></div><p class="note" id="eMsg"></p><div class="row" style="justify-content:center"><button class="btn" id="again">Ôn tiếp</button><a class="btn alt" href="luyen-thi.html" style="text-decoration:none">Về luyện thi</a></div></div></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const LV = { A: 'Dưới mức trung bình (nền tảng)', B: 'Tăng tốc', C: 'Bứt phá', D: 'Nâng cao' };
+const NAMES = { TOEIC: { A: 'Dưới 300', B: '300 – 500', C: '500 – 700', D: 'Trên 700' }, IELTS: { A: 'Dưới 4.0', B: '4.0 – 5.0', C: '5.5 – 6.5', D: '7.0 trở lên' }, TOEFL: { A: 'Dưới 40', B: '40 – 70', C: '70 – 90', D: 'Trên 90' } };
+const Q0 = new URLSearchParams(location.search);
+let ALL = [], st = { ex: (Q0.get('exam') || 'TOEIC').toUpperCase(), lv: '' };
+try { st.lv = localStorage.getItem('ms_lv_' + st.ex) || ''; } catch (e) {}
+const day = (n) => new Date(Date.now() + 7 * 3600e3 + n * 864e5).toISOString().slice(0, 10);
+const LS = () => { try { return JSON.parse(localStorage.getItem('ms_tv') || '{}'); } catch (e) { return {}; } };
+const SV = o => { try { localStorage.setItem('ms_tv', JSON.stringify(o)); } catch (e) {} };
+const key = w => w.k + '|' + w.w;
+function chips(el, items, cur, on) { el.innerHTML = ''; items.forEach(([v, t]) => { const b = document.createElement('button'); b.className = 'chip' + (v === cur ? ' on' : ''); b.textContent = t; b.onclick = () => on(v); el.appendChild(b); }); }
+function pool() { return ALL.filter(w => w.k === st.ex && (!st.lv || w.b === st.lv)); }
+function draw() {
+  chips($('rEx'), ['TOEIC', 'IELTS', 'TOEFL'].map(x => [x, x]), st.ex, v => { st.ex = v; try { st.lv = localStorage.getItem('ms_lv_' + v) || ''; } catch (e) {} draw(); });
+  chips($('rLv'), [['', 'Tất cả']].concat(Object.entries(NAMES[st.ex])), st.lv, v => { st.lv = v; try { localStorage.setItem('ms_lv_' + st.ex, v); } catch (e) {} draw(); });
+  const p = pool(), mem = LS(), due = p.filter(w => !mem[key(w)] || mem[key(w)].due <= day(0)).length;
+  $('info').textContent = p.length + ' từ trong bộ này · ' + due + ' từ cần ôn hôm nay.';
+}
+function show(v) { ['vHome', 'vCard', 'vQuiz', 'vEnd'].forEach(x => $(x).classList.toggle('hide', x !== v)); window.scrollTo(0, 0); }
+function speak(t) { try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.lang = 'en-US'; u.rate = .9; speechSynthesis.speak(u); } catch (e) {} }
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+let deck = [], di = 0, flipped = false, seen = 0;
+function startCards() {
+  const p = pool(), mem = LS();
+  const due = p.filter(w => !mem[key(w)] || mem[key(w)].due <= day(0));
+  deck = shuffle(due.length ? due : p).slice(0, 15); di = 0; seen = 0;
+  if (!deck.length) return alert('Chưa có từ nào trong bộ này.');
+  show('vCard'); drawCard();
+}
+function drawCard() {
+  const w = deck[di]; flipped = false;
+  $('cNo').textContent = 'Thẻ ' + (di + 1) + '/' + deck.length; $('cPb').style.width = (di / deck.length * 100) + '%';
+  const m = LS()[key(w)]; $('cBox').textContent = m ? 'Ngăn ' + m.box + '/4' : 'Từ mới';
+  $('card').innerHTML = '<div><div class="w">' + w.w + '</div><div class="p">(' + w.p + ')</div><button class="spk" onclick="event.stopPropagation();speak(\'' + w.w.replace(/'/g, '') + '\')">🔊 Nghe</button><p class="note" style="margin-top:12px">Bấm để xem nghĩa</p></div>';
+}
+$('card').onclick = () => {
+  const w = deck[di]; flipped = !flipped;
+  $('card').innerHTML = flipped ? '<div><div class="vi">' + w.vi + '</div><div class="ex">“' + w.ex + '”</div><button class="spk" onclick="event.stopPropagation();speak(\'' + w.ex.replace(/'/g, '') + '\')">🔊 Nghe câu</button></div>' : '';
+  if (!flipped) drawCard();
+};
+function rate(good) {
+  const w = deck[di], mem = LS(), cur = mem[key(w)] || { box: 0 };
+  const box = good ? Math.min(4, cur.box + 1) : 1, gap = [0, 1, 3, 7, 14][box];
+  mem[key(w)] = { box, due: good ? day(gap) : day(0) }; SV(mem); seen++;
+  if (seen % 10 === 0 && window.BiSao) BiSao.add(3, 'Ôn 10 thẻ từ mới');
+  di++; if (di >= deck.length) return finish(good ? 'cards' : 'cards');
+  drawCard();
+}
+$('yes').onclick = () => rate(true); $('no').onclick = () => rate(false);
+let qs = [], qi = 0, score = 0;
+function startQuiz() {
+  const p = pool(); if (p.length < 4) return alert('Bộ này còn ít từ, em chọn "Tất cả" nhé.');
+  qs = shuffle(p).slice(0, 10); qi = 0; score = 0; show('vQuiz'); drawQ();
+}
+function drawQ() {
+  const w = qs[qi]; $('qNo').textContent = 'Câu ' + (qi + 1) + '/' + qs.length; $('qSc').textContent = '⭐ ' + score; $('qPb').style.width = (qi / qs.length * 100) + '%';
+  $('qW').textContent = w.w + ' (' + w.p + ')'; $('qF').innerHTML = ''; $('qNext').classList.add('hide');
+  const others = shuffle(ALL.filter(x => x.k === st.ex && x.vi !== w.vi)).slice(0, 3);
+  const opts = shuffle([w].concat(others));
+  $('qO').innerHTML = ''; opts.forEach(o => { const b = document.createElement('button'); b.className = 'opt'; b.textContent = o.vi; b.onclick = () => answer(b, o === w, w); $('qO').appendChild(b); });
+  $('qSp').onclick = () => speak(w.w);
+}
+function answer(btn, ok, w) {
+  [...$('qO').children].forEach(b => { b.disabled = true; if (b.textContent === w.vi) b.classList.add('ok'); });
+  if (!ok) btn.classList.add('bad');
+  const mem = LS(), cur = mem[key(w)] || { box: 0 };
+  mem[key(w)] = ok ? { box: Math.min(4, cur.box + 1), due: day([0, 1, 3, 7, 14][Math.min(4, cur.box + 1)]) } : { box: 1, due: day(0) }; SV(mem);
+  if (ok) { score++; if (window.BiSao) BiSao.add(1, 'Đúng một từ mới'); }
+  $('qF').innerHTML = '<div class="fb ' + (ok ? 'ok' : 'bad') + '"><b>' + (ok ? 'Đúng rồi! ' : 'Chưa đúng. ') + w.w + ' = ' + w.vi + '</b><br><i>“' + w.ex + '”</i>' + (ok ? '' : '<br>💡 Từ này sẽ quay lại sớm để em ôn.') + '</div>';
+  $('qNext').classList.remove('hide'); $('qNext').textContent = qi + 1 >= qs.length ? 'Xem kết quả' : 'Câu tiếp';
+  $('qSc').textContent = '⭐ ' + score;
+}
+$('qNext').onclick = () => { qi++; if (qi >= qs.length) return finish('quiz'); drawQ(); };
+function finish(kind) {
+  show('vEnd');
+  const ok = kind === 'quiz';
+  $('eSc').textContent = ok ? score + '/' + qs.length + ' từ đúng' : 'Xong ' + deck.length + ' thẻ!';
+  $('eMsg').textContent = ok ? (score >= 8 ? 'Tuyệt vời! Em nhớ từ rất tốt.' : score >= 5 ? 'Khá lắm! Ôn thêm các từ sai nhé.' : 'Đừng buồn, các từ sai sẽ quay lại để em ôn.') : 'Các từ chưa nhớ sẽ quay lại sớm, từ đã nhớ sẽ cách xa dần.';
+  if (ok && window.BiSao) BiSao.add(score >= 8 ? 8 : 3, 'Hoàn thành kiểm tra từ mới');
+  $('eFig').innerHTML = window.BiQue ? BiQue.html(Math.random() < .5 ? 'nam' : 'nu', ok && score < 5 ? 'think' : 'cheer') : '';
+}
+$('bCard').onclick = startCards; $('bQuiz').onclick = startQuiz; $('again').onclick = () => { show('vHome'); draw(); };
+window.BI_GUIDE = 'Chào bạn! Đây là trang ôn từ mới. Chọn kỳ thi và trình độ của bạn. Học thẻ ghi nhớ: bấm vào thẻ để xem nghĩa, rồi chọn đã nhớ hoặc chưa nhớ. Từ chưa nhớ sẽ quay lại sớm. Hoặc làm kiểm tra mười từ để nhận sao.';
+fetch('tu-vung-thi.json').then(r => r.json()).then(d => { ALL = d; draw(); }).catch(() => { $('info').textContent = 'Chưa tải được bộ từ. Em thử lại sau nhé.'; });
+</script>
+<script src="bi-nguoi-que.js"></script><script src="bi-chung.js"></script>
+</body>
+</html>
