@@ -6,91 +6,125 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mọt sách – Luyện thi TOEIC · IELTS · TOEFL</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Nunito:wght@500;700;800&family=Source+Serif+4:wght@500;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#EAF5FF;--card:#fff;--text:#24305E;--muted:#5F6B92;--line:#C9DAF2;--shadow:#B5CBEA;--mark:#FFD84D;--mark-d:#E3AE00;--mark-ink:#4A3700;--ok:#2E9E5B;--okbg:#E4F7EC;--bad:#D94B4B;--badbg:#FDECEC;
---font:'Nunito',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;--disp:'Baloo 2','Nunito',system-ui,sans-serif}
-*{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-weight:500}
-body{min-height:100vh;padding:env(safe-area-inset-top,0) 16px env(safe-area-inset-bottom,0);background-image:radial-gradient(var(--line) 1.5px,transparent 1.5px);background-size:22px 22px;display:flex;justify-content:center}
-.wrap{width:100%;max-width:600px;padding:18px 0 40px}
-h1{font:800 26px var(--disp);margin:0 0 4px}
-.sub{color:var(--muted);margin:0 0 14px;font-weight:700}
-.card{background:var(--card);border:2px solid var(--line);border-radius:24px;box-shadow:0 4px 0 var(--shadow);padding:16px;margin-bottom:14px}
-.row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px}
-.chip,.btn,.opt{appearance:none;font:inherit;font-weight:800;cursor:pointer;color:var(--text)}
-.chip{padding:8px 14px;border-radius:18px;border:2px solid var(--line);background:#fff}
+:root{--ink:#24305E;--muted:#5F6B92;--line:#C9DAF2;--mark:#FFD84D;--mark-d:#E3AE00;--mark-ink:#4A3700;--ok:#2E9E5B;--okbg:#E4F7EC;--bad:#D94B4B;--badbg:#FDECEC;--green:#4CBF5B;--green-d:#2F9A3E;--blue:#2F6FD6;
+--font:'Nunito',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;--disp:'Baloo 2','Nunito',system-ui,sans-serif;--paper:'Source Serif 4',Georgia,'Times New Roman',serif}
+*{box-sizing:border-box;margin:0}
+html,body{font-family:var(--font);color:var(--ink);font-weight:500}
+body{min-height:100vh;background:linear-gradient(180deg,#A9DBFF 0,#DCF0FF 320px,#F4FAFF 100%) fixed;padding:calc(56px + env(safe-area-inset-top,0px)) 14px 130px}
+.wrap{max-width:1040px;margin:0 auto}
+h1{font:800 clamp(1.5rem,4vw,2.2rem) var(--disp)}
+.sub{color:var(--muted);font-weight:700;margin:4px 0 16px}
+.glass{background:rgba(255,255,255,.8);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:2px solid #fff;border-radius:26px;box-shadow:0 10px 30px rgba(19,84,124,.14);padding:18px}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
+.chip{appearance:none;font:inherit;font-weight:800;cursor:pointer;color:var(--ink);padding:8px 14px;border-radius:999px;border:2px solid var(--line);background:#fff}
 .chip.on{background:var(--mark);border-color:var(--mark-d);color:var(--mark-ink)}
-.btn{width:100%;padding:13px;border-radius:20px;border:2px solid var(--mark-d);background:var(--mark);color:var(--mark-ink);font-size:17px;box-shadow:0 4px 0 var(--mark-d)}
-.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--mark-d)}
-.btn.ghost{background:#fff;border-color:var(--line);box-shadow:0 4px 0 var(--shadow);color:var(--text)}
-.opt{display:block;width:100%;text-align:left;padding:11px 14px;margin:8px 0;border-radius:18px;border:2px solid var(--line);background:#fff;font-weight:700;font-size:16px}
-.opt.sel{border-color:var(--mark-d);background:#FFF6CC}
-.opt.ok{border-color:var(--ok);background:var(--okbg)}
-.opt.bad{border-color:var(--bad);background:var(--badbg)}
-.bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0 12px}
-.bar i{display:block;height:100%;background:var(--mark-d);width:0;transition:width .3s}
-.meta{display:flex;justify-content:space-between;color:var(--muted);font-weight:800;font-size:14px}
-.q{font-size:18px;font-weight:800;line-height:1.45;margin:6px 0 4px;white-space:pre-wrap}
-.ctx{background:#F4F8FF;border:2px dashed var(--line);border-radius:14px;padding:10px;margin:8px 0;white-space:pre-wrap;font-size:15px;line-height:1.5;max-height:220px;overflow:auto}
-.exp{margin-top:10px;padding:12px;border-radius:16px;font-size:15px;line-height:1.5}
-.exp.ok{background:var(--okbg)}.exp.bad{background:var(--badbg)}
-.exp b{display:block;margin-bottom:4px}
-.tip{margin-top:8px;font-weight:800}
-input.txt{width:100%;padding:12px;border-radius:16px;border:2px solid var(--line);font:inherit;font-weight:700;font-size:16px}
-.big{font:800 44px var(--disp);text-align:center;margin:4px 0}
-.note{color:var(--muted);font-size:13px;line-height:1.5}
-.hide{display:none}
-table{width:100%;border-collapse:collapse;font-size:15px}td{padding:6px 4px;border-bottom:1px solid var(--line)}
+.btn{appearance:none;font:800 1.05rem var(--font);cursor:pointer;padding:13px 26px;border-radius:999px;border:2px solid var(--green-d);background:linear-gradient(180deg,#6FD67A,var(--green));color:#fff;box-shadow:0 5px 0 var(--green-d),0 10px 18px rgba(47,154,62,.28);text-shadow:0 1px 0 rgba(0,0,0,.15)}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--green-d)}
+.btn.alt{background:rgba(255,255,255,.85);border-color:#fff;color:var(--ink);box-shadow:0 5px 14px rgba(19,84,124,.16);text-shadow:none}
+.btn.full{width:100%}
+.note{color:var(--muted);font-size:.85rem;line-height:1.5}
+.hide{display:none!important}
+.intro{display:grid;grid-template-columns:1fr 150px;gap:14px;align-items:center}
+.intro .figs{display:flex}
+.exam{display:grid;grid-template-columns:1fr 250px;gap:18px;align-items:start}
+.sheet{background:#fff;border-radius:6px;box-shadow:0 14px 40px rgba(19,84,124,.22),0 0 0 1px #d6dfea;padding:34px 38px 40px;font-family:var(--paper);color:#1b2233;line-height:1.55;position:relative}
+.sheet:before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:repeating-linear-gradient(180deg,#d6dfea 0 8px,transparent 8px 18px)}
+.sh-head{text-align:center;border-bottom:2px solid #1b2233;padding-bottom:12px;margin-bottom:6px}
+.sh-head h2{font:700 1.35rem var(--paper);letter-spacing:.04em;text-transform:uppercase}
+.sh-head p{font-size:.92rem;color:#445}
+.sh-meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:.95rem;margin:10px 0 4px}
+.sh-meta .tm{font:800 1.05rem var(--font);background:#FFF3C4;border:2px solid var(--mark-d);border-radius:999px;padding:2px 14px}
+.part{font:700 1.02rem var(--paper);text-transform:uppercase;letter-spacing:.03em;margin:26px 0 8px;padding:5px 12px;background:#EEF3FA;border-left:5px solid #1b2233}
+.pass{border:1.5px solid #1b2233;padding:12px 16px;margin:10px 0 14px;font-size:.98rem;white-space:pre-wrap;background:#FBFCFE}
+.pass b{display:block;margin-bottom:4px}
+.q{margin:16px 0 4px;padding:6px 6px 8px;border-radius:8px;scroll-margin-top:90px}
+.q .qt{display:flex;gap:10px}.q .no{font:800 1rem var(--font);flex:none;min-width:30px;color:#1b2233}
+.q .tx{white-space:pre-wrap;font-weight:600}
+.opts{margin:6px 0 0 40px;display:grid;gap:4px}
+.opt{display:flex;gap:10px;align-items:flex-start;cursor:pointer;padding:3px 6px;border-radius:8px}
+.opt:hover{background:#F2F6FC}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.bub{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid #1b2233;display:grid;place-items:center;font:800 .8rem var(--font);margin-top:1px;background:#fff}
+.opt input:checked+.bub{background:#1b2233;color:#fff}
+.opt .ot{padding-top:1px}
+.fill{margin:6px 0 0 40px}
+.fill input{font:600 1rem var(--paper);border:0;border-bottom:2px solid #1b2233;background:#FFFDF0;padding:4px 8px;width:min(340px,100%);outline:none}
+.fill input:focus{background:#FFF3C4}
+.q.ok{background:var(--okbg)}.q.bad{background:var(--badbg)}
+.q.ok .no:after{content:" ✓";color:var(--ok)}.q.bad .no:after{content:" ✗";color:var(--bad)}
+.opt.right .bub{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.wrong .bub{background:var(--bad);border-color:var(--bad);color:#fff}
+.exp{margin:8px 0 2px 40px;font-family:var(--font);font-size:.93rem;line-height:1.5;background:#fff;border:2px dashed #bcc9db;border-radius:12px;padding:8px 12px}
+.exp b{color:var(--ink)}.exp .tip{margin-top:4px;font-weight:700;color:#8a5a00}
+.omr{position:sticky;top:76px;font-family:var(--font)}
+.omr h3{font:800 1.05rem var(--disp);margin-bottom:6px}
+.omr .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.omr a{display:grid;place-items:center;height:36px;border-radius:50%;border:2px solid var(--line);background:#fff;color:var(--ink);font-weight:800;font-size:.82rem;text-decoration:none}
+.omr a.done{background:var(--blue);border-color:var(--blue);color:#fff}
+.omr a.ok{background:var(--ok);border-color:var(--ok);color:#fff}.omr a.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+.bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0 10px}.bar i{display:block;height:100%;background:var(--green);width:0;transition:width .3s}
+.result{margin-bottom:16px;text-align:center}
+.result .big{font:800 2.6rem var(--disp);line-height:1.1}
+.result .fg{width:120px;margin:0 auto}
+.weak{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.weak span{background:#FFE0E8;color:#B02A4E;border-radius:999px;padding:3px 12px;font-weight:800;font-size:.85rem}
+.starbox{display:inline-block;margin-top:8px;background:#FFF3C4;border:2px solid var(--mark-d);border-radius:999px;padding:5px 16px;font-weight:800}
+.mbar{display:none}
+@media(max-width:860px){
+ .exam{grid-template-columns:1fr}.omr{display:none}
+ .sheet{padding:20px 16px 26px}.opts,.fill,.exp{margin-left:6px}
+ .mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:9970;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);padding:10px 90px 10px 14px;gap:10px;align-items:center;border-top:2px solid #fff;box-shadow:0 -6px 20px rgba(19,84,124,.15)}
+ .mbar .bar{flex:1;margin:0}.mbar b{font-weight:800;white-space:nowrap}
+ .intro{grid-template-columns:1fr}.intro .figs{width:130px}
+}
+.aud-box{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0 4px;font-family:var(--font)}
+.aud-box audio{height:38px;max-width:100%}
+.aud{appearance:none;border:2px solid var(--green-d);background:linear-gradient(180deg,#6FD67A,var(--green));color:#fff;font:800 .95rem var(--font);border-radius:999px;padding:8px 18px;cursor:pointer;box-shadow:0 3px 0 var(--green-d)}
+.img-box{margin:10px 0}.img-box img{max-width:100%;max-height:320px;border:1.5px solid #1b2233;border-radius:6px;display:block}
+.task{border:1.5px solid #1b2233;border-radius:8px;padding:14px 16px;margin:18px 0;background:#FBFCFE;font-family:var(--font)}
+.task h4{font:700 1.02rem var(--paper);margin-bottom:6px}
+.task .pr{white-space:pre-wrap;font-family:var(--paper);font-weight:600;margin:6px 0 10px}
+.task textarea{width:100%;min-height:150px;border:2px solid #1b2233;border-radius:8px;padding:10px;font:600 1rem var(--paper);background:#FFFDF0;resize:vertical}
+.task .tb{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.mic2{appearance:none;border:2px solid var(--green-d);background:#fff;color:var(--green-d);font:800 .95rem var(--font);border-radius:999px;padding:8px 16px;cursor:pointer}
+.mic2.rec{background:var(--bad);border-color:var(--bad);color:#fff;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.7}}
+.fb{margin-top:10px;background:#fff;border:2px dashed #bcc9db;border-radius:12px;padding:10px 14px;font-size:.93rem;line-height:1.55}
+.fb .sc{font:800 1.4rem var(--disp);color:var(--blue)}.fb ul{padding-left:18px}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>🐛 Luyện thi cùng Bi</h1>
-  <p class="sub" id="hello">Chọn kì thi và chế độ luyện nhé!</p>
-
   <div id="vHome">
-    <div class="card">
-      <b>Kì thi</b>
-      <div class="row" id="rExam"></div>
-      <b>Chế độ</b>
-      <div class="row" id="rMode"></div>
-      <div id="boxPart">
-        <b>Phần luyện</b>
-        <div class="row" id="rPart"></div>
-      </div>
-      <b>Số câu</b>
-      <div class="row" id="rN"></div>
-      <button class="btn" id="go">Bắt đầu</button>
-      <p class="note" id="stat"></p>
+    <div class="intro">
+      <div><h1>🎯 Luyện thi cùng Bút và Chì</h1><p class="sub">Làm đề trên tờ giấy như thi thật: bấm chọn đáp án hoặc gõ vào ô trống, nộp bài là có điểm, lời giải và sao thưởng.</p></div>
+      <div class="figs" id="figsHome"></div>
     </div>
-    <p class="note">Đề trong kho là đề tự soạn, không phải đề thật của ETS, IDP hay IIG. Điểm chỉ là ước lượng để em biết mình đang ở đâu.</p>
+    <div class="glass">
+      <b>Kì thi</b><div class="row" id="rExam"></div>
+      <b>Dạng bài</b><div class="row" id="rMode"></div>
+      <div id="boxPart"><b>Phần luyện</b><div class="row" id="rPart"></div></div>
+      <b>Số câu</b><div class="row" id="rN"></div>
+      <button class="btn full" id="go">Bắt đầu làm đề</button>
+      <p class="note" style="margin-top:10px" id="stat"></p>
+    </div>
+    <p class="note" style="margin-top:12px">Đề là đề tự soạn, không phải đề thật của ETS, IDP hay IIG. Điểm chỉ là ước lượng để em biết mình đang ở đâu. Phần Nghe và Nói sẽ có sau.</p>
   </div>
 
-  <div id="vQuiz" class="hide">
-    <div class="card">
-      <div class="meta"><span id="qNo"></span><span id="qTag"></span></div>
-      <div class="bar"><i id="pb"></i></div>
-      <div id="qCtx"></div>
-      <div class="q" id="qText"></div>
-      <div id="qOpts"></div>
-      <div id="qExp"></div>
-      <div style="height:10px"></div>
-      <button class="btn" id="btnNext">Kiểm tra</button>
+  <div id="vExam" class="hide">
+    <div class="glass result hide" id="vRes">
+      <div class="fg" id="resFig"></div>
+      <div class="note" id="eKind"></div><div class="big" id="eScore"></div><div class="sub" id="eLine" style="margin:0"></div>
+      <div class="weak" id="eWeak"></div><div class="starbox" id="eStar"></div>
+      <div class="row" style="justify-content:center;margin-top:14px"><button class="btn" id="again">Làm đề mới</button><button class="btn alt" id="top">Xem lại từng câu ↓</button></div>
     </div>
-  </div>
-
-  <div id="vEnd" class="hide">
-    <div class="card">
-      <div class="note" id="eKind"></div>
-      <div class="big" id="eScore"></div>
-      <div class="sub" id="eLine" style="text-align:center"></div>
-      <div id="eWeak"></div>
+    <div class="exam">
+      <div class="sheet" id="sheet"></div>
+      <aside class="omr glass"><h3>Phiếu trả lời</h3><div class="bar"><i id="pb"></i></div><div class="note" id="pn"></div><div class="grid" id="omr" style="margin:10px 0 14px"></div><button class="btn full" id="submit">Nộp bài</button></aside>
     </div>
-    <div class="card"><b>Các câu em cần xem lại</b><div id="eWrong"></div></div>
-    <button class="btn" id="again">Luyện tiếp</button>
-    <div style="height:10px"></div>
-    <button class="btn ghost" id="close">Về lại với Bi</button>
+    <div class="mbar"><b id="mn"></b><div class="bar"><i id="mpb"></i></div><button class="btn" id="submit2" style="padding:9px 18px">Nộp</button></div>
   </div>
 </div>
 
@@ -99,116 +133,186 @@ table{width:100%;border-collapse:collapse;font-size:15px}td{padding:6px 4px;bord
 const Q0 = new URLSearchParams(location.search);
 const API = Q0.get('api') || 'https://devotee-outclass-couch.ngrok-free.dev/webhook/luyen-thi-5e2a';
 const H = { 'ngrok-skip-browser-warning': '1', 'Content-Type': 'application/json' };
-const U = Q0.get('u') || '';        // mã người học (chat id) do bot gắn vào link
-const T = Q0.get('t') || '';        // mã xác nhận của link
 const tg = window.Telegram && Telegram.WebApp; if (tg) { try { tg.ready(); tg.expand(); } catch (e) {} }
-
+let SPX = []; try { SPX = String((tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) || Q0.get('tgWebAppStartParam') || '').split('_'); } catch (e) {}
+let UT = {}; try { UT = JSON.parse(localStorage.getItem('ms_vao_id') || '{}') || {}; } catch (e) {}
+const U = Q0.get('u') || SPX[1] || UT.u || '', T = Q0.get('t') || SPX[2] || UT.t || '';
+if (U && T) { try { localStorage.setItem('ms_vao_id', JSON.stringify({ u: U, t: T })); } catch (e) {} }
+const MEDIA = API.replace(/luyen-thi-5e2a$/, 'luyen-thi-am'), HKQ = API.replace(/luyen-thi-5e2a$/, 'hoc-ket-qua');
 const $ = id => document.getElementById(id);
-const st = { exam: (Q0.get('exam') || 'TOEIC').toUpperCase(), mode: Q0.get('mode') || 'nhanh', part: '', n: 10, cau: [], i: 0, res: [], hist: [], checked: false, sel: '' };
-
-async function call(act, body) {
-  const r = await fetch(API, { method: 'POST', headers: H, body: JSON.stringify({ act, u: U, t: T, ...body }) });
-  return r.json();
-}
-function chips(el, items, cur, on) {
-  el.innerHTML = '';
-  items.forEach(([v, t]) => { const b = document.createElement('button'); b.className = 'chip' + (v === cur ? ' on' : ''); b.textContent = t; b.onclick = () => { on(v); }; el.appendChild(b); });
-}
+const esc = s => String(s == null ? '' : s).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+const st = { exam: ((Q0.get('exam') || (['TOEIC', 'IELTS', 'TOEFL'].includes((SPX[0] || '').toUpperCase()) ? SPX[0] : '') || 'TOEIC')).toUpperCase(), mode: Q0.get('mode') === 'nhanh' ? 'nhanh' : 'de', part: Q0.get('part') || '', n: +Q0.get('n') || 20, cau: [], ans: {}, done: false, t0: 0, left: 0, tick: null };
 let DS = null;
+async function call(act, body) { const r = await fetch(API, { method: 'POST', headers: H, body: JSON.stringify({ act, u: U, t: T, ...body }) }); return r.json(); }
+function chips(el, items, cur, on) { el.innerHTML = ''; items.forEach(([v, t]) => { const b = document.createElement('button'); b.className = 'chip' + (v === cur ? ' on' : ''); b.textContent = t; b.onclick = () => on(v); el.appendChild(b); }); }
 function drawHome() {
   chips($('rExam'), [['TOEIC', 'TOEIC'], ['IELTS', 'IELTS'], ['TOEFL', 'TOEFL']], st.exam, v => { st.exam = v; st.part = ''; drawHome(); });
-  chips($('rMode'), [['nhanh', 'Thi nhanh (xếp trình độ)'], ['phan', 'Luyện theo phần']], st.mode, v => { st.mode = v; drawHome(); });
-  $('boxPart').classList.toggle('hide', st.mode !== 'phan');
-  const parts = { TOEIC: [['', 'Tất cả'], ['P5', 'Part 5 Ngữ pháp'], ['P6', 'Part 6'], ['P7', 'Part 7 Đọc hiểu']], IELTS: [['', 'Tất cả']], TOEFL: [['', 'Tất cả']] }[st.exam];
+  chips($('rMode'), [['de', 'Làm đề luyện tập'], ['nhanh', 'Thi nhanh xếp trình độ']], st.mode, v => { st.mode = v; if (v === 'nhanh' && (st.part === 'NOI' || st.part === 'VIET')) st.part = ''; drawHome(); });
+  $('boxPart').classList.toggle('hide', false);
+  const kn = [['NGHE', '🎧 Nghe'], ['NOI', '🎤 Nói'], ['VIET', '✍️ Viết']];
+  const parts = { TOEIC: [['', 'Đọc (tất cả)'], ['P5', 'Part 5 Ngữ pháp'], ['P6', 'Part 6'], ['P7', 'Part 7 Đọc hiểu'], ['NGHE', '🎧 Nghe Part 1–4'], ['NOI', '🎤 Nói'], ['VIET', '✍️ Viết']], IELTS: [['', 'Đọc']].concat(kn), TOEFL: [['', 'Đọc']].concat(kn) }[st.exam];
+  const task = st.part === 'NOI' || st.part === 'VIET';
+  $('rN').parentElement && ($('rN').previousElementSibling.classList.toggle('hide', task), $('rN').classList.toggle('hide', task));
   chips($('rPart'), parts, st.part, v => { st.part = v; drawHome(); });
-  chips($('rN'), [[5, '5'], [10, '10'], [20, '20'], [30, '30']], st.n, v => { st.n = v; drawHome(); });
-  $('stat').textContent = DS && DS.tong ? 'Kho hiện có ' + DS.tong + ' câu hỏi.' : '';
+  chips($('rN'), [[10, '10'], [20, '20'], [30, '30'], [40, '40']], st.n, v => { st.n = v; drawHome(); });
+  $('stat').textContent = DS && DS.tong ? 'Kho hiện có ' + DS.tong + ' câu hỏi. Thời gian làm bài ước tính ' + Math.round(st.n * 1.1) + ' phút.' : '';
 }
-function show(v) { ['vHome', 'vQuiz', 'vEnd'].forEach(x => $(x).classList.toggle('hide', x !== v)); window.scrollTo(0, 0); }
+function show(v) { ['vHome', 'vExam'].forEach(x => $(x).classList.toggle('hide', x !== v)); window.scrollTo(0, 0); }
 
 async function start() {
   $('go').disabled = true; $('go').textContent = 'Đang lấy đề…';
   try {
-    st.i = 0; st.res = []; st.hist = []; st.checked = false;
-    if (st.mode === 'nhanh') {
-      const r = await call('thi-nhanh', { exam: st.exam, lich_su: [], so_cau: st.n, co_nghe: false });
-      if (!r.ok || !r.cau) throw new Error(r.loi || 'khong_co_cau');
-      st.cau = [r.cau];
-    } else {
-      const r = await call('de', { exam: st.exam, part: st.part, n: st.n, ky_nang: st.exam === 'IELTS' ? '' : 'Reading' });
-      if (!r.ok || !r.cau || !r.cau.length) throw new Error(r.loi || 'khong_co_cau');
-      st.cau = r.cau;
+    if (st.part === 'NOI' || st.part === 'VIET') {
+      const t = await call('nhiem-vu', { exam: st.exam, ky_nang: st.part === 'NOI' ? 'Speaking' : 'Writing' });
+      if (!t.ok || !t.cau || !t.cau.length) throw new Error(t.loi || 'khong_co_de');
+      st.tasks = t.cau; st.done = false; renderTasks(); show('vExam'); $('vRes').classList.add('hide'); $('go').disabled = false; $('go').textContent = 'Bắt đầu làm đề'; return;
     }
-    show('vQuiz'); drawQ();
+    const lis = st.part === 'NGHE';
+    const r = await call('de', st.mode === 'nhanh' ? { exam: st.exam, n: st.n } : (lis ? { exam: st.exam, n: st.n, ky_nang: 'Listening' } : { exam: st.exam, part: st.part, n: st.n, ky_nang: 'Reading' }));
+    if (!r.ok || !r.cau || !r.cau.length) throw new Error(r.loi || 'khong_co_cau');
+    st.cau = (st.mode === 'de' || lis) ? r.cau.slice().sort((a, b) => (a.part || '').localeCompare(b.part || '') || (a.so || 0) - (b.so || 0)) : r.cau;
+    st.ans = {}; st.done = false; st.t0 = Date.now(); st.left = Math.round(st.cau.length * 66);
+    renderSheet(); show('vExam'); $('vRes').classList.add('hide');
+    clearInterval(st.tick); st.tick = setInterval(timer, 1000); timer();
   } catch (e) { alert('Chưa lấy được đề (' + e.message + '). Em thử lại sau ít phút nhé!'); }
-  $('go').disabled = false; $('go').textContent = 'Bắt đầu';
+  $('go').disabled = false; $('go').textContent = 'Bắt đầu làm đề';
 }
-function drawQ() {
-  const c = st.cau[st.i]; st.checked = false; st.sel = '';
-  $('qNo').textContent = 'Câu ' + (st.i + 1) + '/' + st.n;
-  $('qTag').textContent = [c.exam, c.part].filter(Boolean).join(' · ');
-  $('pb').style.width = (st.i / st.n * 100) + '%';
-  const nc = c.ngu_canh;
-  $('qCtx').innerHTML = nc ? '<div class="ctx"></div>' : ''; if (nc) $('qCtx').firstChild.textContent = (nc.tieu_de ? nc.tieu_de + '\n\n' : '') + nc.noi_dung;
-  $('qText').textContent = c.cau_hoi || '';
-  const o = $('qOpts'); o.innerHTML = '';
-  if (c.lua_chon) Object.entries(c.lua_chon).forEach(([k, v]) => { const b = document.createElement('button'); b.className = 'opt'; b.dataset.k = k; b.textContent = k + '. ' + v; b.onclick = () => { if (st.checked) return; st.sel = k; [...o.children].forEach(x => x.classList.toggle('sel', x === b)); }; o.appendChild(b); });
-  else { const i = document.createElement('input'); i.className = 'txt'; i.placeholder = 'Em gõ đáp án…'; i.oninput = () => st.sel = i.value; o.appendChild(i); }
-  $('qExp').innerHTML = ''; $('btnNext').textContent = 'Kiểm tra';
-}
-async function next() {
-  const c = st.cau[st.i];
-  if (!st.checked) {
-    if (!st.sel) { alert('Em chọn một đáp án trước nhé!'); return; }
-    $('btnNext').disabled = true;
-    let r; try { r = await call('cham', { id: c.id, tra_loi: st.sel }); } catch (e) { r = { ok: false }; }
-    $('btnNext').disabled = false;
-    if (!r.ok) { alert('Chưa chấm được, em thử lại nhé.'); return; }
-    st.checked = true; st.res.push({ c, sel: st.sel, r }); st.hist.push({ id: c.id, tra_loi: st.sel });
-    [...$('qOpts').querySelectorAll('.opt')].forEach(b => { if (b.dataset.k === r.dap_an) b.classList.add('ok'); else if (b.dataset.k === st.sel) b.classList.add('bad'); });
-    let h = '<div class="exp ' + (r.dung ? 'ok' : 'bad') + '"><b>' + (r.dung ? '🎉 Đúng rồi!' : '😅 Chưa đúng. Đáp án: ' + r.dap_an) + '</b>';
-    h += esc(r.giai_dung || '');
-    if (!r.dung && r.vi_sao_sai) h += '<div class="tip">Vì sao em chọn ' + esc(st.sel) + ' chưa đúng: ' + esc(r.vi_sao_sai) + '</div>';
-    if (r.meo) h += '<div class="tip">💡 Mẹo: ' + esc(r.meo) + '</div>';
-    $('qExp').innerHTML = h + '</div>';
-    $('btnNext').textContent = st.i + 1 >= st.n ? 'Xem kết quả' : 'Câu tiếp';
-    return;
-  }
-  if (st.i + 1 >= st.n) return end();
-  if (st.mode === 'nhanh') {
-    $('btnNext').disabled = true;
-    try { const r = await call('thi-nhanh', { exam: st.exam, lich_su: st.hist, so_cau: st.n, co_nghe: false }); if (r.cau) { st.cau[st.i + 1] = r.cau; } else { $('btnNext').disabled = false; return end(); } } catch (e) { $('btnNext').disabled = false; return end(); }
-    $('btnNext').disabled = false;
-  }
-  st.i++; drawQ();
-}
-function esc(s) { return String(s).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+function fmt(s) { s = Math.max(0, s); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+function timer() { if (st.done) return; st.left--; const e = $('tmv'); if (e) e.textContent = fmt(st.left); if (st.left <= 0) submit(true); }
 
-function uoc(ex, ratio) {   // ĐIỂM ƯỚC LƯỢNG nội bộ, không phải điểm thi thật
-  if (ex === 'TOEIC') return Math.round((10 + ratio * 980) / 5) * 5;
-  if (ex === 'IELTS') return (Math.round((1 + ratio * 8) * 2) / 2).toFixed(1);
-  return Math.round(ratio * 120);
+function renderSheet() {
+  const titles = { TOEIC: 'Test of English for International Communication', IELTS: 'International English Language Testing System', TOEFL: 'Test of English as a Foreign Language' };
+  let h = '<div class="sh-head"><h2>Đề luyện tập ' + st.exam + '</h2><p>' + titles[st.exam] + ' · đề tự soạn, ước lượng điểm</p></div>' +
+    '<div class="sh-meta"><span>Họ và tên: ______________________</span><span>Số câu: <b>' + st.cau.length + '</b></span><span class="tm">⏱ <span id="tmv">' + fmt(st.left) + '</span></span></div>' +
+    '<p class="note" style="font-family:var(--font)">Đọc kỹ câu hỏi. Bấm vào chữ cái để chọn đáp án, hoặc gõ vào ô trống. Làm xong bấm <b>Nộp bài</b>.</p>';
+  let lastPart = null, lastCtx = '', lastAud = '';
+  st.cau.forEach((c, i) => {
+    const part = c.part || '';
+    if (part !== lastPart) { h += '<div class="part">' + esc(st.exam + (part ? ' · ' + part : '') + (c.dang ? ' — ' + c.dang : '')) + '</div>'; lastPart = part; }
+    const nc = c.ngu_canh;
+    if (nc) { const key = (nc.tieu_de || '') + (nc.noi_dung || '').slice(0, 40); if (key !== lastCtx) { h += '<div class="pass">' + (nc.tieu_de ? '<b>' + esc(nc.tieu_de) + '</b>' : '') + esc(nc.noi_dung) + '</div>'; lastCtx = key; } }
+    if (/\.(mp3|m4a|wav|ogg)$/i.test(c.am_thanh || '') && c.am_thanh !== lastAud) { h += '<div class="aud-box"><button type="button" class="aud" data-src="' + esc(c.am_thanh) + '">🎧 Bấm để nghe</button><audio controls class="hide"></audio><span class="note">Nghe rồi chọn đáp án.</span></div>'; lastAud = c.am_thanh; }
+    if (/\.(jpg|jpeg|png|webp)$/i.test(c.anh || '')) h += '<div class="img-box"><img alt="Hình của câu ' + (i + 1) + '" data-src="' + esc(c.anh) + '"></div>';
+    h += '<div class="q" id="q' + i + '" data-i="' + i + '"><div class="qt"><span class="no">' + (i + 1) + '.</span><span class="tx">' + esc(c.cau_hoi || '') + '</span></div>';
+    if (c.lua_chon && Object.keys(c.lua_chon).length) {
+      h += '<div class="opts">' + Object.entries(c.lua_chon).map(([k, v]) => '<label class="opt" data-k="' + esc(k) + '"><input type="radio" name="r' + i + '" value="' + esc(k) + '"><span class="bub">' + esc(k) + '</span><span class="ot">' + esc(v) + '</span></label>').join('') + '</div>';
+    } else h += '<div class="fill"><input type="text" autocomplete="off" placeholder="Gõ đáp án…" data-i="' + i + '"></div>';
+    h += '<div class="exp hide" id="e' + i + '"></div></div>';
+  });
+  $('sheet').innerHTML = h; wireMedia($('sheet'));
+  $('omr').innerHTML = st.cau.map((c, i) => '<a href="#q' + i + '" id="o' + i + '">' + (i + 1) + '</a>').join('');
+  $('sheet').querySelectorAll('input[type=radio]').forEach(r => r.onchange = () => { const i = +r.closest('.q').dataset.i; st.ans[i] = r.value; mark(i); });
+  $('sheet').querySelectorAll('.fill input').forEach(t => t.oninput = () => { const i = +t.dataset.i; if (t.value.trim()) st.ans[i] = t.value.trim(); else delete st.ans[i]; mark(i); });
+  prog();
 }
-async function end() {
-  show('vEnd');
-  const tong = st.res.length, dung = st.res.filter(x => x.r.dung).length, ratio = tong ? dung / tong : 0;
-  $('eKind').textContent = st.mode === 'nhanh' ? 'Điểm ước lượng sau thi nhanh ' + st.exam : 'Kết quả luyện ' + st.exam + (st.part ? ' ' + st.part : '');
-  $('eScore').textContent = dung + '/' + tong + ' câu đúng';
-  const dd = uoc(st.exam, ratio);
-  $('eLine').textContent = 'Điểm ước lượng: ' + dd + (st.exam === 'TOEIC' ? ' / 990' : st.exam === 'IELTS' ? ' band' : ' / 120') + (tong < 20 ? ' (ít câu nên chỉ để tham khảo)' : '');
-  const weak = {}; st.res.filter(x => !x.r.dung).forEach(x => { const k = x.r.diem_yeu || x.c.dang || 'Khác'; weak[k] = (weak[k] || 0) + 1; });
-  const wk = Object.entries(weak).sort((a, b) => b[1] - a[1]);
-  $('eWeak').innerHTML = wk.length ? '<b>Em hay sai ở:</b><table>' + wk.map(([k, v]) => '<tr><td>' + esc(k) + '</td><td>' + v + ' câu</td></tr>').join('') + '</table>' : '<p><b>Tuyệt vời, em không sai câu nào! 🎉</b></p>';
-  $('eWrong').innerHTML = st.res.filter(x => !x.r.dung).map(x => '<div class="exp bad"><b>' + esc(x.c.cau_hoi || '') + '</b>Em chọn ' + esc(x.sel) + ' – đáp án ' + esc(x.r.dap_an) + '. ' + esc(x.r.giai_dung || '') + '</div>').join('') || '<p class="note">Không có câu sai.</p>';
-  // gửi kết quả về n8n để lưu tiến độ và bot báo lại phụ huynh/học sinh
-  try { await call('nop', { exam: st.exam, mode: st.mode, part: st.part, tong, dung, diem_uoc: dd, chi_tiet: st.res.map(x => ({ id: x.c.id, tl: x.sel, d: x.r.dung ? 1 : 0 })) }); } catch (e) {}
+function mark(i) { $('o' + i).classList.toggle('done', i in st.ans); prog(); }
+function prog() { const d = Object.keys(st.ans).length, n = st.cau.length; $('pb').style.width = $('mpb').style.width = (d / n * 100) + '%'; $('pn').textContent = 'Đã làm ' + d + '/' + n + ' câu'; $('mn').textContent = d + '/' + n; }
+
+async function submit(auto) {
+  if (st.done) return;
+  const n = st.cau.length, d = Object.keys(st.ans).length;
+  if (!auto && d < n && !confirm('Em còn ' + (n - d) + ' câu chưa làm. Vẫn nộp bài chứ?')) return;
+  st.done = true; clearInterval(st.tick);
+  $('submit').disabled = $('submit2').disabled = true; $('submit').textContent = 'Đang chấm…';
+  const res = new Array(n);
+  let next = 0;
+  async function worker() { while (next < n) { const i = next++; try { res[i] = await call('cham', { id: st.cau[i].id, tra_loi: st.ans[i] || '' }); } catch (e) { res[i] = { ok: false }; } } }
+  await Promise.all([worker(), worker(), worker(), worker()]);
+  let dung = 0; const weak = {};
+  st.cau.forEach((c, i) => {
+    const r = res[i] || {}, q = $('q' + i); if (!r.ok) return;
+    const mine = st.ans[i] || '';
+    q.classList.add(r.dung ? 'ok' : 'bad'); $('o' + i).classList.remove('done'); $('o' + i).classList.add(r.dung ? 'ok' : 'bad');
+    q.querySelectorAll('.opt').forEach(o => { o.querySelector('input').disabled = true; if (o.dataset.k === r.dap_an) o.classList.add('right'); else if (o.dataset.k === mine) o.classList.add('wrong'); });
+    q.querySelectorAll('.fill input').forEach(t => t.disabled = true);
+    if (r.dung) dung++; else { const k = r.diem_yeu || c.dang || 'Khác'; weak[k] = (weak[k] || 0) + 1; }
+    let e = '<b>' + (r.dung ? 'Đúng rồi! ' : (mine ? 'Chưa đúng. ' : 'Chưa làm. ') + 'Đáp án: ' + esc(r.dap_an) + '. ') + '</b>' + esc(r.giai_dung || '');
+    if (!r.dung && r.vi_sao_sai) e += '<div class="tip">Vì sao ' + esc(mine) + ' chưa đúng: ' + esc(r.vi_sao_sai) + '</div>';
+    if (r.meo) e += '<div class="tip">💡 Mẹo: ' + esc(r.meo) + '</div>';
+    const ee = $('e' + i); ee.innerHTML = e; ee.classList.remove('hide');
+  });
+  const ratio = n ? dung / n : 0, uoc = estimate(st.exam, ratio);
+  $('vRes').classList.remove('hide');
+  $('eKind').textContent = (st.mode === 'nhanh' ? 'Điểm ước lượng sau thi nhanh ' : 'Kết quả luyện ') + st.exam;
+  $('eScore').textContent = dung + '/' + n + ' câu đúng';
+  $('eLine').textContent = 'Điểm ước lượng: ' + uoc + (st.exam === 'TOEIC' ? ' / 990' : st.exam === 'IELTS' ? ' band' : ' / 120') + (n < 20 ? ' (ít câu nên chỉ để tham khảo)' : '');
+  const wk = Object.entries(weak).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  $('eWeak').innerHTML = wk.length ? wk.map(([k, v]) => '<span>' + esc(k) + ' · ' + v + '</span>').join('') : '<b>Tuyệt vời, không sai câu nào! 🎉</b>';
+  $('resFig').innerHTML = window.BiQue ? BiQue.html(Math.random() < .5 ? 'nam' : 'nu', ratio >= .8 ? 'cheer' : ratio < .4 ? 'sad' : 'think') : '';
+  let stars = dung + 5 + (ratio >= .8 ? 10 : 0);
+  if (window.BiSao) { BiSao.add(dung, 'Làm đúng ' + dung + ' câu'); BiSao.add(5, 'Hoàn thành đề'); if (ratio >= .8) BiSao.add(10, 'Đúng trên 80%'); BiSao.report('luyen-thi', { exam: st.exam, dung, tong: n }); }
+  $('eStar').textContent = '⭐ Em nhận được ' + stars + ' sao!';
+  $('submit').textContent = 'Đã nộp bài'; document.querySelector('.mbar').classList.add('hide');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (U && T) { try { const hid = (st.exam + (st.part || 'ALL')).split('').map(ch => ch.charCodeAt(0).toString(16)).join('').slice(0, 30); await fetch(HKQ, { method: 'POST', headers: H, body: JSON.stringify({ u: U, t: T, id: hid, ten: 'Luyện thi ' + st.exam + (st.part ? ' ' + st.part : '') + ' (+' + stars + ' sao)', mon: 'Tiếng Anh', lop: 0, dung, tong: n, kt_dung: dung, kt_tong: n }) }); } catch (e) {} }
+  try { await call('nop', { exam: st.exam, mode: st.mode, part: st.part, tong: n, dung, diem_uoc: uoc, sao: stars, chi_tiet: st.cau.map((c, i) => ({ id: c.id, tl: st.ans[i] || '', d: res[i] && res[i].dung ? 1 : 0 })) }); } catch (e) {}
 }
-$('go').onclick = start; $('btnNext').onclick = next; $('again').onclick = () => { show('vHome'); drawHome(); };
-$('close').onclick = () => { if (tg) tg.close(); else history.length > 1 ? history.back() : location.reload(); };
-if (Q0.get('n')) st.n = +Q0.get('n') || 10; if (Q0.get('part')) st.part = Q0.get('part');
-if (Q0.get('ten')) $('hello').textContent = 'Chào ' + Q0.get('ten') + '! Chọn kì thi và chế độ luyện nhé!';
+
+function mediaFetch(path) { return fetch(MEDIA + '?f=' + encodeURIComponent(path), { headers: { 'ngrok-skip-browser-warning': '1' } }).then(r => { if (!r.ok) throw new Error('media'); return r.blob(); }).then(b => URL.createObjectURL(b)); }
+function wireMedia(root) {
+  root.querySelectorAll('img[data-src]').forEach(im => mediaFetch(im.dataset.src).then(u => { im.src = u; }).catch(() => { im.replaceWith(document.createTextNode('(Chưa tải được hình)')); }));
+  root.querySelectorAll('button.aud').forEach(b => b.onclick = async () => {
+    const a = b.nextElementSibling;
+    if (!a.src) { b.textContent = '⏳ Đang tải âm thanh…'; try { a.src = await mediaFetch(b.dataset.src); } catch (e) { b.textContent = 'Chưa tải được âm thanh, bấm thử lại'; return; } }
+    a.classList.remove('hide'); b.textContent = '🔁 Nghe lại'; a.play();
+  });
+}
+function micFor(ta, btn) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { btn.onclick = () => alert('Trình duyệt này chưa hỗ trợ nói. Em dùng Chrome hoặc Safari mới, hoặc gõ câu trả lời nhé.'); return; }
+  let rec = null, on = false, goc = '';
+  btn.onclick = () => {
+    if (on) { rec.stop(); return; }
+    rec = new SR(); rec.lang = 'en-US'; rec.interimResults = true; rec.continuous = true; goc = ta.value ? ta.value + ' ' : '';
+    rec.onresult = e => { let t = ''; for (let i = 0; i < e.results.length; i++) t += e.results[i][0].transcript; ta.value = goc + t; ta.dispatchEvent(new Event('input')); };
+    rec.onend = () => { on = false; btn.classList.remove('rec'); btn.textContent = '🎤 Bấm để nói'; };
+    rec.onerror = () => { on = false; btn.classList.remove('rec'); btn.textContent = '🎤 Bấm để nói'; };
+    rec.start(); on = true; btn.classList.add('rec'); btn.textContent = '⏹ Đang nghe… bấm để dừng';
+  };
+}
+function renderTasks() {
+  const sp = st.part === 'NOI';
+  let h = '<div class="sh-head"><h2>' + (sp ? 'Luyện nói' : 'Luyện viết') + ' ' + st.exam + '</h2><p>' + (sp ? 'Bấm micro và nói bằng tiếng Anh. Chữ em nói hiện trong khung, em có thể sửa trước khi chấm.' : 'Viết bài trong khung rồi bấm Chấm bài.') + '</p></div>';
+  st.tasks.forEach((c, i) => {
+    const nc = c.ngu_canh;
+    h += '<div class="task" data-i="' + i + '"><h4>' + esc((c.part || '') + (c.dang ? ' — ' + c.dang : '')) + '</h4>' +
+      (nc && nc.noi_dung ? '<div class="pass">' + esc(nc.noi_dung) + '</div>' : '') +
+      (/\.(jpg|jpeg|png|webp)$/i.test(c.anh || '') ? '<div class="img-box"><img data-src="' + esc(c.anh) + '" alt="Hình đề bài"></div>' : '') +
+      '<div class="pr">' + esc(c.cau_hoi || '') + '</div><textarea placeholder="' + (sp ? 'Chữ em nói sẽ hiện ở đây…' : 'Bài viết của em…') + '"></textarea>' +
+      '<div class="tb">' + (sp ? '<button type="button" class="mic2">🎤 Bấm để nói</button>' : '<span class="note wc">0 từ</span>') + '<button type="button" class="btn go2" style="padding:9px 20px">Chấm bài</button></div><div class="fb hide"></div></div>';
+  });
+  $('sheet').innerHTML = h; wireMedia($('sheet'));
+  $('omr').innerHTML = ''; $('pn').textContent = 'Làm từng đề, bấm Chấm bài ở mỗi đề.'; $('pb').style.width = '0';
+  document.querySelector('.omr .btn').classList.add('hide'); document.querySelector('.mbar').classList.add('hide');
+  $('sheet').querySelectorAll('.task').forEach(t => {
+    const ta = t.querySelector('textarea'), c = st.tasks[+t.dataset.i];
+    if (sp) micFor(ta, t.querySelector('.mic2')); else ta.oninput = () => { t.querySelector('.wc').textContent = (ta.value.trim() ? ta.value.trim().split(/\s+/).length : 0) + ' từ'; };
+    t.querySelector('.go2').onclick = async () => {
+      const bai = ta.value.trim(); if (bai.length < 15) { alert('Em làm thêm một chút rồi hãy chấm nhé (ít nhất vài câu).'); return; }
+      const b = t.querySelector('.go2'), fb = t.querySelector('.fb'); b.disabled = true; b.textContent = 'Đang chấm…';
+      let r; try { r = await call('cham-viet-noi', { id: c.id, bai }); } catch (e) { r = { ok: false, loi: 'mang' }; }
+      b.disabled = false; b.textContent = 'Chấm lại';
+      fb.classList.remove('hide');
+      if (!r || r.loi) { fb.innerHTML = 'Máy chấm đang bận hoặc chưa kết nối được. Bài của em vẫn còn trong khung, em bấm Chấm bài lại sau ít phút nhé.'; return; }
+      const d = r.diem || {}, rows = Object.entries(d).map(([k, v]) => '<li>' + esc(k) + ': <b>' + esc(v) + '</b></li>').join('');
+      fb.innerHTML = '<div class="sc">' + esc(r.tong) + (r.thang_toi_da ? ' / ' + esc(r.thang_toi_da) : '') + '</div>' + (rows ? '<ul>' + rows + '</ul>' : '') +
+        (r.khen ? '<p>👍 ' + esc(r.khen) + '</p>' : '') + (r.loi_hay_gap && r.loi_hay_gap.length ? '' : '') +
+        (Array.isArray(r.loi) && r.loi.length ? '<p><b>Cần sửa:</b></p><ul>' + r.loi.map(x => '<li>' + esc(typeof x === 'string' ? x : JSON.stringify(x)) + '</li>').join('') + '</ul>' : '') +
+        (r.sua ? '<p><b>Gợi ý viết lại:</b> ' + esc(r.sua) + '</p>' : '');
+      if (!t.dataset.paid && window.BiSao) { t.dataset.paid = 1; BiSao.add(5, sp ? 'Luyện nói' : 'Luyện viết'); BiSao.report('luyen-thi', { exam: st.exam, ky_nang: sp ? 'Speaking' : 'Writing' }); }
+    };
+  });
+}
+function estimate(ex, ratio) { if (ex === 'TOEIC') return Math.round((10 + ratio * 980) / 5) * 5; if (ex === 'IELTS') return (Math.round((1 + ratio * 8) * 2) / 2).toFixed(1); return Math.round(ratio * 120); }
+
+$('go').onclick = start; $('submit').onclick = () => submit(false); $('submit2').onclick = () => submit(false);
+$('again').onclick = () => { st.done = false; document.querySelector('.omr .btn').classList.remove('hide'); document.querySelector('.mbar').classList.remove('hide'); $('submit').disabled = $('submit2').disabled = false; $('submit').textContent = 'Nộp bài'; show('vHome'); drawHome(); };
+$('top').onclick = () => $('sheet').scrollIntoView({ behavior: 'smooth' });
+window.BI_GUIDE = 'Chào bạn! Đây là trang luyện thi. Bước một: chọn kỳ thi, dạng bài và số câu rồi bấm Bắt đầu làm đề. Bước hai: làm bài như trên tờ đề thật. Bấm vào chữ cái để chọn đáp án, hoặc gõ vào ô trống. Bên phải là phiếu trả lời cho biết bạn đã làm bao nhiêu câu. Bước ba: bấm Nộp bài để xem điểm, lời giải từng câu, mẹo làm bài và nhận sao thưởng.';
 drawHome();
 call('ds', {}).then(r => { if (r && r.ok !== false) { DS = r; drawHome(); } }).catch(() => {});
+window.addEventListener('load', () => { if (window.BiQue) $('figsHome').innerHTML = '<div style="flex:1">' + BiQue.html('nam', 'wave') + '</div><div style="flex:1">' + BiQue.html('nu', 'wave') + '</div>'; });
 </script>
+<script src="bi-nguoi-que.js"></script><script src="bi-chung.js"></script>
 </body>
 </html>

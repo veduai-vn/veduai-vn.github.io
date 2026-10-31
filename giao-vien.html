@@ -148,4 +148,5 @@ $.addEventListener('click',async e=>{const t=e.target,d=t.dataset;msg='';
 $.addEventListener('input',e=>{const t=e.target,d=t.dataset;if(d.a&&ai){ai[d.a]=t.value;return}if(d.f)form[d.f]=t.type==='checkbox'?t.checked:t.value;else if(d.c!==undefined&&t.tagName!=='SELECT')form.cau[+d.c][d.p]=t.value});
 $.addEventListener('change',e=>{const t=e.target,d=t.dataset;if(d.aif!==undefined){aiFiles([...t.files]);t.value='';return}if(t.id==='fl'){window.FL=t.value;ve()}else if(d.f){form[d.f]=t.type==='checkbox'?t.checked:t.value}else if(d.c!==undefined&&t.tagName==='SELECT'){form.cau[+d.c][d.p]=t.value;if(d.p==='loai')form.cau[+d.c].dap_an=t.value==='tn'?'A':'';ve()}});
 vao();
-</script></body></html>
+</script><script src="bi-nguoi-que.js"></script><script src="bi-chung.js"></script>
+</body></html>

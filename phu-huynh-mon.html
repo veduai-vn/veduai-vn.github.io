@@ -77,4 +77,5 @@ $.addEventListener('click',e=>{const t=e.target.closest('button');if(!t||!D)retu
   lam({act:'cai_dat',cai_dat:{tan_suat:g('s_ts'),gio:g('s_gio')||D.cai_dat.gio,thu:g('s_thu')||D.cai_dat.thu,ngay:g('s_ng')||D.cai_dat.ngay,nhac:g('s_nhac')}})}});
 $.addEventListener('change',e=>{if(e.target.id==='s_ts'&&D){D.cai_dat=Object.assign({},D.cai_dat,{tan_suat:e.target.value,gio:(document.getElementById('s_gio')||{}).value||D.cai_dat.gio,nhac:Number((document.getElementById('s_nhac')||{}).value)||0});ve()}});
 tai();
-</script></body></html>
+</script><script src="bi-nguoi-que.js"></script><script src="bi-chung.js"></script>
+</body></html>

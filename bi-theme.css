@@ -40,3 +40,12 @@ body.ms-bi .w.weak{background:rgba(255,190,60,.22)!important}
 body.ms-bi .w.wrong,body.ms-bi .w.missing{background:rgba(255,90,120,.22)!important}
 body.ms-bi #micbar{background:linear-gradient(to top,var(--paper) 78%,transparent)!important}
 body.ms-bi #gear{color:var(--text)}
+
+/* ===== v3 (31/10/2026): đồng bộ với trang chủ Một sách: bầu trời, kính mờ, nút xanh 3D ===== */
+@media (prefers-color-scheme:light){
+  body.ms{background-image:radial-gradient(rgba(201,218,242,.55) 1.5px,transparent 1.5px),linear-gradient(180deg,#A9DBFF 0,#DCF0FF 320px,#F4FAFF 100%)!important;background-size:26px 26px,100% 100%!important;background-attachment:scroll,fixed!important}
+  body.ms .card,body.ms .bubble{background:rgba(255,255,255,.78)!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:2px solid #fff!important;box-shadow:0 8px 26px rgba(19,84,124,.14)!important}
+  #bibar{background:rgba(255,255,255,.72)!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:2px solid #fff!important;box-shadow:0 6px 20px rgba(19,84,124,.18)!important}
+}
+body.ms .btn,body.ms button.go,body.ms .primary,body.ms .cta,body.ms button[type=submit]{background:linear-gradient(180deg,#6FD67A,#4CBF5B)!important;border:2px solid #2F9A3E!important;color:#fff!important;border-radius:999px!important;box-shadow:0 4px 0 #2F9A3E,0 8px 16px rgba(47,154,62,.25)!important;text-shadow:0 1px 0 rgba(0,0,0,.15)}
+body.ms .btn:active,body.ms .primary:active{transform:translateY(3px);box-shadow:0 1px 0 #2F9A3E!important}

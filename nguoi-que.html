@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Bi – Bút và Chì, hai bạn người que</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EAF5FF;--card:#fff;--text:#24305E;--muted:#5F6B92;--line:#C9DAF2;--shadow:#B5CBEA;--mark:#FFD84D;--mark-d:#E3AE00;--mark-ink:#4A3700;--blue:#2F6FD6;--pink:#FF7A90;
+--font:'Nunito',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;--disp:'Baloo 2','Nunito',system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#151B36;--card:#1F2850;--text:#F1F4FF;--muted:#AAB4DC;--line:#38437A;--shadow:#0E1328;--mark-ink:#24305E}}
+*{box-sizing:border-box;margin:0}
+body{font-family:var(--font);color:var(--text);background:var(--bg);background-image:radial-gradient(var(--line) 1.5px,transparent 1.5px);background-size:26px 26px;padding:env(safe-area-inset-top,0) 16px 40px;min-height:100vh}
+.wrap{max-width:980px;margin:0 auto;padding:22px 0}
+h1{font:800 clamp(1.7rem,4.4vw,2.6rem)/1.15 var(--disp)}
+h1 mark{background:var(--mark);color:var(--mark-ink);padding:0 8px;border-radius:8px}
+.lead{color:var(--muted);font-weight:700;margin:8px 0 22px;max-width:60ch;line-height:1.5}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.card{background:var(--card);border:3px solid var(--line);border-radius:28px;box-shadow:0 5px 0 var(--shadow);padding:18px 16px 16px;text-align:center;position:relative}
+.card .fig{width:min(260px,70%);margin:0 auto}
+.card h2{font:800 1.5rem var(--disp);margin-top:4px}
+.card .who{display:inline-block;font-weight:800;font-size:.82rem;border-radius:999px;padding:3px 12px;margin-bottom:4px}
+.nam .who{background:#DCE9FF;color:#1B4FA3}.nu .who{background:#FFE0E8;color:#B02A4E}
+.card p{color:var(--muted);font-weight:700;font-size:.95rem;margin-top:4px;line-height:1.45}
+.say{position:absolute;top:14px;left:14px;right:14px;background:var(--bg);border:3px solid var(--line);border-radius:18px 18px 18px 4px;padding:6px 12px;font:800 .95rem var(--disp);text-align:left;opacity:0;transform:translateY(6px);transition:.25s}
+.say.on{opacity:1;transform:none}
+.row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:20px 0 8px}
+.chip{appearance:none;font:800 .95rem var(--font);color:var(--text);background:var(--card);border:3px solid var(--line);border-radius:999px;padding:8px 16px;cursor:pointer;box-shadow:0 3px 0 var(--shadow)}
+.chip.on{background:var(--mark);border-color:var(--mark-d);color:var(--mark-ink)}
+.chip:active{transform:translateY(2px);box-shadow:0 1px 0 var(--shadow)}
+h3{font:800 1.3rem var(--disp);margin:30px 0 12px;text-align:center}
+.gal{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.gal .g{background:var(--card);border:3px solid var(--line);border-radius:20px;padding:8px 4px 6px;text-align:center;font-weight:800;font-size:.8rem;color:var(--muted)}
+.gal .g svg{margin-bottom:2px}
+.feat{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:6px}
+.feat .f{background:var(--card);border:3px solid var(--line);border-radius:22px;padding:14px;font-weight:700;font-size:.92rem;color:var(--muted);line-height:1.5}
+.feat b{display:block;color:var(--text);font:800 1.05rem var(--disp);margin-bottom:4px}
+.act{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.btn{appearance:none;font:800 1rem var(--font);border:3px solid var(--mark-d);background:var(--mark);color:var(--mark-ink);border-radius:999px;padding:11px 22px;cursor:pointer;box-shadow:0 4px 0 var(--mark-d);text-decoration:none}
+.btn.alt{background:var(--card);border-color:var(--line);color:var(--text);box-shadow:0 4px 0 var(--shadow)}
+pre{background:var(--card);border:3px solid var(--line);border-radius:18px;padding:14px;font-size:.85rem;overflow:auto;color:var(--text);margin-top:10px}
+@media(max-width:760px){.duo{grid-template-columns:1fr}.gal{grid-template-columns:repeat(4,1fr)}.feat{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Gặp <mark>Bút</mark> và <mark>Chì</mark>, hai bạn người que của Bi</h1>
+  <p class="lead">Hai bạn nhỏ làm bằng nét mực và một vệt bút dạ quang vàng. Bút có tóc là ngòi bút chì, Chì buộc hai búi tóc cục tẩy và nơ hồng. Cả hai đeo huy hiệu ngôi sao: học càng nhiều, sao càng sáng.</p>
+
+  <div class="duo">
+    <div class="card nam"><div class="say" id="sayN"></div><span class="who">Bạn nam · Bút</span><div class="fig" id="figN"></div><h2>Bút</h2><p>Nhanh nhẹn, hay tò mò, luôn có một câu hỏi "tại sao?" trong túi.</p></div>
+    <div class="card nu"><div class="say" id="sayC"></div><span class="who">Bạn nữ · Chì</span><div class="fig" id="figC"></div><h2>Chì</h2><p>Cẩn thận, hay cười, giỏi sửa lỗi sai bằng cục tẩy thần kỳ.</p></div>
+  </div>
+
+  <div class="row" id="poses"></div>
+
+  <h3>Bộ dáng điệu</h3>
+  <div class="gal" id="gal"></div>
+
+  <h3>Vì sao hai bạn khác biệt?</h3>
+  <div class="feat">
+    <div class="f"><b>🖍️ Vệt dạ quang</b>Thân người que luôn có một vệt vàng phía sau, như đoạn kiến thức vừa được đánh dấu. Nhìn là nhận ra Bi.</div>
+    <div class="f"><b>✏️ Tóc là đồ dùng học tập</b>Ngòi bút chì cho Bút, cục tẩy và nơ cho Chì. Một nhân vật, một câu chuyện nhỏ.</div>
+    <div class="f"><b>⭐ Huy hiệu sao</b>Ngôi sao trước ngực gắn với số sao học tập, giống bạn gấu Bi lớn lên theo điểm học.</div>
+  </div>
+
+  <div class="act"><button class="btn" id="dlN">⬇ Tải Bút (SVG)</button><button class="btn alt" id="dlC">⬇ Tải Chì (SVG)</button></div>
+  <h3>Cách dùng trong trang</h3>
+<pre>&lt;script src="bi-nguoi-que.js"&gt;&lt;/script&gt;
+&lt;div id="bạn"&gt;&lt;/div&gt;
+&lt;script&gt;BiQue.mount(document.getElementById('bạn'), 'nam', 'wave');&lt;/script&gt;
+// 'nam' | 'nu' · dáng: idle wave cheer think read run sad</pre>
+</div>
+<script src="bi-nguoi-que.js"></script>
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  var NAMES={idle:'Đứng chờ',wave:'Chào bạn',cheer:'Reo hò',think:'Suy nghĩ',read:'Đọc sách',run:'Chạy nhanh',sad:'Buồn'};
+  var SAYN={idle:'Mình là Bút!',wave:'Chào bạn nhé! 👋',cheer:'Đúng rồi! Giỏi quá!',think:'Hmm… tại sao nhỉ?',read:'Đọc bài tiết 45 phút thôi!',run:'Đi học nào!',sad:'Mình làm sai rồi…'};
+  var SAYC={idle:'Mình là Chì!',wave:'Xin chào! 👋',cheer:'Được 10 sao rồi!',think:'Để mình tính lại…',read:'Cùng ôn bài nào!',run:'Chờ mình với!',sad:'Đừng buồn, tẩy đi làm lại!'};
+  var cur='idle',tm;
+  function show(p){
+    cur=p;
+    BiQue.mount($('figN'),'nam',p);BiQue.mount($('figC'),'nu',p);
+    $('sayN').textContent=SAYN[p];$('sayC').textContent=SAYC[p];
+    ['sayN','sayC'].forEach(function(i){$(i).classList.add('on')});
+    clearTimeout(tm);tm=setTimeout(function(){['sayN','sayC'].forEach(function(i){$(i).classList.remove('on')})},2800);
+    [].forEach.call($('poses').children,function(b){b.classList.toggle('on',b.dataset.p===p)});
+  }
+  BiQue.poses.forEach(function(p){
+    var b=document.createElement('button');b.className='chip';b.dataset.p=p;b.textContent=NAMES[p];b.onclick=function(){show(p)};$('poses').appendChild(b);
+    var g=document.createElement('div');g.className='g';g.innerHTML='<div style="display:flex;gap:2px"><div style="flex:1">'+BiQue.html('nam',p)+'</div><div style="flex:1">'+BiQue.html('nu',p)+'</div></div>'+NAMES[p];$('gal').appendChild(g);
+  });
+  function dl(kind,name){
+    var s=BiQue.html(kind,cur).replace('<svg ','<svg xmlns="http://www.w3.org/2000/svg" ').replace(/var\(--qk-ink,#24305E\)/g,'#24305E').replace(/var\(--qk-card,#FFFFFF\)/g,'#FFFFFF');
+    var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([s],{type:'image/svg+xml'}));a.download=name+'-'+cur+'.svg';a.click();
+  }
+  $('dlN').onclick=function(){dl('nam','but')};$('dlC').onclick=function(){dl('nu','chi')};
+  show('wave');
+  var seq=['wave','cheer','think','read','run','idle'],i=0;
+  var auto=setInterval(function(){i=(i+1)%seq.length;show(seq[i])},4200);
+  document.addEventListener('click',function(e){if(e.target.closest('.chip'))clearInterval(auto)});
+})();
+</script>
+<script src="bi-nguoi-que.js"></script><script src="bi-chung.js"></script>
+</body>
+</html>

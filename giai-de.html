@@ -425,18 +425,18 @@ function baoKetQua(){
   });
 }
 function lamTuongTu(btn){
-  if(!SES||!TOK){setNote('Link này là bản cũ nên chưa soạn đề tương tự được. Bạn gửi lại ảnh đề cho bot nhé.');return;}
+  if(!SES||!TOK){setNote('Link này là bản cũ nên chưa soạn bài tương tự được. Bạn gửi lại ảnh đề cho bot nhé.');return;}
   if(simState)return;simState='wait';btn.disabled=true;btn.textContent='⏳ Đang gửi yêu cầu…';
   postApi('giai-de-tuong-tu',{t:TOK,s:SES},function(r){
-    if(r==='ok'){simState='ok';btn.textContent='✅ Đã nhận yêu cầu';setNote('🎯 Mình đang soạn đề tương tự (trúng phần bạn còn yếu). Khoảng 2–3 phút, link sẽ gửi vào chat với bot. Trong lúc chờ bot chưa trả lời việc khác được nhé.');}
-    else if(r==='dang_soan'){simState='';btn.disabled=false;btn.textContent='🎯 Làm đề tương tự';setNote('Bot đang soạn một đề khác cho bạn, bạn chờ xong rồi bấm lại nhé.');}
-    else{simState='';btn.disabled=false;btn.textContent='🎯 Làm đề tương tự';setNote('Chưa gửi được yêu cầu. Bạn thử bấm lại sau ít giây nhé.');}
+    if(r==='ok'){simState='ok';btn.textContent='✅ Đã nhận yêu cầu';if(window.BiTT)BiTT.watch(TOK,SES);setNote('🎯 Mình đang soạn bài tương tự (trúng phần bạn còn yếu), khoảng 2–3 phút. Khi xong sẽ có nút ▶ Play màu xanh nổi lên ở góc màn hình (ở trang nào cũng thấy) và link gửi vào chat với bot. Bạn cứ làm việc khác nhé.');}
+    else if(r==='dang_soan'){simState='';btn.disabled=false;btn.textContent='🎯 Làm bài tương tự';setNote('Bot đang soạn một bài khác cho bạn, chờ nút ▶ Play nổi lên rồi bấm nhé.');}
+    else{simState='';btn.disabled=false;btn.textContent='🎯 Làm bài tương tự';setNote('Chưa gửi được yêu cầu. Bạn thử bấm lại sau ít giây nhé.');}
   });
 }
 var ktState='';
 function tiepBtns(){
   var a=el('button','btn main','🔁 Làm lại');a.type='button';a.onclick=function(){start('lam');};
-  var b=el('button','btn main','🎯 Đề tương tự');b.type='button';b.onclick=function(){lamTuongTu(b);};
+  var b=el('button','btn main','🎯 Làm bài tương tự');b.type='button';b.onclick=function(){lamTuongTu(b);};
   var c=el('button','btn','⏹ Kết thúc');c.type='button';c.onclick=function(){ketThuc(c);};
   return [a,b,c];
 }
@@ -462,9 +462,9 @@ function hanhDong(act){
   function xemDe(){var b=el('button','btn main','📄 Xem lại đề này');b.type='button';b.style.marginTop='14px';b.onclick=chooseMode;s.appendChild(b);}
   if(!SES){t.textContent='Link này là bản cũ';m.textContent='Bạn gửi lại ảnh đề cho bot để mình tạo link mới nhé.';xemDe();return;}
   if(act==='tt'){
-    say('Mình đang gửi yêu cầu soạn đề tương tự…');
+    say('Mình đang gửi yêu cầu soạn bài tương tự…');
     postApi('giai-de-tuong-tu',{t:TOK,s:SES},function(r){
-      if(r==='ok'){t.textContent='Đã nhận yêu cầu rồi!';m.textContent='Mình đang soạn đề tương tự (trúng phần bạn còn yếu), khoảng 2–3 phút. Link sẽ gửi vào chat với bot, bạn quay lại chat chờ nhé.';}
+      if(r==='ok'){t.textContent='Đã nhận yêu cầu rồi!';if(window.BiTT)BiTT.watch(TOK,SES);m.textContent='Mình đang soạn bài tương tự (trúng phần bạn còn yếu), khoảng 2–3 phút. Khi xong sẽ có nút ▶ Play nổi lên ở góc màn hình và link gửi vào chat với bot.';}
       else if(r==='dang_soan'){t.textContent='Bot đang soạn một đề khác';m.textContent='Bạn chờ xong rồi bấm lại nhé.';}
       else{t.textContent='Chưa gửi được yêu cầu';m.textContent='Bạn thử bấm lại sau ít giây nhé.';}
       xemDe();});

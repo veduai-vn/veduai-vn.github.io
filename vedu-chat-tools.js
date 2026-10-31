@@ -34,13 +34,14 @@
     _chip() { const c = this._c; if (!c) return; c.innerHTML = S.ten_file ? '📎 ' + S.ten_file.replace(/[<>&]/g, '') + ' <b style="cursor:pointer" id="vct-x">✕</b>' : ''; const x = c.querySelector('#vct-x'); if (x) x.onclick = () => { S.anh = S.van_ban = S.ten_file = ''; this._chip(); }; },
     init(o) {
       const inp = document.querySelector(o.input), bar = document.querySelector(o.bar); if (!inp || !bar) return;
-      const mk = (t, ti) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = t; b.title = ti; b.style.cssText = 'font-size:20px;padding:6px 10px;border-radius:10px;border:1px solid #cbd5e1;background:transparent;cursor:pointer'; return b; };
-      const bA = mk('📎', 'Đính kèm ảnh, PDF hoặc Word'), bM = mk('🎤', 'Nói thay vì gõ');
+      const mk = (t, ti) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = t; b.title = ti; b.setAttribute('aria-label', ti); b.style.cssText = 'font:700 14px Nunito,system-ui,sans-serif;padding:7px 12px;border-radius:999px;border:1.5px solid #C9DAF2;background:#fff;color:#24305E;cursor:pointer;margin:2px 4px 2px 0'; return b; };
+      const bC = mk('📷 Chụp ảnh', 'Chụp ảnh đề bài hoặc trang sách'), bA = mk('📎 Tài liệu', 'Đính kèm ảnh, PDF hoặc Word'), bM = mk('🎤 Nói', 'Nói thay vì gõ');
       const fi = document.createElement('input'); fi.type = 'file'; fi.accept = 'image/*,.pdf,.doc,.docx'; fi.style.display = 'none';
+      const fc = document.createElement('input'); fc.type = 'file'; fc.accept = 'image/*'; fc.setAttribute('capture', 'environment'); fc.style.display = 'none';
       const chip = document.createElement('span'); chip.style.cssText = 'font-size:13px;margin-left:6px'; this._c = chip;
-      bar.append(bA, bM, fi, chip); bA.onclick = () => fi.click();
-      fi.onchange = async () => {
-        const f = fi.files[0]; fi.value = ''; if (!f) return;
+      bar.append(bC, bA, bM, fi, fc, chip); bA.onclick = () => fi.click(); bC.onclick = () => fc.click();
+      const onf = async (el) => {
+        const f = el.files[0]; el.value = ''; if (!f) return;
         try {
           const n = f.name.toLowerCase(); S.anh = S.van_ban = '';
           if (/^image\//.test(f.type)) { S.anh = await anhNho(f); if (!S.anh) return chia(); }
@@ -52,6 +53,7 @@
           S.ten_file = f.name.slice(0, 40); this._chip();
         } catch (e) { alert('Chưa đọc được file này. Bạn thử lại hoặc chụp ảnh gửi mình nhé.'); }
       };
+      fi.onchange = () => onf(fi); fc.onchange = () => onf(fc);
       const SR = W.SpeechRecognition || W.webkitSpeechRecognition;
       if (!SR) { bM.onclick = () => alert('Trình duyệt này chưa hỗ trợ nói. Bạn dùng Chrome hoặc Safari mới, hoặc gõ chữ nhé.'); return; }
       let rec = null, on = false, goc = '';

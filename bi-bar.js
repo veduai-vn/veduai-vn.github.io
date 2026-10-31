@@ -10,6 +10,7 @@
   } catch (e) {}
   var home = 'vao.html' + (me && me.u && me.t ? '?u=' + encodeURIComponent(me.u) + '&t=' + me.t : '');
 
+  var bc = document.createElement('script'); bc.src = 'bi-chung.js?v=1'; document.head.appendChild(bc);   // sao + nút góc phải + bạn nhỏ chạy nhảy dùng chung
   var tm = document.createElement('link'); tm.rel = 'stylesheet'; tm.href = 'bi-theme.css?v=2'; document.head.appendChild(tm);   // giao diện xanh chấm bi chung (sau mot-sach.css)
   var css = document.createElement('style');
   css.textContent =

@@ -954,4 +954,5 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!busy)rti
 setInterval(()=>{if(!busy)rtick()},30000);
 requestAnimationFrame(frame);
 (async()=>{const MO=Q.get('mo')==='en';if(MO){try{document.getElementById('en-x').textContent='← Về Trang chủ';window.enOpen()}catch(e){}}await pull();rtick();ui();if(S.ch)load();else if(!MO)openPick(false)})();   /* ?mo=en: mở thẳng màn Nói tiếng Anh theo chủ đề (từ trang Vào học) */
-</script></body></html>
+</script><script src="bi-nguoi-que.js"></script><script src="bi-chung.js"></script>
+</body></html>
