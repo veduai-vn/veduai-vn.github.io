@@ -220,7 +220,7 @@ function ve() {
     <section ${S.buoc === 2 ? '' : 'hidden'}>
       <h2><i class="em" aria-hidden="true">💌</i>Ba/mẹ nhận báo cáo thế nào? <i class="req" title="Bắt buộc">*</i></h2>
       <p class="hint">Bắt buộc: gói học chỉ được kích hoạt sau khi ba/mẹ đã liên kết để nhận báo cáo học tập của bạn.</p>
-      ${[['chung','Dùng chung tài khoản này', laZalo() ? 'Ba/mẹ nhận báo cáo qua chính tài khoản Zalo của bạn.' : 'Ba/mẹ nhận báo cáo qua chính tài khoản của bạn.'],
+      ${[['chung','Dùng chung tài khoản này', laZalo() ? 'Ba/mẹ dùng chung điện thoại hoặc Zalo này. Bạn bấm mở bot Phụ huynh, bot chào là gói học được kích hoạt.' : 'Ba/mẹ dùng chung tài khoản này. Bạn bấm mở bot Phụ huynh, bot chào là gói học được kích hoạt.'],
          ['rieng','Gửi link cho ba/mẹ (khuyên dùng)','Ba/mẹ có Telegram hoặc Zalo riêng. Bạn nhận đường dẫn để gửi cho ba/mẹ; ba/mẹ bấm xong là gói dùng thử 7 ngày bắt đầu.'],
          ]
         .map(o => `<label class="radio ${S.ph===o[0]?'on':''}"><input type="radio" name="ph" value="${o[0]}" ${S.ph===o[0]?'checked':''}><div><b>${o[1]}</b><span>${o[2]}</span></div></label>`).join('')}
@@ -291,31 +291,34 @@ function vaoHoc(j, web) {
   else if (TG) setTimeout(() => { try { TG.close(); } catch (e) {} }, 2000);
 }
 
+const ZALO_PH = 'https://zalo.me/4575554065668007909';
 function xong(j) {
-  const web = !!j.vaoUrl && !TG;   // trên Zalo/web: đi tiếp ngay trên trang này, không bắt quay lại chat
-  if (!j.linkPhuHuynh) {   // dùng chung: bấm xác nhận
-    trang(`<div class="big" aria-hidden="true">🤝</div><h1>Dùng chung tài khoản</h1>
-      <p>Ba/mẹ nhận báo cáo ngay trên tài khoản này. Bạn bấm nút dưới để xác nhận.</p>
-      <button type="button" class="go" id="xn">✅ Bấm để xác nhận</button>`);
-    document.getElementById('xn').onclick = () => vaoHoc(j, web);
-    return;
-  }
+  const web = !!j.vaoUrl && !TG;   // trên Zalo/web: đi tiếp ngay trên trang này
+  const rieng = S.ph === 'rieng';
+  const code = (String(j.linkPhuHuynh || '').match(/start=(ph_[a-z0-9]+)/i) || [])[1] || '';
+  const zalo = laZalo();
   let u = '', t = ''; try { const p = new URL(j.vaoUrl).searchParams; u = p.get('u') || ''; t = p.get('t') || ''; } catch (e) {}
   const hocThu = 'hoc-ngay.html' + (u ? '?u=' + encodeURIComponent(u) + '&t=' + t : '');
-  trang(`<div class="big" aria-hidden="true">📨</div><h1>Gửi link cho ba/mẹ</h1>
-    <p>Bạn bấm <b>Copy</b> rồi gửi tin dưới đây cho ba/mẹ. Ba/mẹ bấm vào là xác nhận xong, bạn sẽ được học chính thức.</p>
-    <div class="box" id="lk" style="white-space:pre-wrap">${esc(tinPH(j))}</div>
-    <button type="button" class="go" id="cp">📋 Copy gửi ba/mẹ</button>
-    <p class="hint" style="margin:16px 0 6px">Ba/mẹ đang cầm máy này? Bấm nút dưới để mở bot Phụ huynh ngay:</p>
-    <p><a class="chip" href="${esc(j.linkKet || j.linkPhuHuynh)}">👨‍👩‍👧 Mở bot Phụ huynh (Zalo / Telegram)</a></p>
-    <p class="hint" id="cho" style="margin-top:18px">⏳ Đang chờ ba/mẹ bấm link… (trang này tự cập nhật)</p>
+  const nutMo = zalo
+    ? `<button type="button" class="go" id="mo">💬 Mở bot Phụ huynh trên Zalo</button><p class="hint" style="margin-top:10px">Mã của bạn: <b>${esc(code)}</b> (tự sao chép khi bấm). Vào bot, <b>dán mã rồi gửi</b>, bot chào là gói học được kích hoạt.</p>`
+    : `<a class="go" id="mo" href="${esc(j.linkPhuHuynh)}" style="text-decoration:none;display:inline-flex;align-items:center">✈️ Mở bot Phụ huynh trên Telegram</a><p class="hint" style="margin-top:10px">Vào bot bấm <b>Start</b>, bot chào là gói học được kích hoạt.</p>`;
+  trang(`<div class="big" aria-hidden="true">${rieng ? '📨' : '🤝'}</div><h1>${rieng ? 'Gửi link cho ba/mẹ' : 'Mở bot Phụ huynh để kích hoạt'}</h1>
+    ${rieng ? `<p>Bạn bấm <b>Copy</b> rồi gửi tin dưới đây cho ba/mẹ. Ba/mẹ bấm vào là xác nhận xong, bạn sẽ được học chính thức.</p>
+      <div class="box" id="lk" style="white-space:pre-wrap">${esc(tinPH(j))}</div>
+      <button type="button" class="go" id="cp">📋 Copy gửi ba/mẹ</button>
+      <p class="hint" style="margin:16px 0 6px">Ba/mẹ đang cầm máy này? Bấm nút dưới để mở bot Phụ huynh ngay:</p>
+      <p><a class="chip" href="${esc(j.linkKet || j.linkPhuHuynh)}">👨‍👩‍👧 Mở bot Phụ huynh (Zalo / Telegram)</a></p>`
+      : `<p>Ba/mẹ dùng chung với bạn. Bạn bấm nút dưới để mở bot Phụ huynh nhé.</p>${nutMo}`}
+    <p class="hint" id="cho" style="margin-top:18px">⏳ Đang chờ bot Phụ huynh chào… (trang này tự cập nhật)</p>
     ${web ? `<p><a class="chip" href="${esc(hocThu)}">📚 Học thử trong lúc chờ</a></p>` : ''}`);
   pop();
   const cp = document.getElementById('cp');
-  cp.onclick = async () => { try { await navigator.clipboard.writeText(tinPH(j)); cp.textContent = '✅ Đã copy, gửi cho ba/mẹ nhé'; } catch (e) { cp.textContent = 'Hãy giữ và chép đoạn tin ở trên'; } };
+  if (cp) cp.onclick = async () => { try { await navigator.clipboard.writeText(tinPH(j)); cp.textContent = '✅ Đã copy, gửi cho ba/mẹ nhé'; } catch (e) { cp.textContent = 'Hãy giữ và chép đoạn tin ở trên'; } };
+  const mo = document.getElementById('mo');
+  if (mo && zalo) mo.onclick = async () => { try { await navigator.clipboard.writeText(code); } catch (e) {} location.href = ZALO_PH; };
   if (!u || !t) return;
   const t0 = Date.now();
-  const tim = setInterval(async () => {   // hỏi máy chủ xem ba/mẹ đã bấm link chưa
+  const tim = setInterval(async () => {   // hỏi máy chủ xem bot Phụ huynh đã chào (kích hoạt) chưa
     if (Date.now() - t0 > 30 * 60 * 1000) return clearInterval(tim);
     try {
       const r = await (await fetch(API + '/web-trang-thai', { method: 'POST', headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' }, body: JSON.stringify({ u, t }) })).json();
