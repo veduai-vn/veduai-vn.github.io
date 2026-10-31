@@ -80,7 +80,9 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid 
   @keyframes bn{50%{transform:translateY(-12px)}}
   @keyframes fall{to{transform:translateY(112vh) rotate(380deg)}}
 }
-.vf{max-width:560px;margin:6px auto 0;padding:10px 8px;text-align:center;font-size:12.5px;line-height:1.6;color:var(--mut,var(--muted,#5F6B92))}.vf a{color:inherit;font-weight:800}</style>
+.vf{max-width:560px;margin:6px auto 0;padding:10px 8px;text-align:center;font-size:12.5px;line-height:1.6;color:var(--mut,var(--muted,#5F6B92))}.vf a{color:inherit;font-weight:800}.req{color:#D94B4B;font-style:normal;font-weight:800;margin-left:2px}
+section:has(.err){outline:2px solid #D94B4B;outline-offset:6px;border-radius:18px}
+</style>
 <style>:root{color-scheme:light}</style>
 <link rel="stylesheet" href="mot-sach.css?v=2">
 </head>
@@ -154,14 +156,14 @@ function ve() {
     <div class="hero"><span class="mascot" aria-hidden="true"><svg viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><ellipse cx="100" cy="100" rx="66" ry="62" fill="#A56BE0" stroke="#3B2A55" stroke-width="3"/><ellipse cx="32" cy="132" rx="17" ry="44" fill="#A56BE0" stroke="#3B2A55" stroke-width="3" transform="rotate(10 32 132)"/><ellipse cx="168" cy="132" rx="17" ry="44" fill="#A56BE0" stroke="#3B2A55" stroke-width="3" transform="rotate(-10 168 132)"/><rect x="91" y="156" width="18" height="16" fill="#FFE4D2" stroke="#3B2A55" stroke-width="2.5"/><path d="M56 170 Q100 150 144 170 L154 230 H46 Z" fill="#24305E" stroke="#3B2A55" stroke-width="3" stroke-linejoin="round"/><path d="M78 163 L100 190 L122 163 Q100 154 78 163 Z" fill="#fff" stroke="#3B2A55" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="100" cy="108" rx="58" ry="54" fill="#FFE4D2" stroke="#3B2A55" stroke-width="3"/><g class="eyes"><ellipse cx="76" cy="112" rx="12" ry="15" fill="#2BB5C8"/><ellipse cx="76" cy="115" rx="7" ry="9.5" fill="#1d1a3a"/><circle cx="71" cy="106" r="4.8" fill="#fff"/><circle cx="81" cy="120" r="2.4" fill="#fff"/><ellipse cx="124" cy="112" rx="12" ry="15" fill="#2BB5C8"/><ellipse cx="124" cy="115" rx="7" ry="9.5" fill="#1d1a3a"/><circle cx="119" cy="106" r="4.8" fill="#fff"/><circle cx="129" cy="120" r="2.4" fill="#fff"/></g><path d="M60 103 Q76 91 92 103 M108 103 Q124 91 140 103" stroke="#3B2A55" stroke-width="3.2" fill="none" stroke-linecap="round"/><ellipse cx="57" cy="130" rx="10" ry="5.5" fill="#FF8FAB" opacity=".65"/><ellipse cx="143" cy="130" rx="10" ry="5.5" fill="#FF8FAB" opacity=".65"/><path d="M90 130 Q100 135 110 130 Q108 147 100 147 Q92 147 90 130Z" fill="#E8546E" stroke="#3B2A55" stroke-width="2.2" stroke-linejoin="round"/><path d="M94 141 Q100 138 106 141 Q103 145 100 145 Q97 145 94 141Z" fill="#FF9EB5"/><path d="M38 102 Q38 40 100 36 Q162 40 162 102 Q146 72 124 86 Q112 60 96 84 Q74 64 38 102 Z" fill="#A56BE0" stroke="#3B2A55" stroke-width="3" stroke-linejoin="round"/><path d="M62 54 Q82 44 104 46" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".55" fill="none"/><path d="M24 63 L38 72 L24 81Z M52 63 L38 72 L52 81Z" fill="#FF5C8A" stroke="#3B2A55" stroke-width="2.5" stroke-linejoin="round"/><circle cx="38" cy="72" r="4.5" fill="#FFB3C9" stroke="#3B2A55" stroke-width="2"/><path d="M148 63 L162 72 L148 81Z M176 63 L162 72 L176 81Z" fill="#FF5C8A" stroke="#3B2A55" stroke-width="2.5" stroke-linejoin="round"/><circle cx="162" cy="72" r="4.5" fill="#FFB3C9" stroke="#3B2A55" stroke-width="2"/><circle cx="64" cy="156" r="10" fill="#FFE4D2" stroke="#3B2A55" stroke-width="2.5"/><circle cx="136" cy="156" r="10" fill="#FFE4D2" stroke="#3B2A55" stroke-width="2.5"/><path class="stw" style="animation-delay:0s" d="M22 31 Q22 40 31 40 Q22 40 22 49 Q22 40 13 40 Q22 40 22 31Z" fill="#FFC400"/><path class="stw" style="animation-delay:0.6s" d="M182 27 Q182 34 189 34 Q182 34 182 41 Q182 34 175 34 Q182 34 182 27Z" fill="#FF8FAB"/><path class="stw" style="animation-delay:1.1s" d="M176 94 Q176 100 182 100 Q176 100 176 106 Q176 100 170 100 Q176 100 176 94Z" fill="#14C7D8"/></svg></span><div class="bubble"><h1>Mình làm quen nhé!</h1><p class="lead">Điền một lần, mình lập lộ trình học cho bạn ngay. Chỉ khoảng 1 phút thôi.</p>${gv.ten ? `<p class="lead" style="margin-top:6px">👩‍🏫 Lớp của ${esc(gv.ten)}${gv.truong ? ' · ' + esc(gv.truong) : ''}</p>` : ''}</div></div>
 
     <section>
-      <h2><i class="em" aria-hidden="true">🎒</i>Bạn học lớp mấy?</h2>
+      <h2><i class="em" aria-hidden="true">🎒</i>Bạn học lớp mấy? <i class="req" title="Bắt buộc">*</i></h2>
       <div class="row lop" role="group" aria-label="Lớp">
         ${[1,2,3,4,5,6,7,8,9,10,11,12].map(n => `<button type="button" class="chip" data-lop="${n}" aria-pressed="${S.lop===n}">Lớp ${n}</button>`).join('')}
       </div>${E('lop')}
     </section>
 
     <section ${S.lop ? '' : 'hidden'}>
-      <h2><i class="em" aria-hidden="true">📚</i>Bạn muốn học môn nào?</h2>
+      <h2><i class="em" aria-hidden="true">📚</i>Bạn muốn học môn nào? <i class="req" title="Bắt buộc">*</i></h2>
       <p class="hint">${full ? 'Gói Full: bạn học đủ các môn của lớp ' + S.lop + '.' : 'Gói của bạn được chọn tối đa ' + gioiHan + ' môn (đã chọn ' + nChon + ').'} Bộ sách Kết nối tri thức. Hỏi đáp tự do luôn có cho mọi môn.</p>
       <div>
       ${dsMon.map(m => { const x = S.mons[m]; return `
@@ -172,32 +174,32 @@ function ve() {
     </section>
 
     <section>
-      <h2><i class="em" aria-hidden="true">🌟</i>Về bạn</h2>
+      <h2><i class="em" aria-hidden="true">🌟</i>Về bạn <small class="hint">(mục có dấu * đỏ là bắt buộc)</small></h2>
       <div style="display:grid;gap:12px">
-        <div><label class="f" for="ten">Họ và tên của bạn</label>
+        <div><label class="f" for="ten">Họ và tên của bạn <i class="req" title="Bắt buộc">*</i></label>
           <input id="ten" type="text" maxlength="60" autocomplete="name" value="${esc(S.ten)}" placeholder="Ví dụ: Nguyễn Minh Anh">${E('ten')}</div>
-        <div><label class="f">Ngày tháng năm sinh</label>
+        <div><label class="f">Ngày tháng năm sinh <i class="req" title="Bắt buộc">*</i></label>
           <div class="dob">
             <select id="nd" aria-label="Ngày"><option value="">Ngày</option>${days.map(y => `<option ${String(y)===String(S.nd)?'selected':''}>${y}</option>`).join('')}</select>
             <select id="nt" aria-label="Tháng"><option value="">Tháng</option>${months.map(y => `<option ${String(y)===String(S.nt)?'selected':''}>${y}</option>`).join('')}</select>
             <select id="ns" aria-label="Năm"><option value="">Năm</option>${years.map(y => `<option ${String(y)===String(S.nn)?'selected':''}>${y}</option>`).join('')}</select>
           </div>${E('ns')}</div>
-        <div><label class="f">Bạn là</label>
+        <div><label class="f">Bạn là <i class="req" title="Bắt buộc">*</i></label>
           <div class="seg" role="group" aria-label="Giới tính" style="max-width:240px">
             <button type="button" data-gt="Nam" aria-pressed="${S.gt==='Nam'}">Nam</button>
             <button type="button" data-gt="Nữ" aria-pressed="${S.gt==='Nữ'}">Nữ</button>
           </div>${E('gt')}</div>
         <div class="two">
-          <div><label class="f" for="truong">Trường</label>
+          <div><label class="f" for="truong">Trường <i class="req" title="Bắt buộc">*</i></label>
             <input id="truong" type="text" maxlength="80" value="${esc(S.truong)}" placeholder="Ví dụ: THCS Nguyễn Du">${E('truong')}</div>
-          <div><label class="f" for="tenlop">Lớp</label>
+          <div><label class="f" for="tenlop">Lớp (ví dụ 7A2) <i class="req" title="Bắt buộc">*</i></label>
             <input id="tenlop" type="text" maxlength="20" value="${esc(S.tenLop)}" placeholder="Ví dụ: 7A2">${E('tenlop')}</div>
         </div>
       </div>
     </section>
 
     <section>
-      <h2><i class="em" aria-hidden="true">⏰</i>Lịch học</h2>
+      <h2><i class="em" aria-hidden="true">⏰</i>Lịch học <i class="req" title="Bắt buộc">*</i></h2>
       <p class="hint">Chọn các ngày bạn học trong tuần và giờ học. Mình sẽ nhắc bạn đúng giờ.</p>
       <div class="row" role="group" aria-label="Ngày học">
         ${NGAY.map(d => `<button type="button" class="chip" data-ngay="${d}" aria-pressed="${S.ngay.includes(d)}">${d}</button>`).join('')}
@@ -207,17 +209,18 @@ function ve() {
     </section>
 
     <section>
-      <h2><i class="em" aria-hidden="true">💌</i>Ba/mẹ nhận báo cáo thế nào?</h2>
+      <h2><i class="em" aria-hidden="true">💌</i>Ba/mẹ nhận báo cáo thế nào? <i class="req" title="Bắt buộc">*</i></h2>
+      <p class="hint">Bắt buộc: gói học chỉ được kích hoạt sau khi ba/mẹ đã liên kết để nhận báo cáo học tập của bạn.</p>
       ${[['chung','Dùng chung tài khoản này', laZalo() ? 'Ba/mẹ nhận báo cáo qua chính tài khoản Zalo của bạn.' : 'Ba/mẹ nhận báo cáo qua chính tài khoản của bạn.'],
          ['rieng','Gửi link cho ba/mẹ','Ba/mẹ có tài khoản Telegram riêng. Bạn sẽ nhận một đường dẫn để gửi cho ba/mẹ.'],
-         ['boqua','Bỏ qua','Bạn có thể liên kết với ba/mẹ sau.']]
+         ]
         .filter(o => !(laZalo() && o[0] === 'rieng'))
         .map(o => `<label class="radio ${S.ph===o[0]?'on':''}"><input type="radio" name="ph" value="${o[0]}" ${S.ph===o[0]?'checked':''}><div><b>${o[1]}</b><span>${o[2]}</span></div></label>`).join('')}
       ${E('ph')}
     </section>
 
     ${S.ph && S.ph !== 'boqua' ? `<section>
-      <h2><i class="em" aria-hidden="true">📬</i>Báo cáo nhanh &amp; nhắc giờ học cho ba/mẹ</h2>
+      <h2><i class="em" aria-hidden="true">📬</i>Báo cáo nhanh &amp; nhắc giờ học cho ba/mẹ <small class="hint">(không bắt buộc, có thể bỏ qua)</small></h2>
       <p class="hint">Báo cáo ngắn gọn: tuân thủ giờ học, điểm, bài kiểm tra. Ba/mẹ xem chi tiết bằng đường link trong bot. Ba/mẹ có thể đổi lại bất cứ lúc nào.</p>
       <div class="row" role="group" aria-label="Tần suất báo cáo">
         ${[['ngay','Hằng ngày'],['tuan','Hằng tuần'],['thang','Hằng tháng'],['tat','Không nhận']].map(o => `<button type="button" class="chip" data-bc="${o[0]}" aria-pressed="${S.bc === o[0]}">${o[1]}</button>`).join('')}

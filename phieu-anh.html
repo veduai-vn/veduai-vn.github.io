@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mọt sách – Khai báo mục tiêu ôn luyện</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#24305E;--muted:#5F6B92;--line:#C9DAF2;--mark:#FFD84D;--mark-d:#E3AE00;--mark-ink:#4A3700;--bad:#D94B4B;--green:#4CBF5B;--green-d:#2F9A3E;--font:'Nunito',system-ui,sans-serif;--disp:'Baloo 2','Nunito',sans-serif}
+*{box-sizing:border-box;margin:0}
+body{font-family:var(--font);color:var(--ink);min-height:100vh;background:linear-gradient(180deg,#A9DBFF 0,#DCF0FF 320px,#F4FAFF 100%) fixed;padding:calc(56px + env(safe-area-inset-top,0px)) 14px 120px}
+.wrap{max-width:640px;margin:0 auto}h1{font:800 clamp(1.5rem,4vw,2rem) var(--disp)}.sub{color:var(--muted);font-weight:700;margin:4px 0 14px}
+.glass{background:rgba(255,255,255,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:2px solid #fff;border-radius:26px;box-shadow:0 10px 30px rgba(19,84,124,.14);padding:18px;margin-bottom:14px}
+.q{font:800 1.1rem var(--disp);margin:14px 0 6px}.q small{font:700 .85rem var(--font);color:var(--muted)}.q i{color:var(--bad);font-style:normal}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.chip{appearance:none;font:inherit;font-weight:800;cursor:pointer;color:var(--ink);padding:10px 16px;border-radius:999px;border:2px solid var(--line);background:#fff}.chip.on{background:var(--mark);border-color:var(--mark-d);color:var(--mark-ink)}
+input{width:100%;padding:12px 14px;border-radius:16px;border:2px solid var(--line);font:700 1rem var(--font);background:#fff}input:focus{outline:none;border-color:var(--mark-d)}
+.btn{appearance:none;width:100%;font:800 1.1rem var(--font);cursor:pointer;padding:14px;border-radius:999px;border:2px solid var(--green-d);background:linear-gradient(180deg,#6FD67A,var(--green));color:#fff;box-shadow:0 5px 0 var(--green-d);margin-top:16px}.btn:disabled{opacity:.6}
+.err{color:var(--bad);font-weight:800;font-size:.9rem;margin-top:6px;min-height:1.2em}.note{color:var(--muted);font-size:.85rem;margin-top:8px}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🏆 Khai báo mục tiêu ôn luyện</h1>
+  <p class="sub">Vài câu hỏi ngắn để đề đúng sức bạn. Xong là vào luyện đề ngay, không cần quay lại chat.</p>
+  <div class="glass" id="form">
+    <div class="q">1. Bạn muốn thi gì? <i>*</i></div><div class="row" id="rEx"></div>
+    <div class="q">2. Hình thức / môn thi <i>*</i></div><div class="row" id="rLoai"></div>
+    <div class="q">3. Trình độ hiện tại của bạn <i>*</i> <small>(không chắc thì chọn "Chưa biết", mình cho làm kiểm tra nhanh)</small></div><div class="row" id="rLv"></div>
+    <div class="q">4. Điểm mục tiêu <i>*</i> <small id="hint"></small></div><input id="muc" inputmode="decimal" placeholder="Ví dụ: 600">
+    <div class="q">5. Ngày dự thi <small>(không bắt buộc)</small></div><input id="ngay" type="date">
+    <div class="q">6. Tên của bạn <small>(không bắt buộc)</small></div><input id="ten" maxlength="40" placeholder="Ví dụ: Minh An">
+    <div class="err" id="err" role="alert"></div>
+    <button class="btn" id="go">Lưu và vào luyện đề</button>
+    <p class="note">Thông tin này chỉ dùng để chọn đề và đo tiến bộ của bạn.</p>
+  </div>
+  <div class="glass hide" id="bad"><b>Link chưa đúng hoặc đã hết hiệu lực.</b><p class="note">Bạn mở lại từ bot Mọt sách (bấm 🏆 Ôn luyện TOEIC · IELTS · TOEFL) nhé.</p></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const Q = new URLSearchParams(location.search);
+const API = Q.get('api') || 'https://devotee-outclass-couch.ngrok-free.dev/webhook/luyen-thi-5e2a', MT = API.replace(/luyen-thi-5e2a$/, 'luyen-thi-muctieu');
+let UT = {}; try { UT = JSON.parse(localStorage.getItem('ms_vao_id') || '{}') || {}; } catch (e) {}
+const U = Q.get('u') || UT.u || '', T = Q.get('t') || UT.t || '';
+if (!U || !T) { $('form').classList.add('hide'); $('bad').classList.remove('hide'); }
+const LOAI = { TOEIC: ['Nghe – Đọc (L&R)', 'Nói – Viết (S&W)', 'Cả hai'], IELTS: ['Academic', 'General Training'], TOEFL: ['TOEFL iBT'] };
+const LV = { TOEIC: ['Dưới 300', '300 – 500', '500 – 700', 'Trên 700'], IELTS: ['Dưới 4.0', '4.0 – 5.0', '5.5 – 6.5', '7.0 trở lên'], TOEFL: ['Dưới 40', '40 – 70', '70 – 90', 'Trên 90'] };
+const RG = { TOEIC: [10, 990, 'từ 10 đến 990, ví dụ 600'], IELTS: [1, 9, 'từ 1.0 đến 9.0, ví dụ 6.5'], TOEFL: [0, 120, 'từ 0 đến 120, ví dụ 80'] };
+const st = { ex: (Q.get('exam') || '').toUpperCase(), loai: '', lv: null };
+function chips(el, items, cur, on) { el.innerHTML = ''; items.forEach(([v, t]) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip' + (v === cur ? ' on' : ''); b.textContent = t; b.onclick = () => on(v); el.appendChild(b); }); }
+function draw() {
+  chips($('rEx'), ['TOEIC', 'IELTS', 'TOEFL'].map(x => [x, x]), st.ex, v => { st.ex = v; st.loai = ''; st.lv = null; draw(); });
+  const ok = !!st.ex;
+  chips($('rLoai'), ok ? LOAI[st.ex].map(x => [x, x]) : [], st.loai, v => { st.loai = v; draw(); });
+  chips($('rLv'), ok ? [['', 'Chưa biết']].concat(['A', 'B', 'C', 'D'].map((k, i) => [k, LV[st.ex][i]])) : [], st.lv, v => { st.lv = v; draw(); });
+  $('hint').textContent = ok ? '(' + RG[st.ex][2] + ')' : '';
+}
+$('go').onclick = async () => {
+  const e = $('err'); e.textContent = '';
+  if (!st.ex) return e.textContent = 'Bạn chọn kỳ thi nhé.';
+  if (!st.loai) return e.textContent = 'Bạn chọn hình thức / môn thi nhé.';
+  if (st.lv === null) return e.textContent = 'Bạn chọn trình độ hiện tại (hoặc "Chưa biết") nhé.';
+  const muc = parseFloat(String($('muc').value).replace(',', '.')), [lo, hi] = RG[st.ex];
+  if (!(muc >= lo && muc <= hi)) return e.textContent = 'Điểm mục tiêu ' + st.ex + ' cần ' + RG[st.ex][2] + '.';
+  const b = $('go'); b.disabled = true; b.textContent = 'Đang lưu…';
+  try {
+    const r = await (await fetch(MT, { method: 'POST', headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' }, body: JSON.stringify({ u: U, t: T, exam: st.ex, loai_thi: st.loai, lv: st.lv, muc_tieu: String(muc), ngay_thi: $('ngay').value, ten: $('ten').value }) })).json();
+    if (!r || !r.ok) throw new Error(r && r.loi || 'loi');
+    try { localStorage.setItem('ms_vao_id', JSON.stringify({ u: U, t: T })); localStorage.setItem('ms_lv_' + st.ex, st.lv || ''); localStorage.setItem('ms_muctieu_' + st.ex, String(muc)); } catch (x) {}
+    location.href = 'luyen-thi.html?exam=' + st.ex + '&u=' + encodeURIComponent(U) + '&t=' + T + (st.lv === '' ? '&auto=nhanh' : '') + (Q.get('api') ? '&api=' + encodeURIComponent(Q.get('api')) : '');
+  } catch (x) { e.textContent = 'Chưa lưu được (' + x.message + '). Bạn thử lại sau ít phút nhé.'; b.disabled = false; b.textContent = 'Lưu và vào luyện đề'; }
+};
+window.BI_GUIDE = 'Chào bạn! Đây là phiếu khai báo mục tiêu ôn luyện. Bạn chọn kỳ thi, hình thức thi, trình độ hiện tại và điểm mục tiêu. Bấm Lưu và vào luyện đề, hệ thống mở thẳng phòng luyện đề cho bạn.';
+draw();
+</script>
+<script src="bi-nguoi-que.js"></script><script src="bi-chung.js"></script>
+</body>
+</html>

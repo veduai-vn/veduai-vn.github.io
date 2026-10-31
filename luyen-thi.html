@@ -388,6 +388,7 @@ window.BI_GUIDE = 'Chào bạn! Đây là trang luyện thi. Bước một: ch�
 drawHome();
 if (U && T) callTo(GOI, {}).then(r => { if (r && r.ok) { st.goi = r; drawHome(); } }).catch(() => {});
 if (Q0.get('mode') === 'on' || SPON) setTimeout(() => startOn(), 400);
+if (Q0.get('auto') === 'nhanh') setTimeout(() => $('qk').click(), 900);
 call('ds', {}).then(r => { if (r && r.ok !== false) { DS = r; drawHome(); } }).catch(() => {});
 window.addEventListener('load', () => { if (window.BiQue) $('figsHome').innerHTML = '<div style="flex:1">' + BiQue.html('nam', 'wave') + '</div><div style="flex:1">' + BiQue.html('nu', 'wave') + '</div>'; });
 </script>
