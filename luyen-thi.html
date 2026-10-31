@@ -105,6 +105,7 @@ h1{font:800 clamp(1.5rem,4vw,2.2rem) var(--disp)}
 <body>
 <div class="wrap">
   <div id="vHome">
+    <div class="glass hide" id="upsell" style="margin-bottom:12px"></div>
     <div class="intro">
       <div><h1>🎯 Luyện thi cùng Bút và Chì</h1><p class="sub">Làm đề trên tờ giấy như thi thật: bấm chọn đáp án hoặc gõ vào ô trống, nộp bài là có điểm, lời giải và sao thưởng.</p></div>
       <div class="figs" id="figsHome"></div>
@@ -149,7 +150,7 @@ let SPX = []; try { SPX = String((tg && tg.initDataUnsafe && tg.initDataUnsafe.s
 let UT = {}; try { UT = JSON.parse(localStorage.getItem('ms_vao_id') || '{}') || {}; } catch (e) {}
 const U = Q0.get('u') || SPX[1] || UT.u || '', T = Q0.get('t') || SPX[2] || UT.t || '';
 if (U && T) { try { localStorage.setItem('ms_vao_id', JSON.stringify({ u: U, t: T })); } catch (e) {} }
-const MEDIA = API.replace(/luyen-thi-5e2a$/, 'luyen-thi-am'), GHI = API.replace(/luyen-thi-5e2a$/, 'luyen-thi-ghi'), YEU = API.replace(/luyen-thi-5e2a$/, 'luyen-thi-yeu');
+const MEDIA = API.replace(/luyen-thi-5e2a$/, 'luyen-thi-am'), GHI = API.replace(/luyen-thi-5e2a$/, 'luyen-thi-ghi'), YEU = API.replace(/luyen-thi-5e2a$/, 'luyen-thi-yeu'), GOI = API.replace(/luyen-thi-5e2a$/, 'luyen-thi-goi');
 const LV = {
   TOEIC: [['A', 'Dưới 300', 'A1,A2'], ['B', '300 – 500', 'A2,B1'], ['C', '500 – 700', 'B1,B2'], ['D', 'Trên 700', 'B2,C1']],
   IELTS: [['A', 'Dưới 4.0', 'A1,A2'], ['B', '4.0 – 5.0', 'A2,B1'], ['C', '5.5 – 6.5', 'B1,B2'], ['D', '7.0 trở lên', 'B2,C1']],
@@ -161,6 +162,27 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
 const st = { lv: '', exam: ((Q0.get('exam') || ((SPX[0] || '').split('-')[0]) || 'TOEIC')).toUpperCase().replace(/[^A-Z]/g, '').slice(0, 5), mode: Q0.get('mode') === 'nhanh' ? 'nhanh' : 'de', part: Q0.get('part') || '', n: +Q0.get('n') || 20, cau: [], ans: {}, done: false, t0: 0, left: 0, tick: null };
 let DS = null;
+
+const PLAN = { free: 'Miễn phí (10 câu mỗi ngày)', tiet_kiem: 'Tiết kiệm', hoc_full: 'Học full' };
+function todayKey() { return new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 10); }
+function usedToday() { let l = 0; try { const o = JSON.parse(localStorage.getItem('ms_lt_day') || '{}'); if (o.d === todayKey()) l = o.n || 0; } catch (e) {} return Math.max(l, st.goi ? (st.goi.hom_nay || 0) : 0); }
+function addUsed(n) { try { const k = todayKey(); let o = JSON.parse(localStorage.getItem('ms_lt_day') || '{}'); if (o.d !== k) o = { d: k, n: 0 }; o.n += n; localStorage.setItem('ms_lt_day', JSON.stringify(o)); } catch (e) {} }
+function planNow() { return st.goi ? st.goi.plan : 'free'; }
+function upsell(msg) {
+  const u = $('upsell'); u.classList.remove('hide');
+  u.innerHTML = '<b>' + esc(msg) + '</b><div class="row" style="margin-top:10px"><a class="btn" style="text-decoration:none" href="https://t.me/VeDuAI_PhuHuynh_bot" target="_blank" rel="noopener">🛒 Nhờ ba/mẹ mua gói</a><button class="btn alt" id="upX">Để sau</button></div><p class="note">Ba/mẹ vào bot phụ huynh, bấm “🏆 Ôn luyện tiếng Anh” để chọn: Thi thử 29.000đ mỗi lần · Tiết kiệm 149.000đ / 30 ngày · Học full 299.000đ / 30 ngày.</p>';
+  $('upX').onclick = () => u.classList.add('hide'); window.scrollTo(0, 0);
+}
+function gate(n, kind) {
+  const plan = planNow(); st.useCredit = false;
+  if (kind === 'dinh_ky' && plan !== 'hoc_full') {
+    if (st.goi && st.goi.thi_thu > 0) { st.useCredit = true; return { ok: true }; }
+    return { ok: false, msg: '📅 Kiểm tra định kỳ là bài thi thử trọn đề. Gói Học full thi thử không giới hạn, hoặc mua lẻ 29.000đ mỗi lần.' };
+  }
+  if (plan === 'free' && usedToday() >= 10) return { ok: false, msg: '🆓 Hôm nay em đã luyện đủ 10 câu miễn phí. Gói Tiết kiệm (149.000đ / 30 ngày) luyện không giới hạn, mai em lại có thêm 10 câu miễn phí nhé.' };
+  return { ok: true };
+}
+function capFree(arr) { return planNow() === 'free' ? arr.slice(0, Math.max(1, 10 - usedToday())) : arr; }
 async function callTo(url, body) { const r = await fetch(url, { method: 'POST', headers: H, body: JSON.stringify({ u: U, t: T, ...body }) }); return r.json(); }
 async function call(act, body) { const r = await fetch(API, { method: 'POST', headers: H, body: JSON.stringify({ act, u: U, t: T, ...body }) }); return r.json(); }
 function chips(el, items, cur, on) { el.innerHTML = ''; items.forEach(([v, t]) => { const b = document.createElement('button'); b.className = 'chip' + (v === cur ? ' on' : ''); b.textContent = t; b.onclick = () => on(v); el.appendChild(b); }); }
@@ -177,12 +199,14 @@ function drawHome() {
   $('rN').parentElement && ($('rN').previousElementSibling.classList.toggle('hide', task), $('rN').classList.toggle('hide', task));
   chips($('rPart'), parts, st.part, v => { st.part = v; drawHome(); });
   chips($('rN'), [[10, '10'], [20, '20'], [30, '30'], [40, '40']], st.n, v => { st.n = v; drawHome(); });
-  $('stat').textContent = DS && DS.tong ? 'Kho hiện có ' + DS.tong + ' câu hỏi. Thời gian làm bài ước tính ' + Math.round(st.n * 1.1) + ' phút.' : '';
+  $('stat').textContent = (DS && DS.tong ? 'Kho hiện có ' + DS.tong + ' câu hỏi. Thời gian làm bài ước tính ' + Math.round(st.n * 1.1) + ' phút.' : '') + (st.goi ? ' · Gói của em: ' + PLAN[st.goi.plan] + (st.goi.plan === 'free' ? ' (hôm nay đã dùng ' + Math.min(10, usedToday()) + '/10 câu)' : '') + (st.goi.thi_thu ? ' · ' + st.goi.thi_thu + ' lượt thi thử' : '') : '');
 }
 function show(v) { ['vHome', 'vExam'].forEach(x => $(x).classList.toggle('hide', x !== v)); window.scrollTo(0, 0); }
 
 function lvCefr() { const x = st.lv && LV[st.exam].find(y => y[0] === st.lv); return x ? x[2] : ''; }
 async function start() {
+  if (st.part === 'NOI' || st.part === 'VIET') { if (planNow() === 'free') return upsell('🎤 Chấm bài Nói và Viết bằng AI dành cho gói Tiết kiệm trở lên. Gói Tiết kiệm 149.000đ / 30 ngày.'); }
+  else { const gg = gate(st.kind === 'dinh_ky' ? 30 : st.n, st.kind); if (!gg.ok) return upsell(gg.msg); }
   $('go').disabled = true; $('go').textContent = 'Đang lấy đề…';
   try {
     if (st.part === 'NOI' || st.part === 'VIET') {
@@ -194,6 +218,7 @@ async function start() {
     const r = st.kind ? await call('kiem-tra', { exam: st.exam, loai: st.kind, cefr: lvCefr(), ky_nang: lis ? 'Listening' : 'Reading' }) : await call('de', st.mode === 'nhanh' ? { exam: st.exam, n: st.n } : (lis ? { exam: st.exam, n: st.n, ky_nang: 'Listening', cefr: lvCefr() } : { exam: st.exam, part: st.part, n: st.n, ky_nang: 'Reading', cefr: lvCefr() }));
     if (!r.ok || !r.cau || !r.cau.length) throw new Error(r.loi || 'khong_co_cau');
     st.cau = (st.kind || st.mode === 'de' || lis) ? r.cau.slice().sort((a, b) => (a.part || '').localeCompare(b.part || '') || (a.so || 0) - (b.so || 0)) : r.cau;
+    st.cau = capFree(st.cau);
     st.ans = {}; st.done = false; st.t0 = Date.now(); st.left = Math.round(st.cau.length * 66);
     renderSheet(); show('vExam'); $('vRes').classList.add('hide');
     clearInterval(st.tick); st.tick = setInterval(timer, 1000); timer();
@@ -269,7 +294,7 @@ async function submit(auto) {
   $('ePlan').classList.toggle('hide', !yeu.length);
   $('ePlan').innerHTML = '<b>🎯 Kế hoạch ôn luyện gợi ý</b><br>1) Bấm <b>Ôn điểm yếu ngay</b>: làm lại ' + saiIds.length + ' câu vừa sai kèm câu tương tự.<br>2) Mỗi ngày 15 phút ôn các chủ điểm ở trên.<br>3) Sau 3 ngày làm một đề mới để kiểm tra tiến bộ.';
   $('onNow').classList.toggle('hide', !saiIds.length);
-  st.lastSai = saiIds;
+  st.lastSai = saiIds; addUsed(n);
   try { const key = 'ms_sai_' + st.exam; let cur = JSON.parse(localStorage.getItem(key) || '[]'); cur = cur.filter(x => !dungIds.includes(x)); saiIds.forEach(x => { if (!cur.includes(x)) cur.push(x); }); localStorage.setItem(key, JSON.stringify(cur.slice(-60))); } catch (e) {}
   $('resFig').innerHTML = window.BiQue ? BiQue.html(Math.random() < .5 ? 'nam' : 'nu', ratio >= .8 ? 'cheer' : ratio < .4 ? 'sad' : 'think') : '';
   let stars = dung + 5 + (ratio >= .8 ? 10 : 0);
@@ -277,7 +302,7 @@ async function submit(auto) {
   $('eStar').textContent = '⭐ Em nhận được ' + stars + ' sao!';
   $('submit').textContent = 'Đã nộp bài'; document.querySelector('.mbar').classList.add('hide');
   window.scrollTo({ top: 0, behavior: 'smooth' });
-  if (U && T) { try { await callTo(GHI, { exam: st.exam, part: st.part, mode: st.mode, ky_nang: st.part === 'NGHE' ? 'Listening' : 'Reading', tong: n, dung, diem_uoc: uoc, sao: stars, lo_trinh: st.lv, loai: st.kind || '', manh, yeu, chi_tiet: st.cau.map((c, i) => ({ id: c.id, d: res[i] && res[i].dung ? 1 : 0, part: c.part || '' })) }); } catch (e) {} }
+  if (U && T) { try { await callTo(GHI, { exam: st.exam, part: st.part, mode: st.mode, ky_nang: st.part === 'NGHE' ? 'Listening' : 'Reading', tong: n, dung, diem_uoc: uoc, sao: stars, dung_thi_thu: !!st.useCredit, lo_trinh: st.lv, loai: st.kind || '', manh, yeu, chi_tiet: st.cau.map((c, i) => ({ id: c.id, d: res[i] && res[i].dung ? 1 : 0, part: c.part || '' })) }); } catch (e) {} }
   try { await call('nop', { exam: st.exam, mode: st.mode, part: st.part, tong: n, dung, diem_uoc: uoc, sao: stars, chi_tiet: st.cau.map((c, i) => ({ id: c.id, tl: st.ans[i] || '', d: res[i] && res[i].dung ? 1 : 0 })) }); } catch (e) {}
 }
 
@@ -338,6 +363,7 @@ function renderTasks() {
 }
 
 async function startOn(extra) {
+  { const gg = gate(20, 'on'); if (!gg.ok) return upsell(gg.msg); }
   const b = $('goOn'); if (b) { b.disabled = true; b.textContent = 'Đang tạo bộ câu ôn…'; }
   try {
     let ids = Array.isArray(extra) ? extra.slice() : [];
@@ -346,7 +372,7 @@ async function startOn(extra) {
     if (!ids.length) { alert('Em chưa có câu sai nào để ôn ' + st.exam + '. Làm một đề rồi quay lại nhé!'); return; }
     const r = await call('on-yeu', { exam: st.exam, ids: ids.slice(0, 40).join(','), n: 20 });
     if (!r.ok || !r.cau || !r.cau.length) throw new Error(r.loi || 'khong_co_cau');
-    st.mode = 'on'; st.part = ''; st.cau = r.cau; st.ans = {}; st.done = false; st.t0 = Date.now(); st.left = Math.round(st.cau.length * 66);
+    st.mode = 'on'; st.part = ''; st.cau = capFree(r.cau); st.ans = {}; st.done = false; st.t0 = Date.now(); st.left = Math.round(st.cau.length * 66);
     $('submit').disabled = $('submit2').disabled = false; $('submit').textContent = 'Nộp bài'; document.querySelector('.mbar').classList.remove('hide'); document.querySelector('.omr .btn').classList.remove('hide');
     renderSheet(); show('vExam'); $('vRes').classList.add('hide');
     clearInterval(st.tick); st.tick = setInterval(timer, 1000); timer();
@@ -360,6 +386,7 @@ $('again').onclick = () => { st.done = false; document.querySelector('.omr .btn'
 $('top').onclick = () => $('sheet').scrollIntoView({ behavior: 'smooth' });
 window.BI_GUIDE = 'Chào bạn! Đây là trang luyện thi. Bước một: chọn kỳ thi, dạng bài và số câu rồi bấm Bắt đầu làm đề. Bước hai: làm bài như trên tờ đề thật. Bấm vào chữ cái để chọn đáp án, hoặc gõ vào ô trống. Bên phải là phiếu trả lời cho biết bạn đã làm bao nhiêu câu. Bước ba: bấm Nộp bài để xem điểm, lời giải từng câu, mẹo làm bài và nhận sao thưởng.';
 drawHome();
+if (U && T) callTo(GOI, {}).then(r => { if (r && r.ok) { st.goi = r; drawHome(); } }).catch(() => {});
 if (Q0.get('mode') === 'on' || SPON) setTimeout(() => startOn(), 400);
 call('ds', {}).then(r => { if (r && r.ok !== false) { DS = r; drawHome(); } }).catch(() => {});
 window.addEventListener('load', () => { if (window.BiQue) $('figsHome').innerHTML = '<div style="flex:1">' + BiQue.html('nam', 'wave') + '</div><div style="flex:1">' + BiQue.html('nu', 'wave') + '</div>'; });
