@@ -212,9 +212,8 @@ function ve() {
       <h2><i class="em" aria-hidden="true">💌</i>Ba/mẹ nhận báo cáo thế nào? <i class="req" title="Bắt buộc">*</i></h2>
       <p class="hint">Bắt buộc: gói học chỉ được kích hoạt sau khi ba/mẹ đã liên kết để nhận báo cáo học tập của bạn.</p>
       ${[['chung','Dùng chung tài khoản này', laZalo() ? 'Ba/mẹ nhận báo cáo qua chính tài khoản Zalo của bạn.' : 'Ba/mẹ nhận báo cáo qua chính tài khoản của bạn.'],
-         ['rieng','Gửi link cho ba/mẹ','Ba/mẹ có tài khoản Telegram riêng. Bạn sẽ nhận một đường dẫn để gửi cho ba/mẹ.'],
+         ['rieng','Gửi link cho ba/mẹ (khuyên dùng)','Ba/mẹ có Telegram hoặc Zalo riêng. Bạn nhận đường dẫn để gửi cho ba/mẹ; ba/mẹ bấm xong là gói dùng thử 7 ngày bắt đầu.'],
          ]
-        .filter(o => !(laZalo() && o[0] === 'rieng'))
         .map(o => `<label class="radio ${S.ph===o[0]?'on':''}"><input type="radio" name="ph" value="${o[0]}" ${S.ph===o[0]?'checked':''}><div><b>${o[1]}</b><span>${o[2]}</span></div></label>`).join('')}
       ${E('ph')}
     </section>
@@ -299,7 +298,7 @@ function xong(j) {
   trang(`<div class="big" aria-hidden="true">🎉</div><h1>Đã gửi phiếu rồi!</h1>
     <p>Mình đã nhận đủ thông tin. ${laZalo() ? 'Con quay lại <b>Zalo</b>, mình đã gửi sẵn menu các dịch vụ để bạn chọn nhé.' : 'Con quay lại khung chat, mình đã gửi sẵn menu các dịch vụ để bạn chọn nhé.'}</p>
     <p class="hint">${j.linkPhuHuynh || laZalo() ? '' : 'Cửa sổ này sẽ tự đóng.'}</p>
-    ${j.linkPhuHuynh ? `<p>Bạn chuyển nguyên tin dưới đây cho ba/mẹ để nhận báo cáo sau mỗi buổi học:</p><div class="box" id="lk" style="white-space:pre-wrap">${esc(tinPH(j))}</div>
+    ${j.linkPhuHuynh ? `<p><b>Gói học sẽ bắt đầu ngay khi ba/mẹ bấm link.</b> Bạn chuyển nguyên tin dưới đây cho ba/mẹ:</p><div class="box" id="lk" style="white-space:pre-wrap">${esc(tinPH(j))}</div>
       <button type="button" class="chip" id="cp">Sao chép tin gửi ba/mẹ</button>` : ''}`);
   pop();
   if (TG && !j.linkPhuHuynh) setTimeout(() => { try { TG.close(); } catch (e) {} }, 1600);   // không có link cần sao chép -> tự đóng, quay lại chat
