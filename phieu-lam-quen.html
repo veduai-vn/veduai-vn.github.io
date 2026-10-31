@@ -81,6 +81,14 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid 
   @keyframes fall{to{transform:translateY(112vh) rotate(380deg)}}
 }
 .vf{max-width:560px;margin:6px auto 0;padding:10px 8px;text-align:center;font-size:12.5px;line-height:1.6;color:var(--mut,var(--muted,#5F6B92))}.vf a{color:inherit;font-weight:800}.req{color:#D94B4B;font-style:normal;font-weight:800;margin-left:2px}
+body{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))}
+.bar{z-index:9999}
+#bi-fab{bottom:calc(138px + env(safe-area-inset-bottom,0px))!important}
+#bi-help{bottom:calc(138px + env(safe-area-inset-bottom,0px))!important}
+#bi-tt{bottom:calc(360px + env(safe-area-inset-bottom,0px))!important}
+.bar .chip{flex:none;min-height:46px}
+body.xong #bi-fab,body.xong #bi-help{display:none!important}
+#bi-fab a.sm,#bi-fab .adm{display:none!important}   /* trang học sinh: bớt nút nổi cho gọn */
 section:has(.err){outline:2px solid #D94B4B;outline-offset:6px;border-radius:18px}
 </style>
 <style>:root{color-scheme:light}</style>
@@ -118,7 +126,7 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>'
 const hkMacDinh = () => { const m = new Date().getMonth() + 1; return (m >= 2 && m <= 8) ? '2' : '1'; };
 
 const TONG = 9;   // so muc bat buoc (de tinh thanh tien do)
-const S = { cfg: null, lop: 0, mons: {}, sach: 'Kết nối tri thức', sachKhac: '', hk: hkMacDinh(), gt: '', ten: '', nd: '', nt: '', nn: '', truong: '', tenLop: '', ngay: [], gio: '19:30', ph: '', bc: 'tuan', bcGio: '20:00', bcThu: 'CN', bcNgay: '1', nhac: '10', loi: {}, dangGui: false };
+const S = { buoc: 1, cfg: null, lop: 0, mons: {}, sach: 'Kết nối tri thức', sachKhac: '', hk: hkMacDinh(), gt: '', ten: '', nd: '', nt: '', nn: '', truong: '', tenLop: '', ngay: [], gio: '19:30', ph: '', bc: 'tuan', bcGio: '20:00', bcThu: 'CN', bcNgay: '1', nhac: '10', loi: {}, dangGui: false };
 const ngaySinhISO = () => (S.nd && S.nt && S.nn) ? S.nn + '-' + String(S.nt).padStart(2, '0') + '-' + String(S.nd).padStart(2, '0') : '';
 const ngaySinhHopLe = () => { const v = ngaySinhISO(); if (!v) return false; const d = new Date(v + 'T00:00:00'); return d.getFullYear() === Number(S.nn) && d.getMonth() + 1 === Number(S.nt) && d.getDate() === Number(S.nd); };
 
@@ -127,7 +135,7 @@ function pop() {   // 1 lần pháo giấy khi gửi xong (bỏ qua nếu bật 
   const em = ['🎉','⭐','✨','🎈','🌟','🧡'];
   for (let i = 0; i < 16; i++) { const s = document.createElement('span'); s.className = 'cf'; s.setAttribute('aria-hidden', 'true'); s.textContent = em[i % em.length]; s.style.left = (Math.random() * 94) + 'vw'; s.style.animationDelay = (Math.random() * 0.6) + 's'; document.body.appendChild(s); setTimeout(() => s.remove(), 3600); }
 }
-function trang(html) { $app.innerHTML = '<div class="state">' + html + '</div>'; }
+function trang(html) { document.body.classList.add('xong'); $app.innerHTML = '<div class="state">' + html + '</div>'; }
 
 async function khoiDong() {
   if (!/^[A-Za-z0-9]{16,64}$/.test(token)) return trang('<div class="big" aria-hidden="true">🔍</div><h1>Link chưa đúng</h1><p>Bạn mở lại phiếu từ nút trong tin nhắn của mình nhé.</p>');
@@ -142,6 +150,7 @@ async function khoiDong() {
 }
 
 function ve() {
+  document.body.classList.remove('xong');
   const full = S.cfg.soMon === 'full', gioiHan = full ? 99 : Number(S.cfg.soMon) || 1;
   const dsMon = S.lop ? monTheoLop(S.lop) : [];
   const nChon = Object.keys(S.mons).length;
@@ -153,18 +162,18 @@ function ve() {
 
   $app.innerHTML = `
   <main>
-    <div class="hero"><span class="mascot" aria-hidden="true"><svg viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><ellipse cx="100" cy="100" rx="66" ry="62" fill="#A56BE0" stroke="#3B2A55" stroke-width="3"/><ellipse cx="32" cy="132" rx="17" ry="44" fill="#A56BE0" stroke="#3B2A55" stroke-width="3" transform="rotate(10 32 132)"/><ellipse cx="168" cy="132" rx="17" ry="44" fill="#A56BE0" stroke="#3B2A55" stroke-width="3" transform="rotate(-10 168 132)"/><rect x="91" y="156" width="18" height="16" fill="#FFE4D2" stroke="#3B2A55" stroke-width="2.5"/><path d="M56 170 Q100 150 144 170 L154 230 H46 Z" fill="#24305E" stroke="#3B2A55" stroke-width="3" stroke-linejoin="round"/><path d="M78 163 L100 190 L122 163 Q100 154 78 163 Z" fill="#fff" stroke="#3B2A55" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="100" cy="108" rx="58" ry="54" fill="#FFE4D2" stroke="#3B2A55" stroke-width="3"/><g class="eyes"><ellipse cx="76" cy="112" rx="12" ry="15" fill="#2BB5C8"/><ellipse cx="76" cy="115" rx="7" ry="9.5" fill="#1d1a3a"/><circle cx="71" cy="106" r="4.8" fill="#fff"/><circle cx="81" cy="120" r="2.4" fill="#fff"/><ellipse cx="124" cy="112" rx="12" ry="15" fill="#2BB5C8"/><ellipse cx="124" cy="115" rx="7" ry="9.5" fill="#1d1a3a"/><circle cx="119" cy="106" r="4.8" fill="#fff"/><circle cx="129" cy="120" r="2.4" fill="#fff"/></g><path d="M60 103 Q76 91 92 103 M108 103 Q124 91 140 103" stroke="#3B2A55" stroke-width="3.2" fill="none" stroke-linecap="round"/><ellipse cx="57" cy="130" rx="10" ry="5.5" fill="#FF8FAB" opacity=".65"/><ellipse cx="143" cy="130" rx="10" ry="5.5" fill="#FF8FAB" opacity=".65"/><path d="M90 130 Q100 135 110 130 Q108 147 100 147 Q92 147 90 130Z" fill="#E8546E" stroke="#3B2A55" stroke-width="2.2" stroke-linejoin="round"/><path d="M94 141 Q100 138 106 141 Q103 145 100 145 Q97 145 94 141Z" fill="#FF9EB5"/><path d="M38 102 Q38 40 100 36 Q162 40 162 102 Q146 72 124 86 Q112 60 96 84 Q74 64 38 102 Z" fill="#A56BE0" stroke="#3B2A55" stroke-width="3" stroke-linejoin="round"/><path d="M62 54 Q82 44 104 46" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".55" fill="none"/><path d="M24 63 L38 72 L24 81Z M52 63 L38 72 L52 81Z" fill="#FF5C8A" stroke="#3B2A55" stroke-width="2.5" stroke-linejoin="round"/><circle cx="38" cy="72" r="4.5" fill="#FFB3C9" stroke="#3B2A55" stroke-width="2"/><path d="M148 63 L162 72 L148 81Z M176 63 L162 72 L176 81Z" fill="#FF5C8A" stroke="#3B2A55" stroke-width="2.5" stroke-linejoin="round"/><circle cx="162" cy="72" r="4.5" fill="#FFB3C9" stroke="#3B2A55" stroke-width="2"/><circle cx="64" cy="156" r="10" fill="#FFE4D2" stroke="#3B2A55" stroke-width="2.5"/><circle cx="136" cy="156" r="10" fill="#FFE4D2" stroke="#3B2A55" stroke-width="2.5"/><path class="stw" style="animation-delay:0s" d="M22 31 Q22 40 31 40 Q22 40 22 49 Q22 40 13 40 Q22 40 22 31Z" fill="#FFC400"/><path class="stw" style="animation-delay:0.6s" d="M182 27 Q182 34 189 34 Q182 34 182 41 Q182 34 175 34 Q182 34 182 27Z" fill="#FF8FAB"/><path class="stw" style="animation-delay:1.1s" d="M176 94 Q176 100 182 100 Q176 100 176 106 Q176 100 170 100 Q176 100 176 94Z" fill="#14C7D8"/></svg></span><div class="bubble"><h1>Mình làm quen nhé!</h1><p class="lead">Điền một lần, mình lập lộ trình học cho bạn ngay. Chỉ khoảng 1 phút thôi.</p>${gv.ten ? `<p class="lead" style="margin-top:6px">👩‍🏫 Lớp của ${esc(gv.ten)}${gv.truong ? ' · ' + esc(gv.truong) : ''}</p>` : ''}</div></div>
+    <div class="hero"><span class="mascot" aria-hidden="true"><svg viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><ellipse cx="100" cy="100" rx="66" ry="62" fill="#A56BE0" stroke="#3B2A55" stroke-width="3"/><ellipse cx="32" cy="132" rx="17" ry="44" fill="#A56BE0" stroke="#3B2A55" stroke-width="3" transform="rotate(10 32 132)"/><ellipse cx="168" cy="132" rx="17" ry="44" fill="#A56BE0" stroke="#3B2A55" stroke-width="3" transform="rotate(-10 168 132)"/><rect x="91" y="156" width="18" height="16" fill="#FFE4D2" stroke="#3B2A55" stroke-width="2.5"/><path d="M56 170 Q100 150 144 170 L154 230 H46 Z" fill="#24305E" stroke="#3B2A55" stroke-width="3" stroke-linejoin="round"/><path d="M78 163 L100 190 L122 163 Q100 154 78 163 Z" fill="#fff" stroke="#3B2A55" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="100" cy="108" rx="58" ry="54" fill="#FFE4D2" stroke="#3B2A55" stroke-width="3"/><g class="eyes"><ellipse cx="76" cy="112" rx="12" ry="15" fill="#2BB5C8"/><ellipse cx="76" cy="115" rx="7" ry="9.5" fill="#1d1a3a"/><circle cx="71" cy="106" r="4.8" fill="#fff"/><circle cx="81" cy="120" r="2.4" fill="#fff"/><ellipse cx="124" cy="112" rx="12" ry="15" fill="#2BB5C8"/><ellipse cx="124" cy="115" rx="7" ry="9.5" fill="#1d1a3a"/><circle cx="119" cy="106" r="4.8" fill="#fff"/><circle cx="129" cy="120" r="2.4" fill="#fff"/></g><path d="M60 103 Q76 91 92 103 M108 103 Q124 91 140 103" stroke="#3B2A55" stroke-width="3.2" fill="none" stroke-linecap="round"/><ellipse cx="57" cy="130" rx="10" ry="5.5" fill="#FF8FAB" opacity=".65"/><ellipse cx="143" cy="130" rx="10" ry="5.5" fill="#FF8FAB" opacity=".65"/><path d="M90 130 Q100 135 110 130 Q108 147 100 147 Q92 147 90 130Z" fill="#E8546E" stroke="#3B2A55" stroke-width="2.2" stroke-linejoin="round"/><path d="M94 141 Q100 138 106 141 Q103 145 100 145 Q97 145 94 141Z" fill="#FF9EB5"/><path d="M38 102 Q38 40 100 36 Q162 40 162 102 Q146 72 124 86 Q112 60 96 84 Q74 64 38 102 Z" fill="#A56BE0" stroke="#3B2A55" stroke-width="3" stroke-linejoin="round"/><path d="M62 54 Q82 44 104 46" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".55" fill="none"/><path d="M24 63 L38 72 L24 81Z M52 63 L38 72 L52 81Z" fill="#FF5C8A" stroke="#3B2A55" stroke-width="2.5" stroke-linejoin="round"/><circle cx="38" cy="72" r="4.5" fill="#FFB3C9" stroke="#3B2A55" stroke-width="2"/><path d="M148 63 L162 72 L148 81Z M176 63 L162 72 L176 81Z" fill="#FF5C8A" stroke="#3B2A55" stroke-width="2.5" stroke-linejoin="round"/><circle cx="162" cy="72" r="4.5" fill="#FFB3C9" stroke="#3B2A55" stroke-width="2"/><circle cx="64" cy="156" r="10" fill="#FFE4D2" stroke="#3B2A55" stroke-width="2.5"/><circle cx="136" cy="156" r="10" fill="#FFE4D2" stroke="#3B2A55" stroke-width="2.5"/><path class="stw" style="animation-delay:0s" d="M22 31 Q22 40 31 40 Q22 40 22 49 Q22 40 13 40 Q22 40 22 31Z" fill="#FFC400"/><path class="stw" style="animation-delay:0.6s" d="M182 27 Q182 34 189 34 Q182 34 182 41 Q182 34 175 34 Q182 34 182 27Z" fill="#FF8FAB"/><path class="stw" style="animation-delay:1.1s" d="M176 94 Q176 100 182 100 Q176 100 176 106 Q176 100 170 100 Q176 100 176 94Z" fill="#14C7D8"/></svg></span><div class="bubble">${S.buoc === 1 ? '<h1>Mình làm quen nhé!</h1><p class="lead">Bước 1/2. Chỉ cần chọn lớp là đi tiếp được, mấy mục khác bạn điền hay bỏ qua đều được.</p>' : '<h1>Bước cuối: ba/mẹ của bạn</h1><p class="lead">Bước 2/2. Chọn cách ba/mẹ nhận báo cáo, rồi gửi phiếu.</p>'}${gv.ten ? `<p class="lead" style="margin-top:6px">👩‍🏫 Lớp của ${esc(gv.ten)}${gv.truong ? ' · ' + esc(gv.truong) : ''}</p>` : ''}</div></div>
 
-    <section>
+    <section ${S.buoc === 1 ? '' : 'hidden'}>
       <h2><i class="em" aria-hidden="true">🎒</i>Bạn học lớp mấy? <i class="req" title="Bắt buộc">*</i></h2>
       <div class="row lop" role="group" aria-label="Lớp">
         ${[1,2,3,4,5,6,7,8,9,10,11,12].map(n => `<button type="button" class="chip" data-lop="${n}" aria-pressed="${S.lop===n}">Lớp ${n}</button>`).join('')}
       </div>${E('lop')}
     </section>
 
-    <section ${S.lop ? '' : 'hidden'}>
-      <h2><i class="em" aria-hidden="true">📚</i>Bạn muốn học môn nào? <i class="req" title="Bắt buộc">*</i></h2>
-      <p class="hint">${full ? 'Gói Full: bạn học đủ các môn của lớp ' + S.lop + '.' : 'Gói của bạn được chọn tối đa ' + gioiHan + ' môn (đã chọn ' + nChon + ').'} Bộ sách Kết nối tri thức. Hỏi đáp tự do luôn có cho mọi môn.</p>
+    <section ${S.buoc === 1 && S.lop ? '' : 'hidden'}>
+      <h2><i class="em" aria-hidden="true">📚</i>Bạn muốn học môn nào? <small class="hint">(không bắt buộc)</small></h2>
+      <p class="hint">${full ? 'Gói Full: bạn học đủ các môn của lớp ' + S.lop + '.' : 'Gói của bạn được chọn tối đa ' + gioiHan + ' môn (đã chọn ' + nChon + ').'} Bộ sách Kết nối tri thức. Không chọn thì mình xếp đủ các môn của lớp. Hỏi đáp tự do luôn có cho mọi môn.</p>
       <div>
       ${dsMon.map(m => { const x = S.mons[m]; return `
         <div class="mon">
@@ -173,33 +182,33 @@ function ve() {
       </div>${E('mons')}
     </section>
 
-    <section>
-      <h2><i class="em" aria-hidden="true">🌟</i>Về bạn <small class="hint">(mục có dấu * đỏ là bắt buộc)</small></h2>
+    <section ${S.buoc === 1 ? '' : 'hidden'}>
+      <h2><i class="em" aria-hidden="true">🌟</i>Về bạn <small class="hint">(không bắt buộc, có thể bỏ qua)</small></h2>
       <div style="display:grid;gap:12px">
-        <div><label class="f" for="ten">Họ và tên của bạn <i class="req" title="Bắt buộc">*</i></label>
+        <div><label class="f" for="ten">Họ và tên của bạn</label>
           <input id="ten" type="text" maxlength="60" autocomplete="name" value="${esc(S.ten)}" placeholder="Ví dụ: Nguyễn Minh Anh">${E('ten')}</div>
-        <div><label class="f">Ngày tháng năm sinh <i class="req" title="Bắt buộc">*</i></label>
+        <div><label class="f">Ngày tháng năm sinh</label>
           <div class="dob">
             <select id="nd" aria-label="Ngày"><option value="">Ngày</option>${days.map(y => `<option ${String(y)===String(S.nd)?'selected':''}>${y}</option>`).join('')}</select>
             <select id="nt" aria-label="Tháng"><option value="">Tháng</option>${months.map(y => `<option ${String(y)===String(S.nt)?'selected':''}>${y}</option>`).join('')}</select>
             <select id="ns" aria-label="Năm"><option value="">Năm</option>${years.map(y => `<option ${String(y)===String(S.nn)?'selected':''}>${y}</option>`).join('')}</select>
           </div>${E('ns')}</div>
-        <div><label class="f">Bạn là <i class="req" title="Bắt buộc">*</i></label>
+        <div><label class="f">Bạn là</label>
           <div class="seg" role="group" aria-label="Giới tính" style="max-width:240px">
             <button type="button" data-gt="Nam" aria-pressed="${S.gt==='Nam'}">Nam</button>
             <button type="button" data-gt="Nữ" aria-pressed="${S.gt==='Nữ'}">Nữ</button>
           </div>${E('gt')}</div>
         <div class="two">
-          <div><label class="f" for="truong">Trường <i class="req" title="Bắt buộc">*</i></label>
+          <div><label class="f" for="truong">Trường</label>
             <input id="truong" type="text" maxlength="80" value="${esc(S.truong)}" placeholder="Ví dụ: THCS Nguyễn Du">${E('truong')}</div>
-          <div><label class="f" for="tenlop">Lớp (ví dụ 7A2) <i class="req" title="Bắt buộc">*</i></label>
+          <div><label class="f" for="tenlop">Lớp (ví dụ 7A2)</label>
             <input id="tenlop" type="text" maxlength="20" value="${esc(S.tenLop)}" placeholder="Ví dụ: 7A2">${E('tenlop')}</div>
         </div>
       </div>
     </section>
 
-    <section>
-      <h2><i class="em" aria-hidden="true">⏰</i>Lịch học <i class="req" title="Bắt buộc">*</i></h2>
+    <section ${S.buoc === 1 ? '' : 'hidden'}>
+      <h2><i class="em" aria-hidden="true">⏰</i>Lịch học <small class="hint">(không bắt buộc)</small></h2>
       <p class="hint">Chọn các ngày bạn học trong tuần và giờ học. Mình sẽ nhắc bạn đúng giờ.</p>
       <div class="row" role="group" aria-label="Ngày học">
         ${NGAY.map(d => `<button type="button" class="chip" data-ngay="${d}" aria-pressed="${S.ngay.includes(d)}">${d}</button>`).join('')}
@@ -208,7 +217,7 @@ function ve() {
       ${E('lich')}
     </section>
 
-    <section>
+    <section ${S.buoc === 2 ? '' : 'hidden'}>
       <h2><i class="em" aria-hidden="true">💌</i>Ba/mẹ nhận báo cáo thế nào? <i class="req" title="Bắt buộc">*</i></h2>
       <p class="hint">Bắt buộc: gói học chỉ được kích hoạt sau khi ba/mẹ đã liên kết để nhận báo cáo học tập của bạn.</p>
       ${[['chung','Dùng chung tài khoản này', laZalo() ? 'Ba/mẹ nhận báo cáo qua chính tài khoản Zalo của bạn.' : 'Ba/mẹ nhận báo cáo qua chính tài khoản của bạn.'],
@@ -218,7 +227,7 @@ function ve() {
       ${E('ph')}
     </section>
 
-    ${S.ph && S.ph !== 'boqua' ? `<section>
+    ${S.buoc === 2 && S.ph ? `<section>
       <h2><i class="em" aria-hidden="true">📬</i>Báo cáo nhanh &amp; nhắc giờ học cho ba/mẹ <small class="hint">(không bắt buộc, có thể bỏ qua)</small></h2>
       <p class="hint">Báo cáo ngắn gọn: tuân thủ giờ học, điểm, bài kiểm tra. Ba/mẹ xem chi tiết bằng đường link trong bot. Ba/mẹ có thể đổi lại bất cứ lúc nào.</p>
       <div class="row" role="group" aria-label="Tần suất báo cáo">
@@ -233,52 +242,31 @@ function ve() {
       </div>
     </section>` : ''}
   </main>
-  <div class="bar"><div class="prog" aria-hidden="true"><i id="pg" style="width:${Math.round((TONG - thieu().length) / TONG * 100)}%"></i></div><div class="bar-in">
-    <p id="tt">${thieu().length ? 'Còn ' + thieu().length + ' mục nữa thôi nè 🐾' : 'Xong hết rồi, gửi thôi! 🚀'}</p>
-    <button type="button" class="go" id="go" ${S.dangGui ? 'disabled' : ''}>${S.dangGui ? 'Đang gửi…' : 'Gửi phiếu 🚀'}</button>
+  <div class="bar"><div class="prog" aria-hidden="true"><i id="pg" style="width:${S.buoc === 1 ? 50 : 100}%"></i></div><div class="bar-in">
+    ${S.buoc === 2 ? '<button type="button" class="chip" id="back">‹ Quay lại</button>' : ''}
+    <p id="tt">${S.buoc === 1 ? 'Bước 1/2 · chỉ cần chọn lớp' : (S.ph ? 'Xong rồi, gửi thôi! 🚀' : 'Chọn cách nhận báo cáo nhé')}</p>
+    <button type="button" class="go" id="go" ${S.dangGui ? 'disabled' : ''}>${S.dangGui ? 'Đang gửi…' : (S.buoc === 1 ? 'Tiếp tục ›' : 'Gửi phiếu 🚀')}</button>
   </div></div>`;
 }
 
-function thieu() {
-  const t = [];
-  if (!S.lop) t.push('lop');
-  if (!Object.keys(S.mons).length) t.push('mons');
-  if (S.ten.trim().split(/\s+/).filter(Boolean).length < 2) t.push('ten');
-  if (!ngaySinhHopLe()) t.push('ns');
-  if (!S.gt) t.push('gt');
-  if (!S.truong.trim()) t.push('truong');
-  if (!S.tenLop.trim()) t.push('tenlop');
-  if (!S.ngay.length || !/^\d{1,2}:\d{2}$/.test(S.gio)) t.push('lich');
-  if (!S.ph) t.push('ph');
-  return t;
-}
-
-function kiemTra() {
+function kiemTra() {   // chỉ 2 mục bắt buộc: lớp (bước 1) và cách ba/mẹ nhận báo cáo (bước 2)
   const L = {};
   if (!S.lop) L.lop = 'Chọn lớp của bạn.';
-  const ms = Object.keys(S.mons);
-  if (!ms.length) L.mons = 'Chọn ít nhất một môn.';
-  if (S.ten.trim().split(/\s+/).filter(Boolean).length < 2) L.ten = 'Nhập đủ họ và tên của bạn.';
-  if (!S.nd || !S.nt || !S.nn) L.ns = 'Chọn đủ ngày, tháng, năm sinh.';
-  else if (!ngaySinhHopLe()) L.ns = 'Ngày sinh chưa đúng, bạn kiểm tra lại nhé.';
-  if (!S.gt) L.gt = 'Chọn nam hoặc nữ.';
-  if (!S.truong.trim()) L.truong = 'Nhập tên trường.';
-  if (!S.tenLop.trim()) L.tenlop = 'Nhập tên lớp, ví dụ 7A2.';
-  if (!S.ngay.length) L.lich = 'Chọn ít nhất một ngày học.';
-  else if (!/^\d{1,2}:\d{2}$/.test(S.gio)) L.lich = 'Chọn giờ học.';
-  if (!S.ph) L.ph = 'Chọn một cách nhận báo cáo.';
+  if (S.buoc === 2 && !S.ph) L.ph = 'Chọn một cách nhận báo cáo.';
   return L;
 }
+function thieu() { return Object.keys(kiemTra()); }
 
 async function gui() {
   S.loi = kiemTra();
   if (Object.keys(S.loi).length) { ve(); const e = document.querySelector('.err'); if (e) e.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
+  if (S.buoc === 1) { S.buoc = 2; ve(); window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
   S.dangGui = true; ve();
   const body = {
     t: token, lop: S.lop,
     mons: Object.keys(S.mons).map(m => ({ mon: m, ht: S.mons[m].ht, chu_de: S.mons[m].cd.trim(), tien_do: S.mons[m].td.trim() })),
     bo_sach: 'Kết nối tri thức', hoc_ki: S.hk,   // chi hoc 1 bo sach; hoc ki tu suy theo thang (hoi lai chi tiet khi bat dau hoc)
-    ho_ten: S.ten.trim(), ngay_sinh: ngaySinhISO(), nam_sinh: Number(S.nn), gioi_tinh: S.gt, truong: S.truong.trim(), ten_lop: S.tenLop.trim(), ngay: S.ngay, gio: S.gio, phu_huynh: S.ph,
+    ho_ten: S.ten.trim(), ngay_sinh: ngaySinhISO(), nam_sinh: Number(S.nn) || 0, gioi_tinh: S.gt, truong: S.truong.trim(), ten_lop: S.tenLop.trim(), ngay: S.ngay, gio: S.ngay.length ? S.gio : '', phu_huynh: S.ph,
     bao_cao: { tan_suat: S.bc, gio: S.bcGio, thu: S.bcThu, ngay: Number(S.bcNgay), nhac: Number(S.nhac) }
   };
   try {
@@ -294,23 +282,48 @@ function tinPH(j) {   // tin học sinh chuyển cho ba/mẹ: có cả cách Tel
   return 'Chào ba/mẹ, đây là cách nhận báo cáo học tập của con trên Mọt sách:\n• Ba/mẹ dùng Telegram: bấm ' + j.linkPhuHuynh + '\n• ' + (j.huongDanZalo || '');
 }
 
-function xong(j) {
-  const web = !!j.vaoUrl && !TG;   // trên Zalo/web: chuyển thẳng sang trang học, không bắt quay lại chat
-  const coLink = !!j.linkPhuHuynh;
-  trang(`<div class="big" aria-hidden="true">🎉</div><h1>Đã gửi phiếu rồi!</h1>
-    <p>Mình đã nhận đủ thông tin.${web ? (coLink ? '' : ' Đang mở trang học cho bạn…') : ' Con quay lại khung chat, mình đã gửi sẵn menu các dịch vụ để bạn chọn nhé.'}</p>
-    ${coLink ? `<p><b>Gói học sẽ bắt đầu ngay khi ba/mẹ bấm link.</b> Bạn chuyển nguyên tin dưới đây cho ba/mẹ:</p><div class="box" id="lk" style="white-space:pre-wrap">${esc(tinPH(j))}</div>
-      <button type="button" class="chip" id="cp">Sao chép tin gửi ba/mẹ</button>` : ''}
-    ${web ? `<p style="margin-top:14px"><a class="chip" id="vao" href="${esc(j.vaoUrl)}">📚 Vào trang học ngay</a></p>` : ''}`);
+function vaoHoc(j, web) {
+  trang(`<div class="big" aria-hidden="true">🎉</div><h1>Xác nhận thành công!</h1>
+    <p>${web ? 'Chính thức vào học nhé. Đang mở trang học cho bạn…' : 'Bạn quay lại khung chat để bắt đầu học nhé.'}</p>
+    ${web ? `<p style="margin-top:14px"><a class="chip" href="${esc(j.vaoUrl)}">📚 Vào học ngay</a></p>` : ''}`);
   pop();
-  if (TG && !coLink) setTimeout(() => { try { TG.close(); } catch (e) {} }, 1600);   // Telegram: không có link cần sao chép -> tự đóng, quay lại chat
-  if (web && !coLink) setTimeout(() => { location.href = j.vaoUrl; }, 1800);
+  if (web) setTimeout(() => { location.href = j.vaoUrl; }, 1500);
+  else if (TG) setTimeout(() => { try { TG.close(); } catch (e) {} }, 2000);
+}
+
+function xong(j) {
+  const web = !!j.vaoUrl && !TG;   // trên Zalo/web: đi tiếp ngay trên trang này, không bắt quay lại chat
+  if (!j.linkPhuHuynh) {   // dùng chung: bấm xác nhận
+    trang(`<div class="big" aria-hidden="true">🤝</div><h1>Dùng chung tài khoản</h1>
+      <p>Ba/mẹ nhận báo cáo ngay trên tài khoản này. Bạn bấm nút dưới để xác nhận.</p>
+      <button type="button" class="go" id="xn">✅ Bấm để xác nhận</button>`);
+    document.getElementById('xn').onclick = () => vaoHoc(j, web);
+    return;
+  }
+  let u = '', t = ''; try { const p = new URL(j.vaoUrl).searchParams; u = p.get('u') || ''; t = p.get('t') || ''; } catch (e) {}
+  const hocThu = 'hoc-ngay.html' + (u ? '?u=' + encodeURIComponent(u) + '&t=' + t : '');
+  trang(`<div class="big" aria-hidden="true">📨</div><h1>Gửi link cho ba/mẹ</h1>
+    <p>Bạn bấm <b>Copy</b> rồi gửi tin dưới đây cho ba/mẹ. Ba/mẹ bấm vào là xác nhận xong, bạn sẽ được học chính thức.</p>
+    <div class="box" id="lk" style="white-space:pre-wrap">${esc(tinPH(j))}</div>
+    <button type="button" class="go" id="cp">📋 Copy gửi ba/mẹ</button>
+    <p class="hint" id="cho" style="margin-top:18px">⏳ Đang chờ ba/mẹ bấm link… (trang này tự cập nhật)</p>
+    ${web ? `<p><a class="chip" href="${esc(hocThu)}">📚 Học thử trong lúc chờ</a></p>` : ''}`);
+  pop();
   const cp = document.getElementById('cp');
-  if (cp) cp.onclick = async () => { try { await navigator.clipboard.writeText(tinPH(j)); cp.textContent = 'Đã sao chép'; } catch (e) { cp.textContent = 'Hãy giữ và sao chép đường dẫn ở trên'; } };
+  cp.onclick = async () => { try { await navigator.clipboard.writeText(tinPH(j)); cp.textContent = '✅ Đã copy, gửi cho ba/mẹ nhé'; } catch (e) { cp.textContent = 'Hãy giữ và chép đoạn tin ở trên'; } };
+  if (!u || !t) return;
+  const t0 = Date.now();
+  const tim = setInterval(async () => {   // hỏi máy chủ xem ba/mẹ đã bấm link chưa
+    if (Date.now() - t0 > 30 * 60 * 1000) return clearInterval(tim);
+    try {
+      const r = await (await fetch(API + '/web-trang-thai', { method: 'POST', headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' }, body: JSON.stringify({ u, t }) })).json();
+      if (r && r.ok && r.active) { clearInterval(tim); vaoHoc(j, web); }
+    } catch (e) {}
+  }, 4000);
 }
 
 $app.addEventListener('click', e => {
-  const b = e.target.closest('button'); if (!b || b.id === 'go') return;
+  const b = e.target.closest('button'); if (!b || b.id === 'go' || b.id === 'back') return;
   const d = b.dataset;
   if (d.lop) { const n = Number(d.lop); if (n !== S.lop) { S.lop = n; S.mons = {}; if (S.cfg.soMon === 'full') monTheoLop(n).forEach(m => S.mons[m] = { ht: 'sgk', cd: '', td: '' }); } }
   else if (d.ht) S.mons[d.m].ht = d.ht;
@@ -345,10 +358,8 @@ $app.addEventListener('input', e => {   // gõ chữ: chỉ cập nhật state, 
   else if (t.id === 'ten') S.ten = t.value;
   else if (t.id === 'truong') S.truong = t.value;
   else if (t.id === 'tenlop') S.tenLop = t.value;
-  const pg = document.getElementById('pg'); if (pg) pg.style.width = Math.round((TONG - thieu().length) / TONG * 100) + '%';
-  const tt = document.getElementById('tt'); if (tt) tt.textContent = thieu().length ? 'Còn ' + thieu().length + ' mục nữa thôi nè 🐾' : 'Xong hết rồi, gửi thôi! 🚀';
 });
-$app.addEventListener('click', e => { if (e.target.id === 'go') gui(); });
+$app.addEventListener('click', e => { if (e.target.id === 'go') gui(); else if (e.target.id === 'back') { S.buoc = 1; S.loi = {}; ve(); window.scrollTo({ top: 0, behavior: 'smooth' }); } });
 
 khoiDong();
 </script>
